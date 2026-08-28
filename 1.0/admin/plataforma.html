@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Super Admin · Plataforma</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+<link rel="stylesheet" href="../css/admin.css">
+</head>
+<body class="creator-body">
+<header class="creator-topbar">
+  <div class="creator-brand"><span class="creator-logo">N</span><div><strong>Super Admin</strong><small>Control de la plataforma</small></div></div>
+  <div class="creator-top-actions">
+    <button id="refresh-platform" class="btn btn-ghost">Actualizar</button>
+    <a href="index.html" class="btn btn-ghost">Panel negocio</a>
+    <button id="btn-logout" class="btn btn-ghost">Salir</button>
+  </div>
+</header>
+
+<div class="creator-layout">
+  <aside class="creator-sidebar">
+    <nav>
+      <a href="#resumen" class="active">⌂ <span>Resumen</span></a>
+      <a href="#negocios">▦ <span>Negocios</span></a>
+      <a href="#suscripciones">◇ <span>Suscripciones</span></a>
+      <a href="#alertas">! <span>Alertas</span></a>
+    </nav>
+    <div class="creator-sidebar-foot">Vista exclusiva del creador</div>
+  </aside>
+
+  <main class="creator-main">
+    <section id="resumen" class="creator-hero">
+      <div><div class="eyebrow">OPERACIÓN SAAS</div><h1>Tu plataforma, de un vistazo</h1><p>Negocios, pruebas, ingresos recurrentes y salud operativa en un solo lugar.</p></div>
+      <div class="creator-date" id="creator-date">—</div>
+    </section>
+
+    <section class="creator-kpis">
+      <article><span>MRR</span><strong id="kpi-mrr">—</strong><small id="kpi-mrr-note">Mensual recurrente</small></article>
+      <article><span>Negocios</span><strong id="kpi-businesses">—</strong><small id="kpi-businesses-note">registrados</small></article>
+      <article><span>En prueba</span><strong id="kpi-trials">—</strong><small id="kpi-trials-note">30 días gratis</small></article>
+      <article><span>Pagando</span><strong id="kpi-paying">—</strong><small id="kpi-paying-note">suscripciones activas</small></article>
+      <article><span>Riesgo</span><strong id="kpi-risk">—</strong><small>vencidas / por vencer</small></article>
+    </section>
+
+    <section class="creator-grid-2" id="suscripciones">
+      <article class="creator-card">
+        <div class="creator-card-head"><div><span class="eyebrow">PLANES</span><h2>Distribución de suscripciones</h2></div><span class="creator-soft" id="plans-total">0 negocios</span></div>
+        <div id="plan-distribution" class="plan-distribution"></div>
+      </article>
+      <article class="creator-card">
+        <div class="creator-card-head"><div><span class="eyebrow">INGRESOS</span><h2>Pagos de plataforma</h2></div><span class="creator-soft" id="payments-period">Últimos 6 meses</span></div>
+        <div id="payment-chart" class="creator-bars"></div>
+        <div class="creator-inline-stats"><div><span>Cobrado</span><strong id="payments-collected">$0</strong></div><div><span>Pendiente/fallido</span><strong id="payments-risk">$0</strong></div></div>
+      </article>
+    </section>
+
+    <section class="creator-card" id="alertas">
+      <div class="creator-card-head"><div><span class="eyebrow">ATENCIÓN</span><h2>Alertas de plataforma</h2></div><span id="alert-count" class="creator-soft">0 alertas</span></div>
+      <div id="platform-alerts" class="creator-alerts"></div>
+    </section>
+
+    <section class="creator-card" id="negocios">
+      <div class="creator-card-head creator-business-head">
+        <div><span class="eyebrow">CLIENTES SAAS</span><h2>Negocios</h2></div>
+        <div class="creator-controls">
+          <input id="business-search" class="input" placeholder="Buscar negocio, correo o slug">
+          <select id="business-filter" class="input"><option value="all">Todos</option><option value="trial">En prueba</option><option value="active">Pagando</option><option value="risk">En riesgo</option><option value="suspended">Suspendido</option><option value="no-sub">Sin suscripción</option></select>
+        </div>
+      </div>
+      <div id="business-table" class="creator-business-table"></div>
+    </section>
+  </main>
+</div>
+
+<nav class="creator-mobile-nav" aria-label="Super Admin móvil">
+  <a href="#resumen" class="active"><span>⌂</span>Inicio</a><a href="#negocios"><span>▦</span>Negocios</a><a href="#suscripciones"><span>◇</span>Planes</a><a href="#alertas"><span>!</span>Alertas</a>
+</nav>
+
+<div id="business-drawer" class="creator-drawer" aria-hidden="true">
+  <div class="creator-drawer-backdrop" data-close-drawer></div>
+  <aside class="creator-drawer-panel">
+    <div class="creator-drawer-head"><div><span class="eyebrow">DETALLE DEL NEGOCIO</span><h2 id="drawer-name">—</h2></div><button class="creator-icon-btn" data-close-drawer>×</button></div>
+    <div id="drawer-content"></div>
+  </aside>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/config.js"></script>
+<script src="../js/supabase.js"></script>
+<script src="../js/admin-auth.js"></script>
+<script src="../js/admin-platform.js"></script>
+</body>
+</html>

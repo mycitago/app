@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panel · Iniciar sesión</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+<link rel="stylesheet" href="../css/admin.css">
+<style>
+  .adm-links { display: flex; justify-content: space-between; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .adm-link { color: #9d2b4f; font-size: 13px; cursor: pointer; text-decoration: underline; background: none; border: none; padding: 0; }
+  .adm-info { color: #1e5c3a; margin-top: 12px; font-size: 14px; }
+</style>
+</head>
+<body class="adm-login-body">
+
+<main class="adm-login-card">
+  <h1 id="card-title">Panel administrativo</h1>
+  <p class="text-muted" id="card-sub">Ingresa con tu cuenta de administrador.</p>
+
+  <!-- LOGIN -->
+  <div id="view-login">
+    <div class="field">
+      <label for="login-email">Correo</label>
+      <input type="email" id="login-email" autocomplete="email" placeholder="tu@correo.com">
+    </div>
+    <div class="field">
+      <label for="login-password">Contraseña</label>
+      <input type="password" id="login-password" autocomplete="current-password">
+    </div>
+    <button id="btn-login" class="btn btn-primary">Entrar</button>
+    <div class="adm-links">
+      <button class="adm-link" data-view="forgot">¿Olvidaste tu contraseña?</button>
+      <button class="adm-link" data-view="register">Crear una cuenta</button>
+    </div>
+  </div>
+
+  <!-- REGISTRO -->
+  <div id="view-register" class="hidden">
+    <div class="field">
+      <label for="reg-business">Nombre de tu estética</label>
+      <input type="text" id="reg-business" placeholder="Ej. Estética Glamour">
+      <div class="adm-note" id="reg-slug-preview" style="font-size:12px;color:#6b5a5e;margin-top:4px;"></div>
+    </div>
+    <div class="field">
+      <label for="reg-whatsapp">WhatsApp del negocio (10 dígitos)</label>
+      <input type="tel" id="reg-whatsapp" inputmode="numeric" placeholder="Ej. 5512345678">
+    </div>
+    <div class="field">
+      <label for="reg-email">Correo</label>
+      <input type="email" id="reg-email" autocomplete="email" placeholder="tu@correo.com">
+    </div>
+    <div class="field">
+      <label for="reg-password">Contraseña (mínimo 10 caracteres)</label>
+      <input type="password" id="reg-password" autocomplete="new-password">
+    </div>
+    <button id="btn-register" class="btn btn-primary">Crear cuenta y negocio</button>
+    <div class="adm-links">
+      <button class="adm-link" data-view="login">Ya tengo cuenta</button>
+    </div>
+  </div>
+
+  <!-- OLVIDÉ CONTRASEÑA -->
+  <div id="view-forgot" class="hidden">
+    <div class="field">
+      <label for="forgot-email">Correo</label>
+      <input type="email" id="forgot-email" autocomplete="email" placeholder="tu@correo.com">
+    </div>
+    <button id="btn-forgot" class="btn btn-primary">Enviar enlace de recuperación</button>
+    <div class="adm-links">
+      <button class="adm-link" data-view="login">Volver a iniciar sesión</button>
+    </div>
+  </div>
+
+  <!-- NUEVA CONTRASEÑA (al abrir el enlace del correo) -->
+  <div id="view-reset" class="hidden">
+    <div class="field">
+      <label for="reset-password">Nueva contraseña</label>
+      <input type="password" id="reset-password" autocomplete="new-password">
+    </div>
+    <button id="btn-reset" class="btn btn-primary">Guardar nueva contraseña</button>
+  </div>
+
+  <p id="msg-error" class="adm-error hidden"></p>
+  <p id="msg-info" class="adm-info hidden"></p>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/config.js"></script>
+<script src="../js/supabase.js"></script>
+<script src="../js/theme.js"></script>
+<script src="../js/starter-kit.js"></script>
+<script>
+  if (typeof LOCAL_NO_LOGIN !== 'undefined' && LOCAL_NO_LOGIN) {
+    window.location.replace('index.html');
+  }
+</script>
+<script>
+  const DEFAULT_HOURS = {
+    sun: null,
+    mon: { open: '09:00', close: '19:00' },
+    tue: { open: '09:00', close: '19:00' },
+    wed: { open: '09:00', close: '19:00' },
+    thu: { open: '09:00', close: '19:00' },
+    fri: { open: '09:00', close: '20:00' },
+    sat: { open: '10:00', close: '16:00' },
+  };
+
+  const views = ['login', 'register', 'forgot', 'reset'];
+  const titles = {
+    login: ['Panel administrativo', 'Ingresa con tu cuenta de administrador.'],
+    register: ['Registra tu estética', 'Crea tu cuenta y tu negocio en un solo paso.'],
+    forgot: ['Recuperar contraseña', 'Te enviaremos un enlace por correo.'],
+    reset: ['Nueva contraseña', 'Escribe tu nueva contraseña.'],
+  };
+
+  function showView(name) {
+    views.forEach((v) => document.getElementById('view-' + v).classList.toggle('hidden', v !== name));
+    document.getElementById('card-title').textContent = titles[name][0];
+    document.getElementById('card-sub').textContent = titles[name][1];
+    hideMsgs();
+  }
+
+  function showError(msg) {
+    document.getElementById('msg-error').textContent = msg;
+    document.getElementById('msg-error').classList.remove('hidden');
+    document.getElementById('msg-info').classList.add('hidden');
+  }
+
+  function showInfo(msg) {
+    document.getElementById('msg-info').textContent = msg;
+    document.getElementById('msg-info').classList.remove('hidden');
+    document.getElementById('msg-error').classList.add('hidden');
+  }
+
+  function hideMsgs() {
+    document.getElementById('msg-error').classList.add('hidden');
+    document.getElementById('msg-info').classList.add('hidden');
+  }
+
+  function mapLoginError(msg) {
+    if (/invalid login credentials/i.test(msg || '')) return 'Correo o contraseña incorrectos.';
+    if (/not confirmed/i.test(msg || '')) return 'La cuenta no está confirmada todavía.';
+    return msg || 'No se pudo iniciar sesión.';
+  }
+
+  function onlyDigits(s) { return (s || '').replace(/\D/g, ''); }
+
+  // Vista previa en vivo del slug mientras la persona escribe el nombre.
+  document.getElementById('reg-business').addEventListener('input', (e) => {
+    const preview = document.getElementById('reg-slug-preview');
+    const slug = slugify(e.target.value);
+    preview.textContent = slug ? `Tu link será: ${getAppBaseUrl()}?n=${slug}` : '';
+  });
+
+  async function handleLogin() {
+    hideMsgs();
+    const btn = document.getElementById('btn-login');
+    btn.disabled = true; btn.textContent = 'Entrando…';
+
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+    btn.disabled = false; btn.textContent = 'Entrar';
+    if (error) { showError(mapLoginError(error.message)); return; }
+
+    // El creador entra directamente a Plataforma; cada estética entra a su propio panel.
+    const userId = data?.user?.id;
+    if (userId) {
+      const { data: platformAdmin } = await supabaseClient
+        .from('platform_admins')
+        .select('id')
+        .eq('id', userId)
+        .maybeSingle();
+      if (platformAdmin) {
+        window.location.replace('plataforma.html');
+        return;
+      }
+    }
+    window.location.replace('index.html');
+  }
+
+  /**
+   * Genera un slug único consultando la tabla businesses.
+   * Si el slug base ya existe, agrega un sufijo corto aleatorio.
+   */
+  async function generateUniqueSlug(name) {
+    const base = slugify(name) || 'negocio';
+    let candidate = base;
+
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const { data, error } = await supabaseClient
+        .from('businesses')
+        .select('id')
+        .eq('slug', candidate)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error verificando slug:', error);
+        break;
+      }
+      if (!data) return candidate;
+
+      candidate = `${base}-${Math.random().toString(36).slice(2, 6)}`;
+    }
+
+    // último recurso: garantizado único por timestamp
+    return `${base}-${Date.now().toString(36)}`;
+  }
+
+  // REGISTRO: crea la cuenta Y el negocio en un solo paso (onboarding SaaS)
+  async function handleRegister() {
+    hideMsgs();
+    const bizName = document.getElementById('reg-business').value.trim();
+    const digits = onlyDigits(document.getElementById('reg-whatsapp').value);
+    const email = document.getElementById('reg-email').value.trim();
+    const password = document.getElementById('reg-password').value;
+
+    if (!bizName) return showError('Escribe el nombre de tu estética.');
+    if (digits.length !== 10) return showError('El WhatsApp debe tener 10 dígitos.');
+    if (!email) return showError('Escribe tu correo.');
+    if (password.length < 10) return showError('Usa una contraseña de al menos 10 caracteres.');
+
+    const btn = document.getElementById('btn-register');
+    btn.disabled = true; btn.textContent = 'Creando…';
+
+    const { data, error } = await supabaseClient.auth.signUp({ email, password });
+
+    if (error) {
+      btn.disabled = false; btn.textContent = 'Crear cuenta y negocio';
+      return showError(error.message);
+    }
+
+    if (!data.session) {
+      btn.disabled = false; btn.textContent = 'Crear cuenta y negocio';
+      return showInfo('Cuenta creada. Revisa tu correo para confirmarla y luego inicia sesión.');
+    }
+
+    const slug = await generateUniqueSlug(bizName);
+
+    const { data: newBiz, error: bizError } = await supabaseClient
+      .from('businesses')
+      .insert({
+        owner_id: data.user.id,
+        name: bizName,
+        whatsapp: '52' + digits,
+        opening_hours: DEFAULT_HOURS,
+        theme: DEFAULT_THEME,
+        slug,
+      })
+      .select()
+      .single();
+
+    if (bizError) {
+      btn.disabled = false; btn.textContent = 'Crear cuenta y negocio';
+      console.error('Error creando negocio:', bizError);
+      return showError('Cuenta creada, pero falló al crear el negocio. Inicia sesión de nuevo.');
+    }
+
+    // Kit de bienvenida: servicios de ejemplo + logo/portada placeholder,
+    // para que el panel no se vea vacío en la primera visita.
+    btn.textContent = 'Preparando tu panel…';
+    await seedStarterContent(newBiz, DEFAULT_THEME);
+
+    btn.disabled = false; btn.textContent = 'Crear cuenta y negocio';
+    window.location.replace('index.html');
+  }
+
+  async function handleForgot() {
+    hideMsgs();
+    const email = document.getElementById('forgot-email').value.trim();
+    if (!email) return showError('Escribe tu correo.');
+
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.href.split('#')[0],
+    });
+
+    if (error) return showError(error.message);
+    showInfo('Listo. Revisa tu correo y abre el enlace para crear una nueva contraseña.');
+  }
+
+  async function handleReset() {
+    hideMsgs();
+    const password = document.getElementById('reset-password').value;
+    if (password.length < 10) return showError('Usa una contraseña de al menos 10 caracteres.');
+
+    const { error } = await supabaseClient.auth.updateUser({ password });
+    if (error) return showError(error.message);
+
+    await supabaseClient.auth.signOut();
+    showView('login');
+    showInfo('Contraseña actualizada. Inicia sesión con tu nueva contraseña.');
+  }
+
+  document.querySelectorAll('[data-view]').forEach((b) => {
+    b.addEventListener('click', () => showView(b.dataset.view));
+  });
+  document.getElementById('btn-login').addEventListener('click', handleLogin);
+  document.getElementById('btn-register').addEventListener('click', handleRegister);
+  document.getElementById('btn-forgot').addEventListener('click', handleForgot);
+  document.getElementById('btn-reset').addEventListener('click', handleReset);
+  document.getElementById('login-password').addEventListener('keydown', (e) => { if (e.key === 'Enter') handleLogin(); });
+
+  (async function start() {
+    // Si viene del enlace de recuperación del correo
+    if (window.location.hash.includes('type=recovery')) {
+      showView('reset');
+      return;
+    }
+    const { data } = await supabaseClient.auth.getSession();
+    if (data.session) window.location.replace('index.html');
+  })();
+</script>
+</body>
+</html>

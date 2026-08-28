@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panel · Dashboard</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css">
+<link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+
+<header class="adm-topbar">
+  <div>
+    <div class="adm-topbar-title" id="biz-name">Cargando…</div>
+    <div class="adm-topbar-sub" id="today-label"></div>
+  </div>
+  <div class="adm-topbar-actions">
+    <a href="configuracion.html" class="btn btn-ghost">Mi negocio</a>
+    <a href="equipo.html" class="btn btn-ghost">Equipo</a>
+    <a href="servicios.html" class="btn btn-ghost">Servicios</a>
+    <a href="contabilidad.html" class="btn btn-ghost">Contabilidad</a>
+    <button id="btn-logout" class="btn btn-ghost">Salir</button>
+  </div>
+</header>
+
+<main class="adm-main">
+  <div style="display:flex;justify-content:space-between;align-items:end;gap:16px;margin-bottom:18px;flex-wrap:wrap"><div><h1 style="font-size:30px;margin:0;letter-spacing:-.045em">Tu día, de un vistazo</h1><p style="margin:5px 0 0;color:#747986;font-size:13px">Citas, actividad e ingresos en un solo lugar.</p></div><a href="servicios.html" class="btn btn-primary" style="width:auto;min-height:42px;padding:10px 15px">+ Nuevo servicio</a></div>
+
+  <section class="adm-kpis">
+    <div class="adm-kpi"><div class="adm-kpi-num" id="kpi-today">–</div><div class="adm-kpi-label">Citas hoy</div></div>
+    <div class="adm-kpi"><div class="adm-kpi-num" id="kpi-upcoming">–</div><div class="adm-kpi-label">Próximas</div></div>
+    <div class="adm-kpi"><div class="adm-kpi-num" id="kpi-pending">–</div><div class="adm-kpi-label">Por confirmar</div></div>
+    <div class="adm-kpi"><div class="adm-kpi-num" id="kpi-revenue">–</div><div class="adm-kpi-label">Ingresos del mes</div></div>
+  </section>
+
+  <section>
+    <h2 class="adm-h2" id="agenda">Agenda de hoy</h2>
+    <div id="list-today" class="adm-list"></div>
+  </section>
+
+  <section>
+    <h2 class="adm-h2">Próximas citas</h2>
+    <div id="list-upcoming" class="adm-list"></div>
+  </section>
+
+</main>
+
+<div id="toast" class="toast hidden"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/config.js"></script>
+<script src="../js/supabase.js"></script>
+<script src="../js/admin-auth.js"></script>
+<script src="../js/admin-dashboard.js"></script>
+</body>
+</html>
