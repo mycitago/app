@@ -449,11 +449,17 @@ async function refreshData(){
 
 function bind(){
   $('btn-logout').addEventListener('click',logout);
-  ['new-appointment','hero-new-appointment','quick-new','mobile-new'].forEach(id=>$(id)?.addEventListener('click',publicBooking));
+  ['new-appointment','hero-new-appointment','quick-new','mobile-new','mobile-bottom-new']
+    .forEach(id=>$(id)?.addEventListener('click',publicBooking));
   $('drawer-close').addEventListener('click',closeDrawer);$('drawer-backdrop').addEventListener('click',closeDrawer);
   $('global-search').addEventListener('input',performSearch);
   document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$('global-search').focus()}if(e.key==='Escape'){closeDrawer();$('search-results').classList.add('hidden')}});
   $('mobile-menu')?.addEventListener('click',()=>$('sidebar').classList.toggle('open'));
+  document.querySelectorAll('.dash-nav a').forEach(a=>{
+    a.addEventListener('click',()=>{
+      if(window.innerWidth<=820) $('sidebar')?.classList.remove('open');
+    });
+  });
 }
 
 async function init(){

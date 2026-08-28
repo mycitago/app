@@ -1,0 +1,34 @@
+CITAS · BLOQUE 29 · RESPONSIVE COMPUTADORA + CELULAR
+
+SUBIR A GITHUB:
+1. /admin/index.html
+2. /css/admin-dashboard-pro.css
+3. /js/admin-dashboard-pro.js
+
+QUÉ MEJORA
+----------
+COMPUTADORA
+- Sidebar permanente.
+- Dashboard amplio de 4 KPIs.
+- Agenda + actividad en columnas.
+- Servicios y accesos rápidos.
+- Mejor uso de pantallas grandes.
+
+TABLET
+- Dashboard en 2 columnas.
+- Secciones grandes pasan a 1 columna.
+- Sidebar compacta.
+
+CELULAR
+- Barra superior móvil.
+- Sidebar deslizable.
+- Navegación inferior fija:
+  Inicio / Citas / + Nueva cita / Clientes / Servicios.
+- KPIs apilados y fáciles de tocar.
+- Agenda optimizada para pantalla pequeña.
+- Drawer de cita aparece desde abajo.
+- Botón Nueva cita siempre accesible.
+- Soporte para safe-area de iPhone.
+- Mejor experiencia táctil.
+
+No requiere cambios en Supabase.
