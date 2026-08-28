@@ -169,11 +169,35 @@ async function bookAppointment({ business, service, dateKey, startTime, endTime,
   });
 
   if (error) {
-    if (error.code === '23P01' || /exclu/i.test(error.message || '')) {
-      return { ok: false, reason: 'Justo alguien más reservó ese horario. Elige otro, por favor.' };
-    }
     console.error('Error creando cita:', error);
-    return { ok: false, reason: 'No se pudo crear la cita. Intenta de nuevo.' };
+
+    const msg = String(error.message || '');
+    const code = String(error.code || '');
+
+    if (code === '23P01' || msg.includes('slot_taken') || /exclu/i.test(msg)) {
+      return { ok: false, reason: 'Ese horario acaba de ocuparse. Elige otro horario.' };
+    }
+
+    const known = {
+      invalid_name: 'Revisa tu nombre.',
+      invalid_whatsapp: 'Revisa tu número de WhatsApp.',
+      invalid_service: 'Ese servicio ya no está disponible. Actualiza la página.',
+      inactive_service: 'Ese servicio está temporalmente desactivado.',
+      invalid_date: 'La fecha seleccionada ya no es válida.',
+      invalid_time: 'El horario seleccionado no es válido.',
+      invalid_duration: 'El servicio cambió de duración. Vuelve a elegir tu horario.',
+      date_blocked: 'Ese día ya no está disponible.',
+      time_blocked: 'Ese horario fue bloqueado por el negocio.'
+    };
+
+    for (const [key, reason] of Object.entries(known)) {
+      if (msg.includes(key)) return { ok: false, reason };
+    }
+
+    return {
+      ok: false,
+      reason: 'No pudimos confirmar la cita. Actualiza la página y vuelve a intentarlo.'
+    };
   }
 
   // Nota: create_appointment ahora regresa una tabla (appointment_id, access_token)

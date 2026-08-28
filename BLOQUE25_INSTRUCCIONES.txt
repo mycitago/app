@@ -1,0 +1,16 @@
+CITAS · BLOQUE 25 · CORRECCIÓN DE RESERVA
+
+1. Ejecuta 25_CORREGIR_CREAR_CITA_PRODUCCION.sql en Supabase.
+2. Debe devolver:
+   create_appointment_ok = true
+   anon_execute_ok = true
+
+3. Después reemplaza en GitHub:
+   /js/appointments.js
+
+La RPC ahora:
+- evita la ambigüedad de RETURNING access_token;
+- normaliza WhatsApp;
+- valida bloqueos de día y hora en servidor;
+- conserva protección contra doble reservación;
+- devuelve errores seguros y comprensibles al cliente.
