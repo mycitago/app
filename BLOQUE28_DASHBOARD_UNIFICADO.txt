@@ -1,0 +1,32 @@
+CITAS · BLOQUE 28 · DASHBOARD UNIFICADO PREMIUM
+
+SUBIR A GITHUB:
+1. /admin/index.html                (reemplazar)
+2. /css/admin-dashboard-pro.css     (nuevo)
+3. /js/admin-dashboard-pro.js       (nuevo)
+
+NO REQUIERE SQL NUEVO.
+
+QUÉ CAMBIA
+----------
+- Centro de control unificado y profesional.
+- Sidebar única para todo el negocio.
+- Buscador global de clientes, citas y servicios.
+- KPIs con mini tendencias.
+- Agenda de hoy en timeline.
+- Próximas citas compactas.
+- Actividad reciente.
+- Accesos rápidos.
+- Servicios más reservados.
+- Plan y soporte integrados visualmente.
+- Logo del negocio si existe.
+- Panel lateral para gestionar una cita sin salir del dashboard.
+- Confirmar, completar, cancelar y abrir WhatsApp desde el detalle.
+- Responsive para móvil.
+- Usa datos reales de Supabase.
+- Compatible con price_charged si ya ejecutaste el Bloque 27; si no, usa services.price como respaldo.
+
+IMPORTANTE
+----------
+“Nueva cita” abre el enlace público real del negocio. Esto permite registrar una cita
+con el mismo flujo validado que utiliza el cliente, sin duplicar lógica insegura en admin.

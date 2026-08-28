@@ -1,49 +1,184 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Panel · Dashboard</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../css/styles.css">
-<link rel="stylesheet" href="../css/admin.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Panel · CITAS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/admin-dashboard-pro.css">
+  <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
 </head>
-<body>
+<body class="dash-body">
 
-<header class="adm-topbar">
-  <div>
-    <div class="adm-topbar-title" id="biz-name">Cargando…</div>
-    <div class="adm-topbar-sub" id="today-label"></div>
+<header class="dash-mobile-top">
+  <button id="mobile-menu" class="icon-btn" type="button"><i data-lucide="menu"></i></button>
+  <div class="dash-mobile-brand">
+    <div class="brand-logo" id="mobile-logo">C</div>
+    <div><b id="mobile-biz-name">CITAS</b><small>Panel de control</small></div>
   </div>
-  <div class="adm-topbar-actions">
-    <a href="configuracion.html" class="btn btn-ghost">Mi negocio</a>
-    <a href="equipo.html" class="btn btn-ghost">Equipo</a>
-    <a href="servicios.html" class="btn btn-ghost">Servicios</a>
-    <a href="contabilidad.html" class="btn btn-ghost">Contabilidad</a>
-    <button id="btn-logout" class="btn btn-ghost">Salir</button>
-  </div>
+  <button id="mobile-new" class="icon-btn primary" type="button"><i data-lucide="plus"></i></button>
 </header>
 
-<main class="adm-main">
-  <div style="display:flex;justify-content:space-between;align-items:end;gap:16px;margin-bottom:18px;flex-wrap:wrap"><div><h1 style="font-size:30px;margin:0;letter-spacing:-.045em">Tu día, de un vistazo</h1><p style="margin:5px 0 0;color:#747986;font-size:13px">Citas, actividad e ingresos en un solo lugar.</p></div><a href="servicios.html" class="btn btn-primary" style="width:auto;min-height:42px;padding:10px 15px">+ Nuevo servicio</a></div>
+<div class="dash-app">
+  <aside class="dash-sidebar" id="sidebar">
+    <div class="dash-brand">
+      <div class="brand-logo" id="brand-logo">C</div>
+      <div>
+        <strong id="sidebar-biz">CITAS</strong>
+        <small>Panel de control</small>
+      </div>
+    </div>
 
-  <section class="adm-kpis">
-    <div class="adm-kpi"><div class="adm-kpi-num" id="kpi-today">–</div><div class="adm-kpi-label">Citas hoy</div></div>
-    <div class="adm-kpi"><div class="adm-kpi-num" id="kpi-upcoming">–</div><div class="adm-kpi-label">Próximas</div></div>
-    <div class="adm-kpi"><div class="adm-kpi-num" id="kpi-pending">–</div><div class="adm-kpi-label">Por confirmar</div></div>
-    <div class="adm-kpi"><div class="adm-kpi-num" id="kpi-revenue">–</div><div class="adm-kpi-label">Ingresos del mes</div></div>
-  </section>
+    <nav class="dash-nav">
+      <a class="active" href="index.html"><i data-lucide="house"></i><span>Resumen</span></a>
+      <a href="#agenda"><i data-lucide="calendar-days"></i><span>Citas</span></a>
+      <a href="#agenda"><i data-lucide="calendar-range"></i><span>Calendario</span></a>
+      <a href="clientes.html"><i data-lucide="users"></i><span>Clientes</span></a>
+      <a href="servicios.html"><i data-lucide="scissors"></i><span>Servicios</span></a>
+      <a href="equipo.html"><i data-lucide="user-round-cog"></i><span>Equipo</span></a>
+      <a href="contabilidad.html"><i data-lucide="chart-no-axes-combined"></i><span>Reportes</span></a>
+      <a href="integraciones.html"><i data-lucide="message-circle-more"></i><span>Mensajes</span></a>
+      <a href="configuracion.html"><i data-lucide="settings"></i><span>Configuración</span></a>
+    </nav>
 
-  <section>
-    <h2 class="adm-h2" id="agenda">Agenda de hoy</h2>
-    <div id="list-today" class="adm-list"></div>
-  </section>
+    <div class="dash-side-spacer"></div>
 
-  <section>
-    <h2 class="adm-h2">Próximas citas</h2>
-    <div id="list-upcoming" class="adm-list"></div>
-  </section>
+    <section class="dash-plan-card">
+      <div class="plan-kicker"><i data-lucide="crown"></i> Plan actual</div>
+      <div id="plan-loading" class="plan-loading"><i></i><i></i></div>
+      <strong id="plan-name" class="hidden"></strong>
+      <small id="plan-date" class="hidden"></small>
+      <a href="planes.html">Ver mi plan</a>
+    </section>
 
-</main>
+    <section class="dash-support-card">
+      <div class="support-icon"><i data-lucide="headphones"></i></div>
+      <strong>¿Necesitas ayuda?</strong>
+      <p>Accesos y configuración de tu negocio en un solo lugar.</p>
+      <a href="configuracion.html"><i data-lucide="circle-help"></i> Centro de ayuda</a>
+    </section>
+  </aside>
+
+  <div class="dash-content">
+    <header class="dash-topbar">
+      <div class="dash-search-wrap">
+        <i data-lucide="search"></i>
+        <input id="global-search" type="search" autocomplete="off" placeholder="Buscar clientes, citas, servicios…">
+        <kbd>Ctrl K</kbd>
+        <div id="search-results" class="search-results hidden"></div>
+      </div>
+
+      <div class="dash-top-actions">
+        <button id="new-appointment" class="btn-new" type="button"><i data-lucide="plus"></i> Nueva cita</button>
+        <button class="top-icon-btn" type="button" title="Notificaciones"><i data-lucide="bell"></i><span id="notification-count" class="notify-badge hidden"></span></button>
+        <div class="dash-user">
+          <div class="user-avatar" id="user-avatar">A</div>
+          <div><strong id="user-name">Administrador</strong><small>Administrador</small></div>
+          <i data-lucide="chevron-down"></i>
+          <button id="btn-logout" class="user-logout" type="button">Salir</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="dash-main">
+      <section class="dash-welcome">
+        <div>
+          <h1 id="welcome-title">Tu negocio, en un vistazo</h1>
+          <p id="today-label">Cargando resumen…</p>
+        </div>
+        <button id="hero-new-appointment" class="btn-new hero" type="button"><i data-lucide="plus"></i> Nueva cita</button>
+      </section>
+
+      <section class="dash-kpis">
+        <article class="kpi-card purple">
+          <div class="kpi-icon"><i data-lucide="calendar-days"></i></div>
+          <div class="kpi-copy"><span>Citas hoy</span><strong id="kpi-today">–</strong><small id="kpi-today-sub">Cargando…</small></div>
+          <div class="mini-chart" id="chart-today"></div>
+          <a href="#agenda">Ver agenda <i data-lucide="arrow-right"></i></a>
+        </article>
+        <article class="kpi-card blue">
+          <div class="kpi-icon"><i data-lucide="calendar-clock"></i></div>
+          <div class="kpi-copy"><span>Próximas citas</span><strong id="kpi-upcoming">–</strong><small>En los próximos 7 días</small></div>
+          <div class="mini-chart" id="chart-upcoming"></div>
+          <a href="#upcoming">Ver próximas <i data-lucide="arrow-right"></i></a>
+        </article>
+        <article class="kpi-card green">
+          <div class="kpi-icon"><i data-lucide="circle-check-big"></i></div>
+          <div class="kpi-copy"><span>Por confirmar</span><strong id="kpi-pending">–</strong><small>Citas pendientes</small></div>
+          <div class="mini-chart" id="chart-pending"></div>
+          <a href="#agenda">Ver pendientes <i data-lucide="arrow-right"></i></a>
+        </article>
+        <article class="kpi-card orange">
+          <div class="kpi-icon"><i data-lucide="badge-dollar-sign"></i></div>
+          <div class="kpi-copy"><span>Ingresos del mes</span><strong id="kpi-revenue">–</strong><small id="month-label">Mes actual</small></div>
+          <div class="mini-chart" id="chart-revenue"></div>
+          <a href="contabilidad.html">Ver reportes <i data-lucide="arrow-right"></i></a>
+        </article>
+      </section>
+
+      <section class="dash-grid-main">
+        <div class="dash-left-col">
+          <article class="dash-card agenda-card" id="agenda">
+            <div class="card-head">
+              <div><h2>Agenda de hoy</h2><p id="agenda-date"></p></div>
+              <div class="card-actions">
+                <button type="button" class="small-btn"><i data-lucide="calendar"></i> Hoy</button>
+              </div>
+            </div>
+            <div id="today-timeline" class="today-timeline"></div>
+            <div class="card-footer-link"><a href="#upcoming">Ver próximas citas <i data-lucide="arrow-right"></i></a></div>
+          </article>
+
+          <article class="dash-card" id="upcoming">
+            <div class="card-head">
+              <div><h2>Próximas citas</h2><p>Tu agenda de los próximos días</p></div>
+              <a href="#agenda">Ver hoy</a>
+            </div>
+            <div id="upcoming-list" class="upcoming-list"></div>
+          </article>
+        </div>
+
+        <div class="dash-right-col">
+          <article class="dash-card activity-card">
+            <div class="card-head"><div><h2>Actividad reciente</h2><p>Lo último que pasó en tu negocio</p></div></div>
+            <div id="recent-activity" class="activity-list"></div>
+          </article>
+
+          <article class="dash-card quick-card">
+            <div class="card-head"><div><h2>Accesos rápidos</h2><p>Lo que más usas, a un clic</p></div></div>
+            <div class="quick-grid">
+              <button type="button" id="quick-new"><span class="qicon purple"><i data-lucide="calendar-plus"></i></span><b>Nueva cita</b></button>
+              <a href="clientes.html"><span class="qicon blue"><i data-lucide="users"></i></span><b>Clientes</b></a>
+              <a href="contabilidad.html"><span class="qicon green"><i data-lucide="chart-no-axes-combined"></i></span><b>Reportes</b></a>
+              <a href="configuracion.html"><span class="qicon orange"><i data-lucide="settings"></i></span><b>Mi negocio</b></a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="dash-card top-services-card">
+        <div class="card-head">
+          <div><h2>Servicios más reservados</h2><p>Qué está moviendo tu negocio</p></div>
+          <a href="servicios.html">Gestionar servicios</a>
+        </div>
+        <div id="top-services" class="top-services"></div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<div id="appointment-drawer" class="appointment-drawer hidden">
+  <div class="drawer-backdrop" id="drawer-backdrop"></div>
+  <aside class="drawer-panel">
+    <div class="drawer-head">
+      <div><span>DETALLE DE CITA</span><h2 id="drawer-client">Cliente</h2></div>
+      <button id="drawer-close" class="icon-btn" type="button"><i data-lucide="x"></i></button>
+    </div>
+    <div id="drawer-content" class="drawer-content"></div>
+  </aside>
+</div>
 
 <div id="toast" class="toast hidden"></div>
 
@@ -51,6 +186,7 @@
 <script src="../js/config.js"></script>
 <script src="../js/supabase.js"></script>
 <script src="../js/admin-auth.js"></script>
-<script src="../js/admin-dashboard.js"></script>
+<script src="../js/admin-dashboard-pro.js"></script>
+<script>document.addEventListener("DOMContentLoaded",()=>window.lucide?.createIcons());</script>
 </body>
 </html>
