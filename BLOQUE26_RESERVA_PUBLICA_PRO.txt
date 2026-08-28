@@ -1,0 +1,20 @@
+CITAS · BLOQUE 26 · RESERVA PÚBLICA PRO
+
+SUBIR A GITHUB:
+- /reservar.html
+- /css/booking-public-pro.css
+- /js/public-booking-pro.js
+
+No requiere SQL nuevo.
+
+MEJORAS:
+- Hero profesional.
+- Si el negocio no tiene portada, crea una portada genérica según business_type.
+- Si un servicio no tiene imagen, crea una imagen genérica automáticamente.
+- Diseño de servicios en tarjetas.
+- Panel “Cómo funciona”.
+- Beneficios de reserva.
+- Barra inferior de acción.
+- Responsive móvil.
+
+La imagen genérica se genera localmente como SVG; no depende de un sitio externo.

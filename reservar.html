@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/booking-public-pro.css">
 </head>
 <body>
 
@@ -45,7 +46,33 @@
         <input id="service-search" class="service-search" type="search" placeholder="Buscar corte, uñas, facial…" autocomplete="off">
       </div>
       <div id="category-tabs" class="category-tabs hidden"></div>
-      <div id="services-list" class="services-grid"></div>
+      <div class="booking-main-grid">
+        <div class="booking-services-col">
+          <div class="services-heading-row">
+            <h3>Servicios disponibles</h3>
+            <span id="services-count"></span>
+          </div>
+          <div id="services-list" class="services-grid"></div>
+        </div>
+
+        <aside class="booking-help-panel">
+          <div class="booking-trust-cards">
+            <div><b>✓</b><span>Confirmación<br>instantánea</span></div>
+            <div><b>◷</b><span>Horarios<br>actualizados</span></div>
+            <div><b>♢</b><span>Tus datos<br>protegidos</span></div>
+          </div>
+
+          <div class="how-card">
+            <span class="section-kicker">Cómo funciona</span>
+            <ol>
+              <li><b>1</b><div><strong>Elige tu servicio</strong><span>Selecciona la opción que necesitas.</span></div></li>
+              <li><b>2</b><div><strong>Elige fecha y hora</strong><span>Consulta la disponibilidad real.</span></div></li>
+              <li><b>3</b><div><strong>Completa tus datos</strong><span>Solo necesitamos nombre y WhatsApp.</span></div></li>
+              <li><b>4</b><div><strong>Confirma tu cita</strong><span>Recibirás los datos de tu reservación.</span></div></li>
+            </ol>
+          </div>
+        </aside>
+      </div>
 
       <div class="sticky-footer premium-booking-footer">
         <div id="selected-service-mini" class="selected-service-mini hidden">
@@ -124,7 +151,7 @@
         <div class="summary-row"><span>Fecha</span><span id="summary-date"></span></div>
         <div class="summary-row"><span>Hora</span><span id="summary-time"></span></div>
         <div class="summary-row"><span>Duración</span><span id="summary-duration"></span></div>
-        <div class="summary-row"><span>Estética</span><span id="summary-business"></span></div>
+        <div class="summary-row"><span>Negocio</span><span id="summary-business"></span></div>
         <div class="summary-row"><span>Dirección</span><span id="summary-address"></span></div>
       </div>
 
@@ -146,5 +173,6 @@
 <script src="js/services.js"></script>
 <script src="js/appointments.js"></script>
 <script src="js/app.js"></script>
+<script src="js/public-booking-pro.js"></script>
 </body>
 </html>
