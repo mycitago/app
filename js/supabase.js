@@ -91,5 +91,5 @@ function getAppBaseUrl() {
 
 function buildPublicBookingUrl(business) {
   if (!business?.slug) return null;
-  return `${getAppBaseUrl()}?n=${encodeURIComponent(business.slug)}`;
+  return `${getAppBaseUrl()}reservar.html?n=${encodeURIComponent(business.slug)}`;
 }

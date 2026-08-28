@@ -1,150 +1,120 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Reservar cita</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="description" content="CITAS: agenda, clientes, servicios y operación para estéticas y negocios de belleza.">
+  <title>CITAS · Tu negocio, mejor organizado</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Fraunces:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#f7f8fb;--surface:#fff;--text:#15171b;--muted:#6c7280;--line:#e7e9ee;
+      --accent:#111827;--soft:#eef1f5;--radius:24px;--shadow:0 22px 60px rgba(17,24,39,.10)
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:Manrope,system-ui,sans-serif}
+    a{text-decoration:none;color:inherit}
+    .wrap{width:min(1160px,calc(100% - 32px));margin:auto}
+    nav{display:flex;align-items:center;justify-content:space-between;padding:22px 0}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.08em}
+    .mark{width:34px;height:34px;border-radius:12px;background:#111827;color:#fff;display:grid;place-items:center;font-weight:800}
+    .nav-actions{display:flex;gap:10px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;border-radius:14px;padding:12px 18px;font-weight:700;border:1px solid var(--line);background:#fff}
+    .btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .hero{padding:72px 0 54px}
+    .hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center}
+    .eyebrow{font-size:.78rem;text-transform:uppercase;letter-spacing:.13em;font-weight:800;color:#596170;margin-bottom:18px}
+    h1{font-family:Fraunces,serif;font-size:clamp(3rem,7vw,5.9rem);line-height:.92;margin:0 0 24px;letter-spacing:-.045em}
+    .lead{font-size:1.15rem;color:var(--muted);line-height:1.7;max-width:650px}
+    .hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
+    .panel{background:var(--surface);border:1px solid var(--line);border-radius:30px;padding:22px;box-shadow:var(--shadow)}
+    .mock-top{display:flex;align-items:center;justify-content:space-between;padding:4px 4px 18px}
+    .dots{display:flex;gap:7px}.dot{width:8px;height:8px;background:#cfd3da;border-radius:50%}
+    .mock-card{background:#f7f8fa;border-radius:18px;padding:18px;margin-top:12px}
+    .kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .kpi div{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px}
+    .kpi strong{display:block;font-size:1.35rem}
+    .mini-row{display:flex;justify-content:space-between;gap:16px;padding:13px 0;border-bottom:1px solid var(--line);font-size:.9rem}
+    .mini-row:last-child{border-bottom:0}
+    .section{padding:64px 0}
+    .section h2{font-family:Fraunces,serif;font-size:clamp(2rem,4vw,3.6rem);margin:0 0 14px}
+    .section-intro{color:var(--muted);max-width:720px;line-height:1.7}
+    .features{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:30px}
+    .feature{background:#fff;border:1px solid var(--line);border-radius:22px;padding:24px}
+    .feature b{font-size:1.05rem}.feature p{color:var(--muted);line-height:1.6;margin-bottom:0}
+    .cta{background:#111827;color:#fff;border-radius:30px;padding:42px;display:flex;align-items:center;justify-content:space-between;gap:28px}
+    .cta h3{font-family:Fraunces,serif;font-size:clamp(2rem,4vw,3rem);margin:0 0 8px}
+    .cta p{color:#c7ccd6;margin:0}
+    .cta .btn{background:#fff;color:#111827;border-color:#fff}
+    footer{padding:34px 0 50px;color:var(--muted);font-size:.9rem}
+    @media(max-width:820px){
+      .hero{padding-top:44px}.hero-grid{grid-template-columns:1fr}.panel{order:2}
+      .features{grid-template-columns:1fr}.cta{align-items:flex-start;flex-direction:column}
+      .nav-actions .btn:first-child{display:none}
+    }
+  </style>
 </head>
 <body>
-
-<div id="app">
-  <!-- ============ HERO / PORTADA ============ -->
-  <header class="hero" id="hero">
-    <div class="hero-inner">
-      <img id="hero-logo" class="hero-logo hidden" alt="Logotipo">
-      <h1 class="hero-name" id="hero-name">Cargando…</h1>
-      <div class="hero-eyebrow">Reserva online</div>
-      <div class="hero-meta">
-        <span id="hero-address"></span>
-        <span id="hero-schedule"></span>
+  <div class="wrap">
+    <nav>
+      <a class="brand" href="./"><span class="mark">C</span><span>CITAS</span></a>
+      <div class="nav-actions">
+        <a class="btn" href="#funciones">Conocer CITAS</a>
+        <a class="btn btn-primary" href="admin/login.html">Entrar</a>
       </div>
-    </div>
-  </header>
+    </nav>
 
-  <main class="container">
+    <main>
+      <section class="hero">
+        <div class="hero-grid">
+          <div>
+            <div class="eyebrow">Agenda digital para negocios de belleza</div>
+            <h1>Tu agenda, clientes y negocio en un solo lugar.</h1>
+            <p class="lead">CITAS te ayuda a organizar reservaciones, servicios, clientes y operación diaria desde una experiencia simple, rápida y pensada para estéticas, salones y profesionales.</p>
+            <div class="hero-actions">
+              <a class="btn btn-primary" href="admin/login.html">Ir al panel</a>
+              <a class="btn" href="#funciones">Ver funciones</a>
+            </div>
+          </div>
 
-    <!-- ============ PASO 0: SERVICIOS ============ -->
-    <section id="step-services">
-      <div class="booking-intro">
-        <div>
-          <span class="section-kicker">Elige tu experiencia</span>
-          <h2 class="section-title">¿Qué te gustaría reservar?</h2>
-          <p class="section-subtitle">Explora los servicios disponibles y encuentra el ideal para ti.</p>
+          <div class="panel" aria-label="Vista previa del panel CITAS">
+            <div class="mock-top"><strong>Hoy</strong><div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div></div>
+            <div class="kpi">
+              <div><small>Citas</small><strong>12</strong></div>
+              <div><small>Clientes</small><strong>86</strong></div>
+              <div><small>Ocupación</small><strong>78%</strong></div>
+            </div>
+            <div class="mock-card">
+              <div class="mini-row"><span>10:00 · Corte y peinado</span><b>Confirmada</b></div>
+              <div class="mini-row"><span>11:30 · Uñas</span><b>Pendiente</b></div>
+              <div class="mini-row"><span>13:00 · Facial</span><b>Confirmada</b></div>
+              <div class="mini-row"><span>16:30 · Color</span><b>Confirmada</b></div>
+            </div>
+          </div>
         </div>
-        <div class="trust-row" aria-label="Beneficios de reservar en línea">
-          <span>✓ Horarios en tiempo real</span>
-          <span>✓ Reserva en minutos</span>
+      </section>
+
+      <section class="section" id="funciones">
+        <h2>Más orden. Menos mensajes cruzados.</h2>
+        <p class="section-intro">Cada negocio obtiene su propio enlace de reservación. Tus clientes consultan servicios y horarios disponibles, mientras tú administras la operación desde el panel.</p>
+        <div class="features">
+          <article class="feature"><b>Reservaciones online</b><p>Enlace propio por negocio, disponibilidad en tiempo real y flujo de reserva sencillo.</p></article>
+          <article class="feature"><b>Clientes y CRM</b><p>Historial, visitas, segmentos y comunicación con clientes desde un mismo lugar.</p></article>
+          <article class="feature"><b>Servicios y operación</b><p>Configura precios, duración, horarios, equipo, bloqueos y detalles del negocio.</p></article>
         </div>
-      </div>
+      </section>
 
-      <div class="service-search-wrap">
-        <span class="service-search-icon">⌕</span>
-        <input id="service-search" class="service-search" type="search" placeholder="Buscar corte, uñas, facial…" autocomplete="off">
-      </div>
-      <div id="category-tabs" class="category-tabs hidden"></div>
-      <div id="services-list" class="services-grid"></div>
-
-      <div class="sticky-footer premium-booking-footer">
-        <div id="selected-service-mini" class="selected-service-mini hidden">
-          <span class="selected-service-label">Tu elección</span>
-          <strong id="selected-service-name"></strong>
-          <span id="selected-service-meta"></span>
+      <section class="section">
+        <div class="cta">
+          <div><h3>¿Ya tienes una cuenta?</h3><p>Entra al panel administrativo de CITAS para continuar.</p></div>
+          <a class="btn" href="admin/login.html">Iniciar sesión</a>
         </div>
-        <button id="btn-agendar" class="btn btn-primary" disabled>Elegir horario</button>
-      </div>
-    </section>
+      </section>
+    </main>
 
-    <!-- ============ PASO 1: FECHA Y HORA ============ -->
-    <section id="booking-step" class="hidden">
-      <div class="step-progress">
-        <div class="step-dot is-active"></div>
-        <div class="step-dot"></div>
-        <div class="step-dot"></div>
-      </div>
-
-      <h2 class="section-title">Elige fecha y hora</h2>
-
-      <div class="step-label">Fecha</div>
-      <div class="date-scroller" id="date-scroller"></div>
-
-      <div class="step-label mt-16">Horario disponible</div>
-      <div class="slot-grid" id="slot-grid">
-        <p class="empty-state">Elige una fecha para ver los horarios.</p>
-      </div>
-
-      <div class="sticky-footer">
-        <button id="btn-go-to-form" class="btn btn-primary" disabled>Continuar</button>
-      </div>
-    </section>
-
-    <!-- ============ PASO 2: DATOS DEL CLIENTE ============ -->
-    <section id="form-step" class="hidden">
-      <div class="step-progress">
-        <div class="step-dot is-done"></div>
-        <div class="step-dot is-active"></div>
-        <div class="step-dot"></div>
-      </div>
-
-      <h2 class="section-title">Tus datos</h2>
-
-      <div class="field">
-        <label for="input-name">Nombre completo</label>
-        <input type="text" id="input-name" placeholder="Ej. María López" autocomplete="name">
-        <div class="field-error">Escribe tu nombre.</div>
-      </div>
-
-      <div class="field">
-        <label for="input-whatsapp">Número de WhatsApp</label>
-        <input type="tel" id="input-whatsapp" placeholder="10 dígitos, ej. 2281234567" autocomplete="tel" inputmode="numeric">
-        <div class="field-error">Escribe un número de WhatsApp válido a 10 dígitos.</div>
-      </div>
-
-      <div class="field">
-        <label for="input-notes">Comentario (opcional)</label>
-        <textarea id="input-notes" rows="3" placeholder="Alguna indicación para tu cita…"></textarea>
-      </div>
-
-      <div class="sticky-footer">
-        <button id="btn-confirm-booking" class="btn btn-primary">Confirmar cita</button>
-        <button class="btn btn-ghost" data-back="booking-step">Regresar</button>
-      </div>
-    </section>
-
-    <!-- ============ PASO 3: ÉXITO ============ -->
-    <section id="success-step" class="hidden text-center">
-      <div class="confirmation-badge">✓</div>
-      <h2>¡Cita confirmada!</h2>
-      <p class="text-muted">Guarda estos datos o confírmalos por WhatsApp.</p>
-
-      <div class="card mt-16" style="text-align:left">
-        <div class="summary-row"><span>Servicio</span><span id="summary-service"></span></div>
-        <div class="summary-row"><span>Fecha</span><span id="summary-date"></span></div>
-        <div class="summary-row"><span>Hora</span><span id="summary-time"></span></div>
-        <div class="summary-row"><span>Duración</span><span id="summary-duration"></span></div>
-        <div class="summary-row"><span>Estética</span><span id="summary-business"></span></div>
-        <div class="summary-row"><span>Dirección</span><span id="summary-address"></span></div>
-      </div>
-
-      <a id="btn-whatsapp" class="btn btn-whatsapp mt-16" target="_blank" rel="noopener">
-        Confirmar por WhatsApp
-      </a>
-    </section>
-
-  </main>
-</div>
-
-<div id="toast" class="toast hidden"></div>
-
-<!-- SDK de Supabase -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/config.js"></script>
-<script src="js/supabase.js"></script>
-<script src="js/theme.js"></script>
-<script src="js/services.js"></script>
-<script src="js/appointments.js"></script>
-<script src="js/app.js"></script>
+    <footer>© 2026 CITAS · Demo en evolución.</footer>
+  </div>
 </body>
 </html>

@@ -1,0 +1,27 @@
+PARCHE CITAS · PORTADA + RESERVACIÓN
+
+Este parche NO modifica Supabase ni js/config.js.
+
+ARCHIVOS A REEMPLAZAR / AGREGAR EN GITHUB
+-----------------------------------------
+1. /index.html                 -> reemplazar
+2. /reservar.html              -> agregar
+3. /js/supabase.js             -> reemplazar
+4. /admin/login.html           -> reemplazar
+
+RESULTADO
+---------
+https://mycitago.github.io/app/
+  Página principal de CITAS
+
+https://mycitago.github.io/app/admin/login.html
+  Acceso administrativo
+
+https://mycitago.github.io/app/reservar.html?n=slug-del-negocio
+  Reservación pública de una estética
+
+IMPORTANTE
+----------
+No borres js/config.js.
+No vuelvas a subir el ZIP completo anterior.
+Solo sube estos cuatro archivos respetando sus carpetas.

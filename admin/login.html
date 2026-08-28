@@ -150,7 +150,7 @@
   document.getElementById('reg-business').addEventListener('input', (e) => {
     const preview = document.getElementById('reg-slug-preview');
     const slug = slugify(e.target.value);
-    preview.textContent = slug ? `Tu link será: ${getAppBaseUrl()}?n=${slug}` : '';
+    preview.textContent = slug ? `Tu link será: ${getAppBaseUrl()}reservar.html?n=${slug}` : '';
   });
 
   async function handleLogin() {
