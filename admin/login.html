@@ -210,12 +210,14 @@
     return `${base}-${Date.now().toString(36)}`;
   }
 
-  // REGISTRO: crea la cuenta Y el negocio en un solo paso (onboarding SaaS)
+  // REGISTRO SaaS: Auth + datos de onboarding.
+  // El negocio y la suscripción se crean en PostgreSQL mediante trigger,
+  // usando new.id como owner. El navegador no puede elegir otro owner_id.
   async function handleRegister() {
     hideMsgs();
     const bizName = document.getElementById('reg-business').value.trim();
     const digits = onlyDigits(document.getElementById('reg-whatsapp').value);
-    const email = document.getElementById('reg-email').value.trim();
+    const email = document.getElementById('reg-email').value.trim().toLowerCase();
     const password = document.getElementById('reg-password').value;
 
     if (!bizName) return showError('Escribe el nombre de tu estética.');
@@ -224,47 +226,34 @@
     if (password.length < 10) return showError('Usa una contraseña de al menos 10 caracteres.');
 
     const btn = document.getElementById('btn-register');
-    btn.disabled = true; btn.textContent = 'Creando…';
+    btn.disabled = true;
+    btn.textContent = 'Creando cuenta…';
 
-    const { data, error } = await supabaseClient.auth.signUp({ email, password });
+    const params = new URLSearchParams(location.search);
+    const selectedPlan = params.get('plan') || 'reserva';
 
-    if (error) {
-      btn.disabled = false; btn.textContent = 'Crear cuenta y negocio';
-      return showError(error.message);
-    }
+    const { data, error } = await supabaseClient.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${getAppBaseUrl()}admin/login.html`,
+        data: {
+          business_name: bizName,
+          business_whatsapp: digits,
+          plan_id: selectedPlan
+        }
+      }
+    });
+
+    btn.disabled = false;
+    btn.textContent = 'Crear cuenta y negocio';
+
+    if (error) return showError(error.message);
 
     if (!data.session) {
-      btn.disabled = false; btn.textContent = 'Crear cuenta y negocio';
-      return showInfo('Cuenta creada. Revisa tu correo para confirmarla y luego inicia sesión.');
+      return showInfo('Cuenta creada. Revisa tu correo, confirma tu cuenta y luego inicia sesión. Tu negocio y prueba gratuita ya quedaron preparados.');
     }
 
-    const slug = await generateUniqueSlug(bizName);
-
-    const { data: newBiz, error: bizError } = await supabaseClient
-      .from('businesses')
-      .insert({
-        owner_id: data.user.id,
-        name: bizName,
-        whatsapp: '52' + digits,
-        opening_hours: DEFAULT_HOURS,
-        theme: DEFAULT_THEME,
-        slug,
-      })
-      .select()
-      .single();
-
-    if (bizError) {
-      btn.disabled = false; btn.textContent = 'Crear cuenta y negocio';
-      console.error('Error creando negocio:', bizError);
-      return showError('Cuenta creada, pero falló al crear el negocio. Inicia sesión de nuevo.');
-    }
-
-    // Kit de bienvenida: servicios de ejemplo + logo/portada placeholder,
-    // para que el panel no se vea vacío en la primera visita.
-    btn.textContent = 'Preparando tu panel…';
-    await seedStarterContent(newBiz, DEFAULT_THEME);
-
-    btn.disabled = false; btn.textContent = 'Crear cuenta y negocio';
     window.location.replace('index.html');
   }
 
@@ -304,13 +293,25 @@
   document.getElementById('login-password').addEventListener('keydown', (e) => { if (e.key === 'Enter') handleLogin(); });
 
   (async function start() {
-    // Si viene del enlace de recuperación del correo
     if (window.location.hash.includes('type=recovery')) {
       showView('reset');
       return;
     }
-    const { data } = await supabaseClient.auth.getSession();
-    if (data.session) window.location.replace('index.html');
+
+    const params = new URLSearchParams(location.search);
+    const requestedView = params.get('view');
+    if (requestedView === 'register') {
+      showView('register');
+      return;
+    }
+
+    // Solo redirigir si la sesión realmente valida contra Auth.
+    const { data } = await supabaseClient.auth.getUser();
+    if (data?.user) {
+      const { data: platformAdmin } = await supabaseClient
+        .from('platform_admins').select('id').eq('id', data.user.id).maybeSingle();
+      window.location.replace(platformAdmin ? 'plataforma.html' : 'index.html');
+    }
   })();
 </script>
 </body>

@@ -1,0 +1,15 @@
+CITAS · BLOQUE DE PRODUCCIÓN 21
+
+QUÉ CIERRA
+- Sesión validada contra Supabase Auth con getUser().
+- Un usuario autenticado sin business_members no puede abrir el panel.
+- Un negocio sin suscripción queda bloqueado.
+- Solo trial/active con fecha vigente tiene acceso.
+- Registro crea negocio y trial desde PostgreSQL, no confiando en owner_id del navegador.
+- El registro público queda visible desde la portada.
+- La pasarela real NO se simula en frontend.
+
+PAGOS
+El sistema queda listo para tener plan_id y suscripción, pero un cobro real
+(Mercado Pago / Stripe / Clip) requiere backend HTTPS y webhooks firmados.
+No se debe marcar una suscripción como pagada desde JavaScript público.

@@ -3,15 +3,23 @@
 // =========================================================
 
 async function requireAuth() {
+  // El modo sin login solo existe en localhost/127.0.0.1.
   if (typeof LOCAL_NO_LOGIN !== 'undefined' && LOCAL_NO_LOGIN) {
     return { user: { id: 'LOCAL_DEMO', email: 'local@demo' }, localMode: true };
   }
-  const { data } = await supabaseClient.auth.getSession();
-  if (!data.session) {
+
+  // getUser() valida el JWT contra Supabase Auth; no confiamos solo
+  // en una sesión guardada en localStorage.
+  const { data, error } = await supabaseClient.auth.getUser();
+  const user = data?.user;
+
+  if (error || !user) {
+    await supabaseClient.auth.signOut();
     window.location.replace('login.html');
     return null;
   }
-  return data.session;
+
+  return { user };
 }
 
 async function getMySubscription(businessId) {
@@ -24,10 +32,12 @@ async function getMySubscription(businessId) {
 }
 
 function subscriptionExpired(sub) {
-  if (!sub) return false;
-  if (sub.status === 'canceled') return true;
+  // Un negocio sin suscripción NO tiene acceso al panel.
+  if (!sub) return true;
+  if (!['trial', 'active'].includes(sub.status)) return true;
+  if (!sub.current_period_end) return true;
   const end = new Date(sub.current_period_end + 'T23:59:59');
-  return end < new Date();
+  return Number.isNaN(end.getTime()) || end < new Date();
 }
 
 function showPaywall(sub) {
@@ -44,19 +54,9 @@ function showPaywall(sub) {
 }
 
 async function getMyBusiness(user) {
-  // En modo local tomamos el primer negocio disponible para poder probar
-  // Dashboard, Servicios, Configuración y Contabilidad sin una sesión de Auth.
   if (typeof LOCAL_NO_LOGIN !== 'undefined' && LOCAL_NO_LOGIN) {
-    const { data, error } = await supabaseClient
-      .from('businesses')
-      .select('*')
-      .order('created_at', { ascending: true })
-      .limit(1);
-    if (error) {
-      console.error('Error cargando negocio local:', error);
-      return null;
-    }
-    const business = (data && data[0]) || null;
+    const { data } = await supabaseClient.from('businesses').select('*').order('created_at').limit(1);
+    const business = data?.[0] || null;
     if (!business) return null;
     business.subscription = null;
     injectPlatformLink();
@@ -64,27 +64,45 @@ async function getMyBusiness(user) {
     return business;
   }
 
-  const { data, error } = await supabaseClient
-    .from('businesses')
-    .select('*')
-    .eq('owner_id', user.id)
-    .order('created_at', { ascending: true })
+  // La pertenencia al negocio se obtiene de business_members.
+  const { data: memberships, error: membershipError } = await supabaseClient
+    .from('business_members')
+    .select('business_id, role, status')
+    .eq('user_id', user.id)
+    .eq('status', 'active')
     .limit(1);
 
-  if (error) {
+  if (membershipError) {
+    console.error('Error validando membresía:', membershipError);
+    return null;
+  }
+
+  const membership = memberships?.[0];
+  if (!membership) {
+    // Cuenta válida, pero todavía no tiene negocio.
+    window.location.replace('login.html?view=register&complete=1');
+    return null;
+  }
+
+  const { data: business, error } = await supabaseClient
+    .from('businesses')
+    .select('*')
+    .eq('id', membership.business_id)
+    .maybeSingle();
+
+  if (error || !business) {
     console.error('Error cargando negocio:', error);
     return null;
   }
-  const business = (data && data[0]) || null;
-  if (!business) return null;
 
   const sub = await getMySubscription(business.id);
   if (subscriptionExpired(sub)) {
     showPaywall(sub);
     return null;
   }
-  business.subscription = sub;
 
+  business.subscription = sub;
+  business.memberRole = membership.role;
   injectPlatformLink();
   injectPublicLinkButton(business);
   return business;
