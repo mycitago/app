@@ -1,0 +1,8 @@
+CITAS · BLOQUE 22 · LENGUAJE NEUTRAL
+
+Cambios:
+- "Registra tu estética" -> "Registra tu negocio"
+- "Nombre de tu estética" -> "Nombre de tu negocio"
+- Ejemplos genéricos de negocio
+- Portada ya no limita CITAS a belleza
+- No cambia lógica, Supabase, RLS ni onboarding

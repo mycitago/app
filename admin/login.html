@@ -38,8 +38,8 @@
   <!-- REGISTRO -->
   <div id="view-register" class="hidden">
     <div class="field">
-      <label for="reg-business">Nombre de tu estética</label>
-      <input type="text" id="reg-business" placeholder="Ej. Estética Glamour">
+      <label for="reg-business">Nombre de tu negocio</label>
+      <input type="text" id="reg-business" placeholder="Ej. Clínica, barbería, consultorio, taller...">
       <div class="adm-note" id="reg-slug-preview" style="font-size:12px;color:#6b5a5e;margin-top:4px;"></div>
     </div>
     <div class="field">
@@ -109,7 +109,7 @@
   const views = ['login', 'register', 'forgot', 'reset'];
   const titles = {
     login: ['Panel administrativo', 'Ingresa con tu cuenta de administrador.'],
-    register: ['Registra tu estética', 'Crea tu cuenta y tu negocio en un solo paso.'],
+    register: ['Registra tu negocio', 'Crea tu cuenta y tu negocio en un solo paso.'],
     forgot: ['Recuperar contraseña', 'Te enviaremos un enlace por correo.'],
     reset: ['Nueva contraseña', 'Escribe tu nueva contraseña.'],
   };
@@ -220,7 +220,7 @@
     const email = document.getElementById('reg-email').value.trim().toLowerCase();
     const password = document.getElementById('reg-password').value;
 
-    if (!bizName) return showError('Escribe el nombre de tu estética.');
+    if (!bizName) return showError('Escribe el nombre de tu negocio.');
     if (digits.length !== 10) return showError('El WhatsApp debe tener 10 dígitos.');
     if (!email) return showError('Escribe tu correo.');
     if (password.length < 10) return showError('Usa una contraseña de al menos 10 caracteres.');
