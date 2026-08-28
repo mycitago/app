@@ -1,17 +1,237 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Servicios</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght;500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="../css/styles.css"><link rel="stylesheet" href="../css/admin.css"></head><body><header class="adm-topbar"><div><div class="adm-topbar-title">Servicios</div><div class="adm-topbar-sub">Precios, duración, colchón e imagen</div></div><div class="adm-topbar-actions"><a class="btn btn-ghost" href="index.html">Dashboard</a><a class="btn btn-ghost" href="configuracion.html">Mi negocio</a><button id="btn-logout" class="btn btn-ghost">Salir</button></div></header><main class="adm-main"><section class="adm-form"><div class="adm-section-heading"><div><span class="adm-kicker">Catálogo comercial</span><h2 class="adm-h2">Agregar / editar servicio</h2><p>Un buen catálogo ayuda al cliente a decidir más rápido. Usa nombres claros, foto, categoría y una descripción breve.</p></div></div><input id="sid" type="hidden"><div class="form-grid"><input id="sname" placeholder="Nombre del servicio"><div class="field-with-help"><input id="category" placeholder="Categoría" value="Servicios" list="service-category-suggestions"><datalist id="service-category-suggestions"><option value="Cabello"><option value="Uñas"><option value="Rostro"><option value="Cejas y pestañas"><option value="Maquillaje"><option value="Masajes"><option value="Depilación"><option value="Barbería"><option value="Spa"><option value="Paquetes"></datalist><small>Ej. Cabello, Uñas, Rostro, Masajes o Paquetes</small></div><input id="price" type="number" step="0.01" placeholder="Precio"><input id="duration" type="number" placeholder="Duración min"><input id="buffer" type="number" placeholder="Tiempo entre citas min" value="0"><input id="deposit" type="number" step="0.01" placeholder="Anticipo opcional"><textarea id="sdesc" rows="3" placeholder="Describe qué incluye, para quién es y el resultado esperado. Ej. Lavado + corte + peinado final."></textarea><input id="simage" type="file" accept="image/png,image/jpeg,image/webp"></div><div class="form-check-group">
-  <label class="form-check">
-    <div class="form-check-text">
-      <span class="form-check-title">Disponible para reservar</span>
-      <span class="form-check-help">Si lo desactivas, el servicio se oculta de tu página pública y los clientes no podrán agendarlo — pero sigue guardado, puedes reactivarlo cuando quieras.</span>
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Servicios · CITAS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/admin.css">
+  <link rel="stylesheet" href="../css/admin-services-pro.css">
+</head>
+<body class="svc-body">
+
+<header class="svc-mobile-topbar">
+  <div class="svc-brand-mark">C</div>
+  <div>
+    <strong>CITAS</strong>
+    <small>Servicios y disponibilidad</small>
+  </div>
+  <button id="svc-mobile-menu" class="svc-icon-btn" type="button" aria-label="Abrir menú">☰</button>
+</header>
+
+<div class="svc-shell">
+  <aside class="svc-sidebar" id="svc-sidebar">
+    <div class="svc-brand">
+      <div class="svc-logo">C</div>
+      <div><strong>CITAS</strong><small>Tu negocio, organizado</small></div>
     </div>
-    <input id="active" type="checkbox" checked>
-  </label>
-  <label class="form-check">
-    <div class="form-check-text">
-      <span class="form-check-title">Destacado</span>
-      <span class="form-check-help">Aparece primero en el catálogo de tu página pública, antes que el resto de tus servicios.</span>
+
+    <div class="svc-side-label">MI NEGOCIO</div>
+    <nav class="svc-nav">
+      <a href="configuracion.html"><span>⌂</span> Información</a>
+      <a class="active" href="servicios.html"><span>▣</span> Servicios</a>
+      <a href="equipo.html"><span>♙</span> Personal</a>
+      <a href="index.html"><span>◷</span> Reservas</a>
+      <a href="clientes.html"><span>♧</span> Clientes</a>
+      <a href="contabilidad.html"><span>▥</span> Reportes</a>
+      <a href="integraciones.html"><span>⚙</span> Integraciones</a>
+    </nav>
+
+    <div class="svc-side-spacer"></div>
+    <section class="svc-plan-card">
+      <span class="svc-plan-kicker">TU PLAN ACTUAL</span>
+      <strong id="svc-plan-name">Cargando…</strong>
+      <small id="svc-plan-date">Validando suscripción</small>
+      <a href="planes.html">Ver mi plan</a>
+    </section>
+    <section class="svc-help-card">
+      <b>¿Necesitas ayuda?</b>
+      <p>Configura tu negocio paso a paso. Empieza con un horario rápido y ajusta después.</p>
+    </section>
+  </aside>
+
+  <main class="svc-main">
+    <section class="svc-page-head">
+      <div>
+        <span class="svc-eyebrow">CATÁLOGO Y DISPONIBILIDAD</span>
+        <h1>Agregar / editar servicio <span>✦</span></h1>
+        <p>Crea un servicio, define cuándo atiendes y bloquea excepciones sin salir de esta pantalla.</p>
+      </div>
+      <div class="svc-head-actions">
+        <button id="preview-client" class="svc-btn svc-btn-ghost" type="button">◉ Vista previa cliente</button>
+        <button id="duplicate-service" class="svc-btn svc-btn-ghost" type="button">⧉ Duplicar servicio</button>
+        <button id="save-service" class="svc-btn svc-btn-primary" type="button">✓ Guardar servicio</button>
+      </div>
+    </section>
+
+    <input id="sid" type="hidden">
+
+    <div class="svc-layout">
+      <div class="svc-column">
+        <section class="svc-card">
+          <div class="svc-card-title purple"><span>1</span><div><h2>Información básica</h2><p>Los datos que verá tu cliente al reservar.</p></div></div>
+
+          <label class="svc-field svc-field-full">
+            <span>Nombre del servicio *</span>
+            <input id="sname" maxlength="80" placeholder="Ej. Consulta inicial, Corte premium, Afinación">
+            <small><b id="name-count">0</b>/80 caracteres</small>
+          </label>
+
+          <div class="svc-form-row three">
+            <label class="svc-field">
+              <span>Categoría</span>
+              <input id="category" value="Servicios" list="service-category-suggestions" placeholder="Ej. Consulta">
+              <datalist id="service-category-suggestions">
+                <option value="Consultas">
+                <option value="Salud y bienestar">
+                <option value="Belleza y cuidado">
+                <option value="Barbería">
+                <option value="Entrenamiento">
+                <option value="Clases">
+                <option value="Asesoría">
+                <option value="Mantenimiento">
+                <option value="Reparación">
+                <option value="Servicios profesionales">
+                <option value="Paquetes">
+              </datalist>
+            </label>
+
+            <label class="svc-field">
+              <span>Duración *</span>
+              <div class="svc-input-unit"><input id="duration" type="number" min="5" step="5" placeholder="60"><em>min</em></div>
+            </label>
+
+            <label class="svc-field">
+              <span>Precio *</span>
+              <div class="svc-input-unit"><em>$</em><input id="price" type="number" min="0" step="0.01" placeholder="250"><em>MXN</em></div>
+            </label>
+          </div>
+
+          <div class="svc-form-row two">
+            <label class="svc-field">
+              <span>Anticipo opcional</span>
+              <div class="svc-input-unit"><em>$</em><input id="deposit" type="number" min="0" step="0.01" value="0"><em>MXN</em></div>
+            </label>
+            <label class="svc-field">
+              <span>Tiempo entre citas</span>
+              <div class="svc-input-unit"><input id="buffer" type="number" min="0" step="5" value="0"><em>min</em></div>
+            </label>
+          </div>
+
+          <label class="svc-field svc-field-full">
+            <span>Descripción</span>
+            <textarea id="sdesc" rows="4" maxlength="500" placeholder="Describe qué incluye, para quién es y qué debe esperar el cliente."></textarea>
+            <small><b id="desc-count">0</b>/500 caracteres</small>
+          </label>
+        </section>
+
+        <section class="svc-card">
+          <div class="svc-card-title blue"><span>2</span><div><h2>Imagen del servicio</h2><p>Elige una imagen rápida o sube la tuya.</p></div></div>
+
+          <div class="svc-image-grid" id="preset-images"></div>
+
+          <label class="svc-upload">
+            <input id="simage" type="file" accept="image/png,image/jpeg,image/webp">
+            <span class="svc-upload-icon">☁</span>
+            <b>Subir mi propia imagen</b>
+            <small>PNG, JPG o WEBP · máx. recomendado 5 MB</small>
+          </label>
+          <input id="preset-image-url" type="hidden">
+        </section>
+
+        <section class="svc-card svc-compact">
+          <div class="svc-switch-row">
+            <div class="svc-card-title green no-margin"><span>3</span><div><h2>Disponible para reservar</h2><p>Al desactivarlo se oculta del enlace público, pero no se elimina.</p></div></div>
+            <label class="svc-switch"><input id="active" type="checkbox" checked><i></i></label>
+          </div>
+          <div class="svc-switch-row svc-featured-row">
+            <div><b>Destacar este servicio</b><small>Muéstralo primero en tu catálogo.</small></div>
+            <label class="svc-switch"><input id="featured" type="checkbox"><i></i></label>
+          </div>
+        </section>
+
+        <section class="svc-card">
+          <div class="svc-card-title violet"><span>7</span><div><h2>Tu catálogo</h2><p>Edita, activa u oculta servicios existentes.</p></div></div>
+          <div id="service-list" class="svc-catalog"></div>
+        </section>
+      </div>
+
+      <div class="svc-column">
+        <section class="svc-card">
+          <div class="svc-card-title blue"><span>4</span><div><h2>Horarios disponibles</h2><p>Estos horarios aplican a todo tu negocio.</p></div></div>
+
+          <div class="svc-quick-label">Plantillas rápidas</div>
+          <div class="svc-template-row">
+            <button class="svc-template active" type="button" data-template="office">Lun–Vie <b>9–7</b></button>
+            <button class="svc-template" type="button" data-template="extended">Lun–Sáb <b>9–6</b></button>
+            <button class="svc-template" type="button" data-template="daily">Lun–Dom <b>10–8</b></button>
+            <button class="svc-template" type="button" data-template="custom">Personalizado</button>
+          </div>
+
+          <div class="svc-hours-table">
+            <div class="svc-hours-head"><span>Día</span><span>Abre</span><span>Cierra</span><span>Estado</span></div>
+            <div id="weekly-hours"></div>
+          </div>
+
+          <div class="svc-inline-actions">
+            <button id="save-hours" class="svc-btn svc-btn-soft" type="button">Guardar horarios</button>
+            <small>Los cambios afectan la disponibilidad de todas las reservaciones.</small>
+          </div>
+        </section>
+
+        <div class="svc-two-cards">
+          <section class="svc-card svc-block-card pink">
+            <div class="svc-card-title pink"><span>5</span><div><h2>Bloquear fechas</h2><p>Vacaciones, festivos o eventos.</p></div></div>
+            <div class="svc-block-form">
+              <input id="block-date" type="date">
+              <input id="block-date-reason" placeholder="Motivo opcional">
+              <button id="add-block-date" class="svc-btn svc-btn-pink" type="button">Bloquear día</button>
+            </div>
+            <div id="blocked-dates" class="svc-block-list"></div>
+          </section>
+
+          <section class="svc-card svc-block-card orange">
+            <div class="svc-card-title orange"><span>6</span><div><h2>Bloquear horas</h2><p>Cierra solo una parte del día.</p></div></div>
+            <div class="svc-block-form">
+              <input id="block-time-date" type="date">
+              <div class="svc-form-row two">
+                <input id="block-start" type="time" value="13:00">
+                <input id="block-end" type="time" value="14:00">
+              </div>
+              <input id="block-time-reason" placeholder="Ej. Comida, capacitación">
+              <button id="add-block-time" class="svc-btn svc-btn-orange" type="button">Bloquear horario</button>
+            </div>
+            <div id="blocked-times" class="svc-block-list"></div>
+          </section>
+        </div>
+
+        <section class="svc-summary">
+          <div class="svc-summary-title">Resumen del servicio</div>
+          <div class="svc-summary-grid">
+            <div><span>Categoría</span><b id="sum-category">Servicios</b></div>
+            <div><span>Duración</span><b id="sum-duration">—</b></div>
+            <div><span>Precio</span><b id="sum-price">$0 MXN</b></div>
+            <div><span>Anticipo</span><b id="sum-deposit">$0 MXN</b></div>
+            <div><span>Disponible</span><b id="sum-active" class="svc-ok">Activo</b></div>
+          </div>
+          <div class="svc-client-preview">
+            <div class="svc-preview-thumb" id="sum-image"><span>▣</span></div>
+            <div><small>Así lo verá tu cliente</small><b id="sum-name">Nuevo servicio</b><span id="sum-detail">Completa los datos para previsualizar</span></div>
+          </div>
+        </section>
+      </div>
     </div>
-    <input id="featured" type="checkbox">
-  </label>
-</div><div class="mt-16"><button id="save-service" class="btn btn-primary">Guardar servicio</button><button id="clear-service" class="btn btn-ghost">Nuevo</button></div></section><h2 class="adm-h2">Catálogo</h2><div id="service-list" class="catalog-grid"></div></main><div id="toast" class="toast hidden"></div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="../js/config.js"></script>
-<script src="../js/supabase.js"></script><script src="../js/admin-auth.js"></script><script src="../js/admin-services.js"></script></body></html>
+  </main>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/config.js"></script>
+<script src="../js/supabase.js"></script>
+<script src="../js/admin-auth.js"></script>
+<script src="../js/admin-services.js"></script>
+</body>
+</html>

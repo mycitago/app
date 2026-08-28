@@ -1,0 +1,40 @@
+CITAS · BLOQUE 23 · SERVICIOS PRO
+
+ARCHIVOS A SUBIR A GITHUB
+-------------------------
+/admin/servicios.html
+/css/admin-services-pro.css
+/js/admin-services.js
+
+QUÉ INCLUYE
+-----------
+- Rediseño completo de Servicios basado en la interfaz aprobada.
+- Sidebar y diseño responsive.
+- Resumen del servicio en vivo.
+- 6 imágenes predeterminadas genéricas.
+- Subida de imagen propia a business-public-media.
+- Plantillas rápidas de horario:
+  * Lun–Vie 9–19
+  * Lun–Sáb 9–18
+  * Lun–Dom 10–20
+  * Personalizado
+- Guardado de opening_hours en businesses.
+- Bloqueo de día completo usando blocked_times.
+- Bloqueo de horas específicas usando blocked_times.
+- Listado y eliminación de bloqueos.
+- Duplicar servicio.
+- Vista previa del enlace público.
+- Catálogo existente construido con DOM seguro (sin onclick inline).
+
+NO REQUIERE SQL NUEVO
+---------------------
+Usa las tablas y políticas que ya instalamos:
+businesses.opening_hours
+services
+blocked_times
+business-public-media
+
+NOTA
+----
+Los horarios son del NEGOCIO completo, no de un servicio individual.
+Esto coincide con la lógica actual de reservaciones.
