@@ -1,0 +1,28 @@
+CITAS · BLOQUE 27
+
+SQL:
+27_INTEGRACION_SERVICIOS_CITAS_PERSONAL.sql
+
+FRONTEND SERVICIOS:
+- admin/servicios.html
+- css/admin-services-pro.css
+- js/admin-services.js
+
+PÚBLICO:
+- js/public-services-realtime.js
+
+IMPORTANTE:
+Para activar catálogo en tiempo real, agregar en reservar.html después de public-booking-pro.js:
+<script src="js/public-services-realtime.js"></script>
+
+Incluye:
+- price_charged y duration_charged congelados por cita.
+- service_staff para vincular servicios y personal.
+- staff_id preparado en appointments.
+- vista service_report_summary.
+- Services en Supabase Realtime.
+- selector de personal en Servicios.
+- iconos Lucide.
+- skeleton del plan.
+- menú “Más opciones”.
+- configuración avanzada colapsada.

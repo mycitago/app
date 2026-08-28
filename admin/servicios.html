@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="../css/styles.css">
   <link rel="stylesheet" href="../css/admin.css">
   <link rel="stylesheet" href="../css/admin-services-pro.css">
+<script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
 </head>
 <body class="svc-body">
 
@@ -30,20 +31,21 @@
 
     <div class="svc-side-label">MI NEGOCIO</div>
     <nav class="svc-nav">
-      <a href="configuracion.html"><span>⌂</span> Información</a>
-      <a class="active" href="servicios.html"><span>▣</span> Servicios</a>
-      <a href="equipo.html"><span>♙</span> Personal</a>
-      <a href="index.html"><span>◷</span> Reservas</a>
-      <a href="clientes.html"><span>♧</span> Clientes</a>
-      <a href="contabilidad.html"><span>▥</span> Reportes</a>
-      <a href="integraciones.html"><span>⚙</span> Integraciones</a>
+      <a href="configuracion.html"><i data-lucide="building-2"></i> Información</a>
+      <a class="active" href="servicios.html"><i data-lucide="package"></i> Servicios</a>
+      <a href="equipo.html"><i data-lucide="users"></i> Personal</a>
+      <a href="index.html"><i data-lucide="calendar-clock"></i> Reservas</a>
+      <a href="clientes.html"><i data-lucide="contact"></i> Clientes</a>
+      <a href="contabilidad.html"><i data-lucide="chart-no-axes-column-increasing"></i> Reportes</a>
+      <a href="integraciones.html"><i data-lucide="plug"></i> Integraciones</a>
     </nav>
 
     <div class="svc-side-spacer"></div>
     <section class="svc-plan-card">
       <span class="svc-plan-kicker">TU PLAN ACTUAL</span>
-      <strong id="svc-plan-name">Cargando…</strong>
-      <small id="svc-plan-date">Validando suscripción</small>
+      <div id="svc-plan-skeleton" class="svc-plan-skeleton"><i></i><i></i></div>
+<strong id="svc-plan-name" class="hidden"></strong>
+<small id="svc-plan-date" class="hidden"></small>
       <a href="planes.html">Ver mi plan</a>
     </section>
     <section class="svc-help-card">
@@ -60,9 +62,18 @@
         <p>Crea un servicio, define cuándo atiendes y bloquea excepciones sin salir de esta pantalla.</p>
       </div>
       <div class="svc-head-actions">
-        <button id="preview-client" class="svc-btn svc-btn-ghost" type="button">◉ Vista previa cliente</button>
-        <button id="duplicate-service" class="svc-btn svc-btn-ghost" type="button">⧉ Duplicar servicio</button>
-        <button id="save-service" class="svc-btn svc-btn-primary" type="button">✓ Guardar servicio</button>
+        <div class="svc-more-wrap">
+          <button id="svc-more-btn" class="svc-btn svc-btn-ghost" type="button" aria-expanded="false">
+            <i data-lucide="ellipsis"></i> Más opciones
+          </button>
+          <div id="svc-more-menu" class="svc-more-menu hidden">
+            <button id="preview-client" type="button"><i data-lucide="eye"></i> Vista previa cliente</button>
+            <button id="duplicate-service" type="button"><i data-lucide="copy"></i> Duplicar servicio</button>
+          </div>
+        </div>
+        <button id="save-service" class="svc-btn svc-btn-primary" type="button">
+          <i data-lucide="save"></i> Guardar servicio
+        </button>
       </div>
     </section>
 
@@ -128,6 +139,13 @@
         </section>
 
         <section class="svc-card">
+          <div class="svc-card-title teal"><span><i data-lucide="users-round"></i></span><div><h2>Personal que puede realizarlo</h2><p>Selecciona uno o varios miembros capacitados para este servicio.</p></div></div>
+          <div id="service-staff-list" class="svc-staff-grid">
+            <div class="svc-empty">Cargando personal…</div>
+          </div>
+        </section>
+
+        <section class="svc-card">
           <div class="svc-card-title blue"><span>2</span><div><h2>Imagen del servicio</h2><p>Elige una imagen rápida o sube la tuya.</p></div></div>
 
           <div class="svc-image-grid" id="preset-images"></div>
@@ -181,7 +199,12 @@
           </div>
         </section>
 
-        <div class="svc-two-cards">
+        <details class="svc-advanced">
+          <summary>
+            <div><i data-lucide="sliders-horizontal"></i><span><b>Configuración avanzada</b><small>Bloqueos de fechas y horas especiales</small></span></div>
+            <i data-lucide="chevron-down"></i>
+          </summary>
+          <div class="svc-two-cards">
           <section class="svc-card svc-block-card pink">
             <div class="svc-card-title pink"><span>5</span><div><h2>Bloquear fechas</h2><p>Vacaciones, festivos o eventos.</p></div></div>
             <div class="svc-block-form">
@@ -205,7 +228,8 @@
             </div>
             <div id="blocked-times" class="svc-block-list"></div>
           </section>
-        </div>
+          </div>
+        </details>
 
         <section class="svc-summary">
           <div class="svc-summary-title">Resumen del servicio</div>
@@ -233,5 +257,6 @@
 <script src="../js/supabase.js"></script>
 <script src="../js/admin-auth.js"></script>
 <script src="../js/admin-services.js"></script>
+<script>document.addEventListener("DOMContentLoaded",()=>window.lucide?.createIcons());</script>
 </body>
 </html>

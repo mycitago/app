@@ -3,6 +3,8 @@ let biz = null;
 let items = [];
 let blockedItems = [];
 let selectedPresetImage = '';
+let staffItems = [];
+let selectedStaffIds = new Set();
 const $ = id => document.getElementById(id);
 
 const DAYS = [
@@ -240,6 +242,8 @@ function clearForm() {
   selectedPresetImage = '';
   $('preset-image-url').value = '';
   document.querySelectorAll('.svc-image-preset').forEach(x => x.classList.remove('active'));
+  selectedStaffIds.clear();
+  loadStaff();
   updateSummary();
 }
 
@@ -285,6 +289,88 @@ function catalogCard(service) {
   return card;
 }
 
+
+async function loadStaff() {
+  const {data,error} = await supabaseClient
+    .from('staff')
+    .select('id,name,active')
+    .eq('business_id',biz.id)
+    .eq('active',true)
+    .order('name');
+
+  const root = $('service-staff-list');
+  root.replaceChildren();
+
+  if (error) {
+    const e = document.createElement('div');
+    e.className='svc-empty';
+    e.textContent='No se pudo cargar el personal.';
+    root.appendChild(e);
+    return;
+  }
+
+  staffItems = data || [];
+  if (!staffItems.length) {
+    const e = document.createElement('div');
+    e.className='svc-empty';
+    e.textContent='Aún no tienes personal activo. Puedes guardar el servicio y asignarlo después.';
+    root.appendChild(e);
+    return;
+  }
+
+  staffItems.forEach(s => {
+    const label = document.createElement('label');
+    label.className='svc-staff-option';
+    const input = document.createElement('input');
+    input.type='checkbox';
+    input.checked=selectedStaffIds.has(s.id);
+    input.addEventListener('change',()=>{
+      if(input.checked) selectedStaffIds.add(s.id);
+      else selectedStaffIds.delete(s.id);
+    });
+    const info=document.createElement('div');
+    const b=document.createElement('b'); b.textContent=s.name;
+    const small=document.createElement('small'); small.textContent='Puede realizar este servicio';
+    info.append(b,small);
+    label.append(input,info);
+    root.appendChild(label);
+  });
+}
+
+async function loadServiceStaff(serviceId) {
+  selectedStaffIds.clear();
+  if (!serviceId) {
+    await loadStaff();
+    return;
+  }
+  const {data,error}=await supabaseClient
+    .from('service_staff')
+    .select('staff_id')
+    .eq('service_id',serviceId)
+    .eq('business_id',biz.id);
+  if(!error) (data||[]).forEach(r=>selectedStaffIds.add(r.staff_id));
+  await loadStaff();
+}
+
+async function saveServiceStaff(serviceId) {
+  const {error:delError}=await supabaseClient
+    .from('service_staff')
+    .delete()
+    .eq('service_id',serviceId)
+    .eq('business_id',biz.id);
+  if(delError) throw delError;
+
+  if(!selectedStaffIds.size) return;
+
+  const rows=[...selectedStaffIds].map(staff_id=>({
+    service_id:serviceId,
+    staff_id,
+    business_id:biz.id
+  }));
+  const {error}=await supabaseClient.from('service_staff').insert(rows);
+  if(error) throw error;
+}
+
 async function loadServices() {
   const {data,error} = await supabaseClient
     .from('services')
@@ -322,6 +408,7 @@ function editService(id) {
   selectedPresetImage = s.image_url || '';
   $('preset-image-url').value = s.image_url || '';
   updateSummary();
+  loadServiceStaff(s.id);
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -383,11 +470,14 @@ async function saveService() {
 
     const id = $('sid').value;
     const query = id
-      ? supabaseClient.from('services').update(payload).eq('id',id)
-      : supabaseClient.from('services').insert(payload);
+      ? supabaseClient.from('services').update(payload).eq('id',id).select('id').single()
+      : supabaseClient.from('services').insert(payload).select('id').single();
 
-    const {error} = await query;
+    const {data:saved,error} = await query;
     if (error) throw error;
+    if (!saved?.id) throw new Error('No se pudo confirmar el guardado del servicio');
+
+    await saveServiceStaff(saved.id);
 
     toast('Servicio guardado');
     clearForm();
@@ -519,6 +609,22 @@ function bindUI() {
 
   const menu = $('svc-mobile-menu');
   if (menu) menu.addEventListener('click',() => $('svc-sidebar').classList.toggle('open'));
+
+  const moreBtn=$('svc-more-btn');
+  const moreMenu=$('svc-more-menu');
+  if(moreBtn && moreMenu){
+    moreBtn.addEventListener('click',()=>{
+      const opening=moreMenu.classList.contains('hidden');
+      moreMenu.classList.toggle('hidden');
+      moreBtn.setAttribute('aria-expanded',String(opening));
+    });
+    document.addEventListener('click',(ev)=>{
+      if(!moreBtn.contains(ev.target) && !moreMenu.contains(ev.target)){
+        moreMenu.classList.add('hidden');
+        moreBtn.setAttribute('aria-expanded','false');
+      }
+    });
+  }
 }
 
 async function init() {
@@ -534,6 +640,9 @@ async function init() {
 
   const sub = biz.subscription;
   if (sub) {
+    $('svc-plan-skeleton')?.remove();
+    $('svc-plan-name').classList.remove('hidden');
+    $('svc-plan-date').classList.remove('hidden');
     $('svc-plan-name').textContent = sub.plan_id || sub.plan || 'Plan activo';
     $('svc-plan-date').textContent = sub.current_period_end
       ? `Vigente hasta ${localDateLabel(sub.current_period_end)}`
@@ -545,6 +654,7 @@ async function init() {
   $('block-date').min = iso;
   $('block-time-date').min = iso;
 
-  await Promise.all([loadServices(),loadBlocks()]);
+  await Promise.all([loadServices(),loadBlocks(),loadStaff()]);
+  window.lucide?.createIcons();
 }
 document.addEventListener('DOMContentLoaded',init);
