@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ayuda · MyCitaGo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/styles.css"><link rel="stylesheet" href="../css/citago-admin.css"><link rel="stylesheet" href="../css/admin-support.css">
+</head>
+<body><div id="citago-shell"></div>
+<main class="support-page">
+  <header class="support-hero">
+    <div><div class="ct-eyebrow">AYUDA Y SOPORTE</div><h1>¿Cómo podemos ayudarte?</h1><p>Cuéntanos qué necesitas. MyCitaGo adjunta automáticamente el contexto de tu negocio para resolverlo más rápido.</p></div>
+    <div class="support-sla"><span>Soporte MyCitaGo</span><strong>Directo y contextual</strong><small>Historial y seguimiento dentro de tu cuenta</small></div>
+  </header>
+  <section class="support-grid">
+    <div class="support-main">
+      <article class="ct-card support-form-card">
+        <div class="support-card-head"><div><span class="ct-eyebrow">NUEVO TICKET</span><h2>Contactar soporte</h2></div><span class="support-status-dot">● Disponible</span></div>
+        <div class="ct-form-grid">
+          <label class="ct-form-field"><span>Categoría</span><select id="support-category"><option value="reservas">Reservaciones</option><option value="servicios">Servicios</option><option value="clientes">Clientes</option><option value="billing">Pagos y suscripción</option><option value="branding">Mi página</option><option value="google">Google y reseñas</option><option value="config">Configuración</option><option value="general">Otro</option></select></label>
+          <label class="ct-form-field"><span>Prioridad</span><select id="support-priority"><option value="normal">Normal</option><option value="high">Importante</option><option value="urgent">Mi operación está detenida</option></select></label>
+          <label class="ct-form-field full"><span>¿Con qué necesitas ayuda?</span><input id="support-subject" maxlength="120" placeholder="Ej. No puedo publicar un servicio"></label>
+          <label class="ct-form-field full"><span>Descripción</span><textarea id="support-description" rows="6" maxlength="2000" placeholder="Describe qué intentabas hacer y qué ocurrió."></textarea></label>
+        </div>
+        <div class="support-context" id="support-context"></div>
+        <div class="support-actions"><span id="support-save-state">Listo para enviar</span><button id="support-send" class="ct-btn ct-btn-primary" type="button">Enviar a soporte</button></div>
+      </article>
+      <article class="ct-card"><div class="support-card-head"><div><span class="ct-eyebrow">SEGUIMIENTO</span><h2>Mis solicitudes</h2></div><button id="support-refresh" class="ct-btn ct-btn-secondary" type="button">Actualizar</button></div><div id="support-list" class="support-list"><div class="ct-empty">Cargando solicitudes…</div></div></article><article id="support-thread-card" class="ct-card hidden"><div class="support-card-head"><div><span class="ct-eyebrow">CONVERSACIÓN</span><h2 id="support-thread-title">Solicitud</h2></div><span id="support-thread-status" class="support-status-dot"></span></div><div id="support-thread" class="support-thread"></div><div class="support-reply"><textarea id="support-reply" rows="3" placeholder="Escribe un mensaje para continuar la conversación…"></textarea><button id="support-reply-send" class="ct-btn ct-btn-primary" type="button">Enviar mensaje</button></div></article>
+    </div>
+    <aside class="support-side">
+      <article class="ct-card"><span class="ct-eyebrow">SOLUCIONES RÁPIDAS</span><h3>Antes de crear un ticket</h3><a href="servicios.html">Configurar servicios <b>→</b></a><a href="mi-pagina.html">Publicar mi página <b>→</b></a><a href="resenas.html">Conectar Google <b>→</b></a><a href="configuracion.html">Datos de mi negocio <b>→</b></a></article>
+      <article class="ct-card support-promise"><div class="support-icon">✓</div><h3>Tu contexto viaja contigo</h3><p>Negocio, usuario, página actual, navegador y fecha se adjuntan al ticket para evitar preguntas repetidas.</p></article>
+    </aside>
+  </section>
+</main>
+<div id="toast" class="toast hidden"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="../js/config.js"></script><script src="../js/supabase.js"></script><script src="../js/admin-auth.js"></script><script src="../js/admin-support.js"></script><script src="../js/citago-shell.js"></script><script>document.addEventListener('DOMContentLoaded',()=>CitagoShell.mount({mode:'tenant',activePage:'ayuda'}));</script>
+</body></html>

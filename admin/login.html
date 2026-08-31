@@ -3,9 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Panel · Iniciar sesión</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght;500;600;700;800&display=swap" rel="stylesheet">
+<title>MyCitaGo · Iniciar sesión</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/styles.css">
 <link rel="stylesheet" href="../css/admin.css">
+<link rel="stylesheet" href="../css/admin-login-mycitago.css">
 <style>
   .adm-links { display: flex; justify-content: space-between; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
   .adm-link { color: #9d2b4f; font-size: 13px; cursor: pointer; text-decoration: underline; background: none; border: none; padding: 0; }
@@ -15,6 +16,8 @@
 <body class="adm-login-body">
 
 <main class="adm-login-card">
+  <img class="mycitago-login-logo" src="../assets/brand/mycitago-logo.png" alt="MyCitaGo">
+  <span class="login-kicker">GESTIÓN DE CITAS Y CLIENTES</span>
   <h1 id="card-title">Panel administrativo</h1>
   <p class="text-muted" id="card-sub">Ingresa con tu cuenta de administrador.</p>
 
@@ -108,8 +111,8 @@
 
   const views = ['login', 'register', 'forgot', 'reset'];
   const titles = {
-    login: ['Panel administrativo', 'Ingresa con tu cuenta de administrador.'],
-    register: ['Registra tu negocio', 'Crea tu cuenta y tu negocio en un solo paso.'],
+    login: ['Bienvenido a MyCitaGo', 'Ingresa para administrar tu negocio.'],
+    register: ['Crea tu espacio MyCitaGo', 'Registra tu negocio y empieza con una configuración guiada.'],
     forgot: ['Recuperar contraseña', 'Te enviaremos un enlace por correo.'],
     reset: ['Nueva contraseña', 'Escribe tu nueva contraseña.'],
   };

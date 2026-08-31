@@ -316,3 +316,17 @@ button,input{font:inherit}
     height:54px
   }
 }
+
+/* --mycitago-dashboard-compact: keep dashboard above the fold */
+body.ct-shell-ready .dash-main{max-width:1450px!important;padding:28px 0 56px!important;margin:0!important;min-height:0!important}
+body.ct-shell-ready .dash-welcome{min-height:0!important;height:auto!important;margin:0 0 18px!important;padding:0!important;align-items:flex-end!important}
+body.ct-shell-ready .dash-welcome .hero-new-appointment,
+body.ct-shell-ready #hero-new-appointment{display:none!important}
+body.ct-shell-ready .dash-kpis{margin:0 0 18px!important;gap:14px!important}
+body.ct-shell-ready .kpi-card{min-height:148px!important}
+body.ct-shell-ready .dash-grid-main{margin-top:0!important}
+body.ct-shell-ready .dash-main:before,body.ct-shell-ready .dash-welcome:before{display:none!important;content:none!important}
+@media(max-width:760px){body.ct-shell-ready .dash-main{padding:16px 0 84px!important}.dash-kpis{grid-template-columns:repeat(2,minmax(0,1fr))!important}.kpi-card{min-height:138px!important}}
+@media(max-width:480px){.dash-kpis{grid-template-columns:1fr!important}}
+.mycitago-health-strip{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(420px,.8fr);gap:14px;background:linear-gradient(120deg,#17151f,#2a2040 68%,#6d28d9 150%);color:#fff;border-radius:18px;padding:17px 18px;margin:0 0 18px;box-shadow:0 12px 34px rgba(36,26,57,.12)}.health-kicker{font-size:8px;letter-spacing:.1em;color:#bba6ff;font-weight:800}.health-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:5px}.health-title strong{font-size:14px}.health-title span{font-size:12px;color:#cfc7dc}.health-progress{height:6px;border-radius:999px;background:rgba(255,255,255,.13);overflow:hidden;margin:10px 0 7px}.health-progress i{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,#8b5cf6,#d946ef);transition:.3s}.health-main small{font-size:9px;color:#c7c0d1}.health-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.health-actions a{text-decoration:none;color:#fff;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:11px}.health-actions b{display:block;font-size:18px}.health-actions span{display:block;font-size:8px;color:#c8c1d3;margin-top:4px}@media(max-width:900px){.mycitago-health-strip{grid-template-columns:1fr}.health-actions{grid-template-columns:repeat(3,1fr)}}@media(max-width:560px){.health-actions{grid-template-columns:1fr 1fr}.health-actions a:last-child{grid-column:1/-1}}
+.health-onboarding{display:inline-flex;margin-top:8px;color:#fff;text-decoration:none;font-size:8px;font-weight:800}.health-onboarding:hover{text-decoration:underline}

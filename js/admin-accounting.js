@@ -15,6 +15,8 @@ const el = {
   monthPicker: document.getElementById('month-picker'),
   kpiIncome: document.getElementById('kpi-income'),
   kpiExpenses: document.getElementById('kpi-expenses'),
+  kpiDone: document.getElementById('kpi-done'),
+  kpiProjected: document.getElementById('kpi-projected'),
   kpiProfit: document.getElementById('kpi-profit'),
   kpiNote: document.getElementById('kpi-note'),
   listExpenses: document.getElementById('list-expenses'),
@@ -85,6 +87,8 @@ async function init() {
 
   document.getElementById('btn-logout').addEventListener('click', logout);
   document.getElementById('btn-add-expense').addEventListener('click', addExpense);
+  document.getElementById('open-expense')?.addEventListener('click',()=>document.getElementById('expense-panel').classList.remove('hidden'));
+  document.querySelectorAll('[data-close-expense]').forEach(x=>x.addEventListener('click',()=>document.getElementById('expense-panel').classList.add('hidden')));
   document.getElementById('exp-date').value = todayKey();
 
   await loadData();
@@ -96,7 +100,7 @@ async function loadData() {
   const [apptsRes, expRes] = await Promise.all([
     supabaseClient
       .from('appointments')
-      .select('appointment_date, status, services(price)')
+      .select('appointment_date, status, services(id,name,price)')
       .eq('business_id', state.business.id)
       .gte('appointment_date', from),
     supabaseClient
@@ -143,6 +147,7 @@ async function addExpense() {
   document.getElementById('exp-concept').value = '';
   document.getElementById('exp-amount').value = '';
   showToast('Gasto guardado.');
+  document.getElementById('expense-panel')?.classList.add('hidden');
   await loadData();
 }
 
@@ -178,6 +183,8 @@ function renderAll() {
 
   el.kpiIncome.textContent = formatMoney(current.income);
   el.kpiExpenses.textContent = formatMoney(current.expenses);
+  if(el.kpiDone)el.kpiDone.textContent=current.doneCount;
+  if(el.kpiProjected)el.kpiProjected.textContent=formatMoney(current.projected);
   el.kpiProfit.textContent = formatMoney(current.profit);
   el.kpiProfit.className = 'adm-kpi-num ' + (current.profit >= 0 ? 'adm-green' : 'adm-red');
   el.kpiNote.textContent =
@@ -207,6 +214,8 @@ function renderAll() {
   renderFinanceChart(perMonth);
 
   const max = Math.max(1, ...perMonth.map((m) => Math.max(m.income, m.expenses)));
+  renderPopularServices();
+
   el.summary6m.innerHTML = perMonth.map((m) => `
     <div class="adm-6m-row">
       <div class="adm-6m-label">${monthLabel(m.key)}</div>
@@ -217,6 +226,9 @@ function renderAll() {
       <div class="adm-6m-profit ${m.profit >= 0 ? 'adm-green' : 'adm-red'}">${formatMoney(m.profit)}</div>
     </div>`).join('');
 }
+
+
+function renderPopularServices(){const root=document.getElementById('popular-services');if(!root)return;const counts=new Map();state.appointments.filter(a=>a.status==='completada'&&(a.appointment_date||'').startsWith(state.month)).forEach(a=>{const name=a.services?.name||'Servicio';counts.set(name,(counts.get(name)||0)+1)});const rows=[...counts.entries()].sort((a,b)=>b[1]-a[1]).slice(0,6);if(!rows.length){root.innerHTML='<div class="ct-empty">Aún no hay servicios completados en este periodo.</div>';return}const max=Math.max(...rows.map(x=>x[1]),1);root.replaceChildren(...rows.map(([name,n])=>{const r=document.createElement('div');r.className='popular-row';const d=document.createElement('div');const b=document.createElement('b');b.textContent=name;const sm=document.createElement('small');sm.textContent=`${n} cita${n===1?'':'s'} completada${n===1?'':'s'}`;const track=document.createElement('div');track.className='popular-track';const i=document.createElement('i');i.style.width=`${n/max*100}%`;track.appendChild(i);d.append(b,sm,track);const st=document.createElement('strong');st.textContent=n;r.append(d,st);return r}))}
 
 function renderFinanceChart(perMonth) {
   const canvas = document.getElementById('finance-chart');

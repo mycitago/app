@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Servicios · CITAS</title>
+  <title>Servicios · MyCitaGo</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/styles.css">
@@ -16,7 +16,7 @@
 <header class="svc-mobile-topbar">
   <div class="svc-brand-mark">C</div>
   <div>
-    <strong>CITAS</strong>
+    <strong>MyCitaGo</strong>
     <small>Servicios y disponibilidad</small>
   </div>
   <button id="svc-mobile-menu" class="svc-icon-btn" type="button" aria-label="Abrir menú">☰</button>
@@ -26,7 +26,7 @@
   <aside class="svc-sidebar" id="svc-sidebar">
     <div class="svc-brand">
       <div class="svc-logo">C</div>
-      <div><strong>CITAS</strong><small>Tu negocio, organizado</small></div>
+      <div><strong>MyCitaGo</strong><small>Tu negocio, organizado</small></div>
     </div>
 
     <div class="svc-side-label">MI NEGOCIO</div>
@@ -57,9 +57,9 @@
   <main class="svc-main">
     <section class="svc-page-head">
       <div>
-        <span class="svc-eyebrow">CATÁLOGO Y DISPONIBILIDAD</span>
-        <h1>Agregar / editar servicio <span>✦</span></h1>
-        <p>Crea un servicio, define cuándo atiendes y bloquea excepciones sin salir de esta pantalla.</p>
+        <span class="svc-eyebrow">SERVICIOS INTELIGENTES</span>
+        <h1>Configura un servicio en minutos <span>✦</span></h1>
+        <p>Elige una plantilla, define el precio y MyCitaGo completa una configuración recomendada que puedes ajustar después.</p>
       </div>
       <div class="svc-head-actions">
         <div class="svc-more-wrap">
@@ -78,6 +78,13 @@
     </section>
 
     <input id="sid" type="hidden">
+
+    <section class="svc-quick-start" id="quick-start">
+      <div class="svc-quick-copy"><span class="svc-eyebrow">CONFIGURACIÓN RÁPIDA</span><h2>¿Qué quieres ofrecer?</h2><p>Selecciona un servicio recomendado para tu giro. Podrás personalizar todo después.</p></div>
+      <div class="svc-business-type"><label>Tipo de negocio<select id="business-type"><option value="barber">Barbería</option><option value="beauty">Salón / Estética</option><option value="nails">Uñas</option><option value="spa">Spa / Masajes</option><option value="dental">Dentista</option><option value="therapy">Psicología / Terapia</option><option value="nutrition">Nutrición</option><option value="physio">Fisioterapia</option><option value="veterinary">Veterinaria</option><option value="consulting">Consultoría</option><option value="automotive">Automotriz</option><option value="photo">Fotografía</option><option value="classes">Clases</option><option value="other">Otro</option></select></label></div>
+      <div id="service-template-library" class="svc-template-library"></div>
+      <div class="svc-quick-hint"><b>Flujo recomendado:</b> elige plantilla → escribe precio → revisa duración/personal → publicar.</div><div id="price-assistant" class="svc-price-assistant hidden"></div>
+    </section>
 
     <div class="svc-layout">
       <div class="svc-column">
@@ -136,6 +143,26 @@
             <textarea id="sdesc" rows="4" maxlength="500" placeholder="Describe qué incluye, para quién es y qué debe esperar el cliente."></textarea>
             <small><b id="desc-count">0</b>/500 caracteres</small>
           </label>
+
+          <details class="svc-business-details" id="commercial-details">
+            <summary><span><b>Costos, políticas y rentabilidad</b><small>Opcional · MyCitaGo calcula margen y capacidad automáticamente</small></span><i data-lucide="chevron-down"></i></summary>
+            <div class="svc-form-row three svc-advanced-fields">
+              <label class="svc-field"><span>Costo interno</span><div class="svc-input-unit"><em>$</em><input id="internal-cost" type="number" min="0" step="0.01" value="0"><em>MXN</em></div></label>
+              <label class="svc-field"><span>Impuestos</span><div class="svc-input-unit"><input id="tax-rate" type="number" min="0" max="100" step="0.01" value="0"><em>%</em></div></label>
+              <label class="svc-field"><span>Utilización esperada</span><div class="svc-input-unit"><input id="expected-utilization" type="number" min="0" max="100" step="1" value="70"><em>%</em></div></label>
+            </div>
+            <div class="svc-form-row three svc-advanced-fields">
+              <label class="svc-field"><span>Preparación antes</span><div class="svc-input-unit"><input id="prep-minutes" type="number" min="0" step="5" value="0"><em>min</em></div></label>
+              <label class="svc-field"><span>Recuperación después</span><div class="svc-input-unit"><input id="recovery-minutes" type="number" min="0" step="5" value="0"><em>min</em></div></label>
+              <label class="svc-field"><span>Reserva mínima</span><div class="svc-input-unit"><input id="min-booking-hours" type="number" min="0" step="1" value="2"><em>h</em></div></label>
+            </div>
+            <div class="svc-form-row two svc-advanced-fields">
+              <label class="svc-field"><span>Reserva máxima</span><div class="svc-input-unit"><input id="max-booking-days" type="number" min="1" step="1" value="60"><em>días</em></div></label>
+              <label class="svc-field"><span>Etiquetas</span><input id="service-tags" placeholder="Ej. premium, caballero, primera visita"></label>
+            </div>
+            <label class="svc-field svc-field-full"><span>Política de cancelación</span><textarea id="cancellation-policy" rows="2" placeholder="Ej. Cancela sin costo hasta 24 horas antes."></textarea></label>
+            <label class="svc-field svc-field-full"><span>Política de reembolso</span><textarea id="refund-policy" rows="2" placeholder="Ej. El anticipo se devuelve si cancela dentro del plazo permitido."></textarea></label>
+          </details>
         </section>
 
         <section class="svc-card">
@@ -172,13 +199,19 @@
 
         <section class="svc-card">
           <div class="svc-card-title violet"><span>7</span><div><h2>Tu catálogo</h2><p>Edita, activa u oculta servicios existentes.</p></div></div>
+          <div class="svc-bulk-toolbar"><span>Configuración masiva</span><button id="bulk-activate" type="button">Activar todos</button><button id="bulk-hide" type="button">Ocultar todos</button><button id="bulk-copy-hours" type="button">Usar horario general</button></div>
           <div id="service-list" class="svc-catalog"></div>
         </section>
       </div>
 
       <div class="svc-column">
         <section class="svc-card">
-          <div class="svc-card-title blue"><span>4</span><div><h2>Horarios disponibles</h2><p>Estos horarios aplican a todo tu negocio.</p></div></div>
+          <div class="svc-card-title blue"><span>4</span><div><h2>Disponibilidad</h2><p>Lo más simple es heredar el horario general del negocio.</p></div></div>
+          <div class="svc-schedule-mode">
+            <label class="svc-choice active"><input type="radio" name="schedule-mode" value="business" checked><span><b>Usar horario del negocio</b><small>Recomendado · sin configuración extra</small></span></label>
+            <label class="svc-choice"><input type="radio" name="schedule-mode" value="custom"><span><b>Horario especial</b><small>Sólo para este servicio</small></span></label>
+          </div>
+          <div id="custom-hours-panel" class="svc-custom-hours hidden">
 
           <div class="svc-quick-label">Plantillas rápidas</div>
           <div class="svc-template-row">
@@ -194,8 +227,10 @@
           </div>
 
           <div class="svc-inline-actions">
-            <button id="save-hours" class="svc-btn svc-btn-soft" type="button">Guardar horarios</button>
-            <small>Los cambios afectan la disponibilidad de todas las reservaciones.</small>
+            <button id="save-hours" class="svc-btn svc-btn-soft" type="button">Guardar horario general</button>
+            <button id="copy-monday" class="svc-btn svc-btn-ghost" type="button">Copiar lunes a todos</button>
+            <small>Si usas horario general, no necesitas editar esta tabla para cada servicio.</small>
+          </div>
           </div>
         </section>
 
@@ -229,6 +264,26 @@
             <div id="blocked-times" class="svc-block-list"></div>
           </section>
           </div>
+        </details>
+
+        <section class="svc-intelligence" id="service-intelligence">
+          <div class="svc-intel-head"><div><span class="svc-eyebrow">INTELIGENCIA DEL SERVICIO</span><h2>Capacidad y rentabilidad</h2></div><span id="service-health" class="svc-health">Completa precio y duración</span></div>
+          <div class="svc-intel-grid">
+            <div><span>Tiempo bloqueado</span><strong id="intel-blocked">—</strong></div>
+            <div><span>Capacidad semanal</span><strong id="intel-capacity">—</strong></div>
+            <div><span>Horas disponibles / semana</span><strong id="intel-hours">—</strong></div>
+            <div><span>Ingreso potencial diario</span><strong id="intel-daily">—</strong></div>
+            <div><span>Ingreso semanal</span><strong id="intel-weekly">—</strong></div>
+            <div><span>Ingreso mensual</span><strong id="intel-monthly">—</strong></div>
+            <div><span>Margen estimado</span><strong id="intel-margin">—</strong></div>
+            <div><span>Ingreso esperado</span><strong id="intel-expected">—</strong></div>
+          </div>
+          <div id="service-alerts" class="svc-intel-alerts"></div>
+        </section>
+
+        <details class="svc-history-panel">
+          <summary><span><b>Historial de cambios</b><small>Versiones guardadas de este servicio</small></span><i data-lucide="chevron-down"></i></summary>
+          <div id="service-history" class="svc-history-list"><div class="svc-empty">Guarda el servicio para comenzar su historial.</div></div>
         </details>
 
         <section class="svc-summary">

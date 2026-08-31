@@ -1,15 +1,15 @@
-<!DOCTYPE html><div id="citago-shell"></div>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Super Admin · Plataforma</title>
+<title>MyCitaGo Platform · Super Admin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/styles.css">
 <link rel="stylesheet" href="../css/admin.css">
 <link rel="stylesheet" href="../css/citago-admin.css"><link rel="stylesheet" href="../css/admin-platform.css"></head>
-<body class="creator-body">
+<body class="creator-body"><div id="citago-shell"></div>
 <header class="creator-topbar">
   <div class="creator-brand"><span class="creator-logo">N</span><div><strong>Super Admin</strong><small>Control de la plataforma</small></div></div>
   <div class="creator-top-actions">
@@ -32,7 +32,7 @@
 
   <main class="creator-main">
     <section id="resumen" class="creator-hero">
-      <div><div class="eyebrow">OPERACIÓN SAAS</div><h1>Tu plataforma, de un vistazo</h1><p>Negocios, pruebas, ingresos recurrentes y salud operativa en un solo lugar.</p></div>
+      <div><div class="eyebrow">MYCITAGO PLATFORM</div><h1>Centro de operaciones</h1><p>Negocios, soporte, suscripciones, plantillas y salud operativa desde un solo lugar.</p></div>
       <div class="creator-date" id="creator-date">—</div>
     </section>
 
@@ -59,6 +59,11 @@
     <section class="creator-card" id="alertas">
       <div class="creator-card-head"><div><span class="eyebrow">ATENCIÓN</span><h2>Alertas de plataforma</h2></div><span id="alert-count" class="creator-soft">0 alertas</span></div>
       <div id="platform-alerts" class="creator-alerts"></div>
+    </section>
+
+    <section class="creator-grid-2" id="soporte">
+      <article class="creator-card platform-support-card"><div class="creator-card-head"><div><span class="eyebrow">SOPORTE</span><h2>Soporte · Bandeja de ayuda</h2></div><span id="support-open-count" class="creator-soft">0 abiertos</span></div><div id="platform-support-list" class="platform-support-list"><div class="creator-empty">Cargando tickets…</div></div></article>
+      <article class="creator-card" id="plantillas"><div class="creator-card-head"><div><span class="eyebrow">CATÁLOGO MYCITAGO</span><h2>Plantillas de servicios</h2></div><div style="display:flex;gap:6px"><button id="new-template" class="btn btn-primary" type="button">+ Plantilla</button><button id="refresh-templates" class="btn btn-ghost" type="button">Actualizar</button></div></div><div id="template-create-panel" class="platform-template-form hidden"><select id="template-category" class="input"></select><input id="template-name" class="input" placeholder="Nombre del servicio"><input id="template-duration" class="input" type="number" min="5" step="5" value="60" placeholder="Duración"><select id="template-image" class="input"><option value="/app/assets/service-presets/barber-cut.svg">Corte</option><option value="/app/assets/service-presets/beauty-hair.svg">Belleza</option><option value="/app/assets/service-presets/nails.svg">Uñas</option><option value="/app/assets/service-presets/spa.svg">Spa</option><option value="/app/assets/service-presets/dental.svg">Salud</option><option value="/app/assets/service-presets/consulting.svg">Profesional</option></select><button id="save-template" class="btn btn-primary" type="button">Guardar</button></div><div id="platform-template-summary" class="platform-template-summary"><div class="creator-empty">Cargando catálogo…</div></div></article>
     </section>
 
     <section class="creator-card" id="negocios">
