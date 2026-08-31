@@ -1,91 +1,55 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>MyCitaGo · Iniciar sesión</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght;500;600;700;800&display=swap" rel="stylesheet">
+<title>MyCitaGo · Acceso</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/styles.css">
 <link rel="stylesheet" href="../css/admin.css">
 <link rel="stylesheet" href="../css/admin-login-mycitago.css">
-<style>
-  .adm-links { display: flex; justify-content: space-between; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
-  .adm-link { color: #9d2b4f; font-size: 13px; cursor: pointer; text-decoration: underline; background: none; border: none; padding: 0; }
-  .adm-info { color: #1e5c3a; margin-top: 12px; font-size: 14px; }
-</style>
+<link rel="stylesheet" href="../css/mycitago-themes.css">
+<script src="../js/ui-theme.js"></script>
 </head>
 <body class="adm-login-body">
+<button class="login-theme-toggle ct-theme-toggle" type="button" data-theme-toggle aria-label="Cambiar tema" title="Cambiar tema"><span data-theme-icon>☾</span></button>
 
 <main class="adm-login-card">
   <img class="mycitago-login-logo" src="../assets/brand/mycitago-logo.png" alt="MyCitaGo">
   <span class="login-kicker">GESTIÓN DE CITAS Y CLIENTES</span>
-  <h1 id="card-title">Panel administrativo</h1>
-  <p class="text-muted" id="card-sub">Ingresa con tu cuenta de administrador.</p>
+  <h1 id="card-title">Bienvenido a MyCitaGo</h1>
+  <p class="text-muted" id="card-sub">Ingresa para administrar tu negocio.</p>
 
-  <!-- LOGIN -->
   <div id="view-login">
-    <div class="field">
-      <label for="login-email">Correo</label>
-      <input type="email" id="login-email" autocomplete="email" placeholder="tu@correo.com">
-    </div>
-    <div class="field">
-      <label for="login-password">Contraseña</label>
-      <input type="password" id="login-password" autocomplete="current-password">
-    </div>
+    <button id="btn-google" class="google-auth-btn" type="button" aria-label="Continuar con Google">
+      <span class="google-g">G</span><strong>Continuar con Google</strong>
+    </button>
+    <div class="auth-divider"><span>o usa tu correo</span></div>
+    <div class="field"><label for="login-email">Correo</label><input type="email" id="login-email" autocomplete="email" placeholder="tu@correo.com"></div>
+    <div class="field"><label for="login-password">Contraseña</label><input type="password" id="login-password" autocomplete="current-password"></div>
     <button id="btn-login" class="btn btn-primary">Entrar</button>
-    <div class="adm-links">
-      <button class="adm-link" data-view="forgot">¿Olvidaste tu contraseña?</button>
-      <button class="adm-link" data-view="register">Crear una cuenta</button>
-    </div>
+    <div class="adm-links"><button class="adm-link" data-view="forgot">¿Olvidaste tu contraseña?</button><button class="adm-link" data-view="register">Crear una cuenta</button></div>
   </div>
 
-  <!-- REGISTRO -->
   <div id="view-register" class="hidden">
-    <div class="field">
-      <label for="reg-business">Nombre de tu negocio</label>
-      <input type="text" id="reg-business" placeholder="Ej. Clínica, barbería, consultorio, taller...">
-      <div class="adm-note" id="reg-slug-preview" style="font-size:12px;color:#6b5a5e;margin-top:4px;"></div>
-    </div>
-    <div class="field">
-      <label for="reg-whatsapp">WhatsApp del negocio (10 dígitos)</label>
-      <input type="tel" id="reg-whatsapp" inputmode="numeric" placeholder="Ej. 5512345678">
-    </div>
-    <div class="field">
-      <label for="reg-email">Correo</label>
-      <input type="email" id="reg-email" autocomplete="email" placeholder="tu@correo.com">
-    </div>
-    <div class="field">
-      <label for="reg-password">Contraseña (mínimo 10 caracteres)</label>
-      <input type="password" id="reg-password" autocomplete="new-password">
+    <div id="register-google-option"><button id="btn-google-register" class="google-auth-btn" type="button"><span class="google-g">G</span><strong>Crear cuenta con Google</strong></button><div class="auth-divider"><span>o usa tu correo</span></div></div>
+    <div id="oauth-profile" class="oauth-profile hidden"><div id="oauth-avatar" class="oauth-avatar">G</div><div><strong id="oauth-name">Cuenta Google conectada</strong><small id="oauth-email"></small></div><span>✓</span></div>
+    <div class="field"><label for="reg-business">Nombre de tu negocio</label><input type="text" id="reg-business" placeholder="Ej. Clínica, barbería, consultorio, taller..."><div class="adm-note" id="reg-slug-preview"></div></div>
+    <div class="field"><label for="reg-whatsapp">Teléfono / WhatsApp del negocio</label><div class="phone-row"><select id="country-code" aria-label="Código internacional"><option value="+52" selected>🇲🇽 +52</option><option value="+1">🇺🇸 +1</option><option value="+57">🇨🇴 +57</option><option value="+54">🇦🇷 +54</option><option value="+34">🇪🇸 +34</option></select><input type="tel" id="reg-whatsapp" inputmode="tel" autocomplete="tel-national" placeholder="665 544 3322"></div><small class="phone-help">No enviamos SMS. Guardamos el número en formato internacional para WhatsApp y contacto.</small></div>
+    <div id="email-register-fields">
+      <div class="field"><label for="reg-email">Correo</label><input type="email" id="reg-email" autocomplete="email" placeholder="tu@correo.com"></div>
+      <div class="field"><label for="reg-password">Contraseña (mínimo 10 caracteres)</label><input type="password" id="reg-password" autocomplete="new-password"></div>
     </div>
     <button id="btn-register" class="btn btn-primary">Crear cuenta y negocio</button>
-    <div class="adm-links">
-      <button class="adm-link" data-view="login">Ya tengo cuenta</button>
-    </div>
+    <div class="adm-links"><button class="adm-link" data-view="login">Ya tengo cuenta</button></div>
   </div>
 
-  <!-- OLVIDÉ CONTRASEÑA -->
-  <div id="view-forgot" class="hidden">
-    <div class="field">
-      <label for="forgot-email">Correo</label>
-      <input type="email" id="forgot-email" autocomplete="email" placeholder="tu@correo.com">
-    </div>
-    <button id="btn-forgot" class="btn btn-primary">Enviar enlace de recuperación</button>
-    <div class="adm-links">
-      <button class="adm-link" data-view="login">Volver a iniciar sesión</button>
-    </div>
-  </div>
+  <div id="view-forgot" class="hidden"><div class="field"><label for="forgot-email">Correo</label><input type="email" id="forgot-email" autocomplete="email" placeholder="tu@correo.com"></div><button id="btn-forgot" class="btn btn-primary">Enviar enlace de recuperación</button><div class="adm-links"><button class="adm-link" data-view="login">Volver a iniciar sesión</button></div></div>
+  <div id="view-reset" class="hidden"><div class="field"><label for="reset-password">Nueva contraseña</label><input type="password" id="reset-password" autocomplete="new-password"></div><button id="btn-reset" class="btn btn-primary">Guardar nueva contraseña</button></div>
 
-  <!-- NUEVA CONTRASEÑA (al abrir el enlace del correo) -->
-  <div id="view-reset" class="hidden">
-    <div class="field">
-      <label for="reset-password">Nueva contraseña</label>
-      <input type="password" id="reset-password" autocomplete="new-password">
-    </div>
-    <button id="btn-reset" class="btn btn-primary">Guardar nueva contraseña</button>
-  </div>
-
-  <p id="msg-error" class="adm-error hidden"></p>
-  <p id="msg-info" class="adm-info hidden"></p>
+  <p id="msg-error" class="adm-error hidden"></p><p id="msg-info" class="adm-info hidden"></p>
+  <div class="login-trust"><span>✓ Sin tarjeta</span><span>✓ Configuración guiada</span><span>✓ Acceso seguro</span></div>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -94,227 +58,68 @@
 <script src="../js/theme.js"></script>
 <script src="../js/starter-kit.js"></script>
 <script>
-  if (typeof LOCAL_NO_LOGIN !== 'undefined' && LOCAL_NO_LOGIN) {
-    window.location.replace('index.html');
-  }
-</script>
-<script>
-  const DEFAULT_HOURS = {
-    sun: null,
-    mon: { open: '09:00', close: '19:00' },
-    tue: { open: '09:00', close: '19:00' },
-    wed: { open: '09:00', close: '19:00' },
-    thu: { open: '09:00', close: '19:00' },
-    fri: { open: '09:00', close: '20:00' },
-    sat: { open: '10:00', close: '16:00' },
-  };
+  if (typeof LOCAL_NO_LOGIN !== 'undefined' && LOCAL_NO_LOGIN) window.location.replace('index.html');
+  const views=['login','register','forgot','reset'];
+  const titles={login:['Bienvenido a MyCitaGo','Ingresa para administrar tu negocio.'],register:['Crea tu espacio MyCitaGo','Registra tu negocio y empieza con una configuración guiada.'],forgot:['Recuperar contraseña','Te enviaremos un enlace por correo.'],reset:['Nueva contraseña','Escribe tu nueva contraseña.']};
+  let oauthMode=false;
 
-  const views = ['login', 'register', 'forgot', 'reset'];
-  const titles = {
-    login: ['Bienvenido a MyCitaGo', 'Ingresa para administrar tu negocio.'],
-    register: ['Crea tu espacio MyCitaGo', 'Registra tu negocio y empieza con una configuración guiada.'],
-    forgot: ['Recuperar contraseña', 'Te enviaremos un enlace por correo.'],
-    reset: ['Nueva contraseña', 'Escribe tu nueva contraseña.'],
-  };
+  function $(id){return document.getElementById(id)}
+  function showView(name){views.forEach(v=>$('view-'+v).classList.toggle('hidden',v!==name));$('card-title').textContent=titles[name][0];$('card-sub').textContent=titles[name][1];hideMsgs()}
+  function showError(msg){$('msg-error').textContent=msg;$('msg-error').classList.remove('hidden');$('msg-info').classList.add('hidden')}
+  function showInfo(msg){$('msg-info').textContent=msg;$('msg-info').classList.remove('hidden');$('msg-error').classList.add('hidden')}
+  function hideMsgs(){$('msg-error').classList.add('hidden');$('msg-info').classList.add('hidden')}
+  function mapLoginError(msg){if(/invalid login credentials/i.test(msg||''))return'Correo o contraseña incorrectos.';if(/not confirmed/i.test(msg||''))return'La cuenta no está confirmada todavía.';return msg||'No se pudo iniciar sesión.'}
+  function onlyDigits(s){return(s||'').replace(/\D/g,'')}
+  function internationalPhone(){const code=$('country-code').value;const national=onlyDigits($('reg-whatsapp').value);return{code,national,e164:`${code}${national}`}}
+  function validPhone({national,e164}){if(!national)return false;if($('country-code').value==='+52'&&national.length!==10)return false;return /^\+[1-9]\d{7,14}$/.test(e164)}
 
-  function showView(name) {
-    views.forEach((v) => document.getElementById('view-' + v).classList.toggle('hidden', v !== name));
-    document.getElementById('card-title').textContent = titles[name][0];
-    document.getElementById('card-sub').textContent = titles[name][1];
-    hideMsgs();
+  $('reg-business').addEventListener('input',e=>{const slug=slugify(e.target.value);$('reg-slug-preview').textContent=slug?`Tu link será: ${getAppBaseUrl()}reservar.html?n=${slug}`:''});
+
+  async function platformAdminFor(userId){const{data}=await supabaseClient.from('platform_admins').select('id').eq('id',userId).maybeSingle();return !!data}
+  async function membershipFor(userId){const{data}=await supabaseClient.from('business_members').select('business_id').eq('user_id',userId).eq('status','active').limit(1);return data?.[0]||null}
+
+  async function handleGoogle(){
+    hideMsgs();const btn=$('btn-google');btn.disabled=true;btn.querySelector('strong').textContent='Abriendo Google…';
+    const redirectTo=`${getAppBaseUrl()}admin/login.html?oauth=1`;
+    const{error}=await supabaseClient.auth.signInWithOAuth({provider:'google',options:{redirectTo,queryParams:{prompt:'select_account'}}});
+    if(error){btn.disabled=false;btn.querySelector('strong').textContent='Continuar con Google';showError(error.message)}
   }
 
-  function showError(msg) {
-    document.getElementById('msg-error').textContent = msg;
-    document.getElementById('msg-error').classList.remove('hidden');
-    document.getElementById('msg-info').classList.add('hidden');
+  async function handleLogin(){hideMsgs();const btn=$('btn-login');btn.disabled=true;btn.textContent='Entrando…';const email=$('login-email').value.trim(),password=$('login-password').value;const{data,error}=await supabaseClient.auth.signInWithPassword({email,password});btn.disabled=false;btn.textContent='Entrar';if(error)return showError(mapLoginError(error.message));if(await platformAdminFor(data.user.id))return location.replace('plataforma.html');location.replace('index.html')}
+
+  async function generateUniqueSlug(name){const base=slugify(name)||'negocio';let candidate=base;for(let attempt=0;attempt<5;attempt++){const{data,error}=await supabaseClient.from('businesses').select('id').eq('slug',candidate).maybeSingle();if(error)break;if(!data)return candidate;candidate=`${base}-${Math.random().toString(36).slice(2,6)}`}return`${base}-${Date.now().toString(36)}`}
+
+  async function completeOAuthBusiness(user,bizName,phone,selectedPlan){
+    const slug=await generateUniqueSlug(bizName);
+    const{data,error}=await supabaseClient.functions.invoke('complete-onboarding',{body:{business_name:bizName,business_phone:phone.e164,slug,plan_id:selectedPlan}});
+    if(error)throw error;if(data?.error)throw new Error(data.error);return data;
   }
 
-  function showInfo(msg) {
-    document.getElementById('msg-info').textContent = msg;
-    document.getElementById('msg-info').classList.remove('hidden');
-    document.getElementById('msg-error').classList.add('hidden');
+  async function handleRegister(){
+    hideMsgs();const bizName=$('reg-business').value.trim(),phone=internationalPhone(),email=$('reg-email').value.trim().toLowerCase(),password=$('reg-password').value;
+    if(!bizName)return showError('Escribe el nombre de tu negocio.');if(!validPhone(phone))return showError($('country-code').value==='+52'?'Escribe un número de México de 10 dígitos.':'Revisa el número internacional.');
+    const btn=$('btn-register');btn.disabled=true;btn.textContent=oauthMode?'Preparando tu negocio…':'Creando cuenta…';const selectedPlan=new URLSearchParams(location.search).get('plan')||'reserva';
+    try{
+      if(oauthMode){const{data:auth}=await supabaseClient.auth.getUser();if(!auth?.user)throw new Error('La sesión de Google expiró. Vuelve a ingresar.');await completeOAuthBusiness(auth.user,bizName,phone,selectedPlan);location.replace('onboarding.html');return}
+      if(!email)throw new Error('Escribe tu correo.');if(password.length<10)throw new Error('Usa una contraseña de al menos 10 caracteres.');
+      const{data,error}=await supabaseClient.auth.signUp({email,password,options:{emailRedirectTo:`${getAppBaseUrl()}admin/login.html`,data:{business_name:bizName,business_whatsapp:phone.e164,business_phone:phone.e164,plan_id:selectedPlan}}});
+      if(error)throw error;if(!data.session){showInfo('Cuenta creada. Revisa tu correo, confirma tu cuenta y luego inicia sesión.');return}location.replace('onboarding.html');
+    }catch(error){showError(error.message||'No se pudo completar el registro.')}finally{btn.disabled=false;btn.textContent=oauthMode?'Crear mi negocio':'Crear cuenta y negocio'}
   }
 
-  function hideMsgs() {
-    document.getElementById('msg-error').classList.add('hidden');
-    document.getElementById('msg-info').classList.add('hidden');
-  }
+  async function handleForgot(){hideMsgs();const email=$('forgot-email').value.trim();if(!email)return showError('Escribe tu correo.');const{error}=await supabaseClient.auth.resetPasswordForEmail(email,{redirectTo:location.href.split('#')[0]});if(error)return showError(error.message);showInfo('Listo. Revisa tu correo y abre el enlace para crear una nueva contraseña.')}
+  async function handleReset(){hideMsgs();const password=$('reset-password').value;if(password.length<10)return showError('Usa una contraseña de al menos 10 caracteres.');const{error}=await supabaseClient.auth.updateUser({password});if(error)return showError(error.message);await supabaseClient.auth.signOut();showView('login');showInfo('Contraseña actualizada. Inicia sesión con tu nueva contraseña.')}
 
-  function mapLoginError(msg) {
-    if (/invalid login credentials/i.test(msg || '')) return 'Correo o contraseña incorrectos.';
-    if (/not confirmed/i.test(msg || '')) return 'La cuenta no está confirmada todavía.';
-    return msg || 'No se pudo iniciar sesión.';
-  }
+  function prepareOAuthRegistration(user){oauthMode=true;showView('register');$('email-register-fields').classList.add('hidden');$('register-google-option').classList.add('hidden');$('oauth-profile').classList.remove('hidden');$('oauth-name').textContent=user.user_metadata?.full_name||user.user_metadata?.name||'Cuenta Google conectada';$('oauth-email').textContent=user.email||'';$('oauth-avatar').textContent=($('oauth-name').textContent||'G').slice(0,1).toUpperCase();$('card-title').textContent='Completa tu negocio';$('card-sub').textContent='Google ya verificó tu identidad. Sólo faltan los datos de tu negocio.';$('btn-register').textContent='Crear mi negocio'}
 
-  function onlyDigits(s) { return (s || '').replace(/\D/g, ''); }
+  document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{oauthMode=false;$('email-register-fields').classList.remove('hidden');$('register-google-option').classList.remove('hidden');$('oauth-profile').classList.add('hidden');showView(b.dataset.view)}));
+  $('btn-google').addEventListener('click',handleGoogle);$('btn-google-register').addEventListener('click',handleGoogle);$('btn-login').addEventListener('click',handleLogin);$('btn-register').addEventListener('click',handleRegister);$('btn-forgot').addEventListener('click',handleForgot);$('btn-reset').addEventListener('click',handleReset);$('login-password').addEventListener('keydown',e=>{if(e.key==='Enter')handleLogin()});
 
-  // Vista previa en vivo del slug mientras la persona escribe el nombre.
-  document.getElementById('reg-business').addEventListener('input', (e) => {
-    const preview = document.getElementById('reg-slug-preview');
-    const slug = slugify(e.target.value);
-    preview.textContent = slug ? `Tu link será: ${getAppBaseUrl()}reservar.html?n=${slug}` : '';
-  });
-
-  async function handleLogin() {
-    hideMsgs();
-    const btn = document.getElementById('btn-login');
-    btn.disabled = true; btn.textContent = 'Entrando…';
-
-    const email = document.getElementById('login-email').value.trim();
-    const password = document.getElementById('login-password').value;
-
-    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-
-    btn.disabled = false; btn.textContent = 'Entrar';
-    if (error) { showError(mapLoginError(error.message)); return; }
-
-    // El creador entra directamente a Plataforma; cada estética entra a su propio panel.
-    const userId = data?.user?.id;
-    if (userId) {
-      const { data: platformAdmin } = await supabaseClient
-        .from('platform_admins')
-        .select('id')
-        .eq('id', userId)
-        .maybeSingle();
-      if (platformAdmin) {
-        window.location.replace('plataforma.html');
-        return;
-      }
-    }
-    window.location.replace('index.html');
-  }
-
-  /**
-   * Genera un slug único consultando la tabla businesses.
-   * Si el slug base ya existe, agrega un sufijo corto aleatorio.
-   */
-  async function generateUniqueSlug(name) {
-    const base = slugify(name) || 'negocio';
-    let candidate = base;
-
-    for (let attempt = 0; attempt < 5; attempt++) {
-      const { data, error } = await supabaseClient
-        .from('businesses')
-        .select('id')
-        .eq('slug', candidate)
-        .maybeSingle();
-
-      if (error) {
-        console.error('Error verificando slug:', error);
-        break;
-      }
-      if (!data) return candidate;
-
-      candidate = `${base}-${Math.random().toString(36).slice(2, 6)}`;
-    }
-
-    // último recurso: garantizado único por timestamp
-    return `${base}-${Date.now().toString(36)}`;
-  }
-
-  // REGISTRO SaaS: Auth + datos de onboarding.
-  // El negocio y la suscripción se crean en PostgreSQL mediante trigger,
-  // usando new.id como owner. El navegador no puede elegir otro owner_id.
-  async function handleRegister() {
-    hideMsgs();
-    const bizName = document.getElementById('reg-business').value.trim();
-    const digits = onlyDigits(document.getElementById('reg-whatsapp').value);
-    const email = document.getElementById('reg-email').value.trim().toLowerCase();
-    const password = document.getElementById('reg-password').value;
-
-    if (!bizName) return showError('Escribe el nombre de tu negocio.');
-    if (digits.length !== 10) return showError('El WhatsApp debe tener 10 dígitos.');
-    if (!email) return showError('Escribe tu correo.');
-    if (password.length < 10) return showError('Usa una contraseña de al menos 10 caracteres.');
-
-    const btn = document.getElementById('btn-register');
-    btn.disabled = true;
-    btn.textContent = 'Creando cuenta…';
-
-    const params = new URLSearchParams(location.search);
-    const selectedPlan = params.get('plan') || 'reserva';
-
-    const { data, error } = await supabaseClient.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${getAppBaseUrl()}admin/login.html`,
-        data: {
-          business_name: bizName,
-          business_whatsapp: digits,
-          plan_id: selectedPlan
-        }
-      }
-    });
-
-    btn.disabled = false;
-    btn.textContent = 'Crear cuenta y negocio';
-
-    if (error) return showError(error.message);
-
-    if (!data.session) {
-      return showInfo('Cuenta creada. Revisa tu correo, confirma tu cuenta y luego inicia sesión. Tu negocio y prueba gratuita ya quedaron preparados.');
-    }
-
-    window.location.replace('index.html');
-  }
-
-  async function handleForgot() {
-    hideMsgs();
-    const email = document.getElementById('forgot-email').value.trim();
-    if (!email) return showError('Escribe tu correo.');
-
-    const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.href.split('#')[0],
-    });
-
-    if (error) return showError(error.message);
-    showInfo('Listo. Revisa tu correo y abre el enlace para crear una nueva contraseña.');
-  }
-
-  async function handleReset() {
-    hideMsgs();
-    const password = document.getElementById('reset-password').value;
-    if (password.length < 10) return showError('Usa una contraseña de al menos 10 caracteres.');
-
-    const { error } = await supabaseClient.auth.updateUser({ password });
-    if (error) return showError(error.message);
-
-    await supabaseClient.auth.signOut();
-    showView('login');
-    showInfo('Contraseña actualizada. Inicia sesión con tu nueva contraseña.');
-  }
-
-  document.querySelectorAll('[data-view]').forEach((b) => {
-    b.addEventListener('click', () => showView(b.dataset.view));
-  });
-  document.getElementById('btn-login').addEventListener('click', handleLogin);
-  document.getElementById('btn-register').addEventListener('click', handleRegister);
-  document.getElementById('btn-forgot').addEventListener('click', handleForgot);
-  document.getElementById('btn-reset').addEventListener('click', handleReset);
-  document.getElementById('login-password').addEventListener('keydown', (e) => { if (e.key === 'Enter') handleLogin(); });
-
-  (async function start() {
-    if (window.location.hash.includes('type=recovery')) {
-      showView('reset');
-      return;
-    }
-
-    const params = new URLSearchParams(location.search);
-    const requestedView = params.get('view');
-    if (requestedView === 'register') {
-      showView('register');
-      return;
-    }
-
-    // Solo redirigir si la sesión realmente valida contra Auth.
-    const { data } = await supabaseClient.auth.getUser();
-    if (data?.user) {
-      const { data: platformAdmin } = await supabaseClient
-        .from('platform_admins').select('id').eq('id', data.user.id).maybeSingle();
-      window.location.replace(platformAdmin ? 'plataforma.html' : 'index.html');
-    }
+  (async function start(){
+    if(location.hash.includes('type=recovery')){showView('reset');return}
+    const params=new URLSearchParams(location.search);const{data}=await supabaseClient.auth.getUser();const user=data?.user;
+    if(user){if(await platformAdminFor(user.id)){location.replace('plataforma.html');return}const member=await membershipFor(user.id);if(member){location.replace('index.html');return}prepareOAuthRegistration(user);return}
+    if(params.get('view')==='register')showView('register');
   })();
 </script>
 </body>

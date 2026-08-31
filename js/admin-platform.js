@@ -1,5 +1,5 @@
 // Super Admin 2026 — datos reales de Supabase, sin métricas simuladas.
-const platformState={businesses:[],subs:[],plans:[],appointments:[],customers:[],integrations:[],payments:[],incidents:[],filtered:[]};
+const platformState={businesses:[],subs:[],plans:[],appointments:[],customers:[],integrations:[],payments:[],incidents:[],filtered:[],support:[],templates:[],categories:[]};
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=n=>'$'+Number(n||0).toLocaleString('es-MX',{maximumFractionDigits:0});
@@ -24,8 +24,34 @@ async function loadData(){
   });
   renderPlatformDashboard(snap);
   renderAll();
+  await loadOperationsModules();
 }
 function renderAll(){renderKpis();renderPlans();renderPayments();renderAlerts();applyBusinessFilters()}
+
+async function loadOperationsModules(){
+  const [tickets,templates,categories]=await Promise.all([
+    supabaseClient.from('support_tickets').select('id,business_id,subject,category,priority,status,created_at').order('created_at',{ascending:false}).limit(30),
+    supabaseClient.from('service_templates').select('id,business_category_id,name,active').order('sort_order',{ascending:true}),
+    supabaseClient.from('business_categories').select('id,name,sort_order').eq('active',true).order('sort_order',{ascending:true})
+  ]);
+  platformState.support=tickets.error?[]:(tickets.data||[]);platformState.templates=templates.error?[]:(templates.data||[]);platformState.categories=categories.error?[]:(categories.data||[]);
+  renderSupportInbox(tickets.error);renderTemplateSummary(templates.error||categories.error);
+}
+function renderSupportInbox(loadError){const root=$('platform-support-list');if(!root)return;if(loadError){root.innerHTML='<div class="creator-empty">Ejecuta APLICAR_EN_SUPABASE.sql para activar soporte.</div>';return}const open=platformState.support.filter(t=>!['resolved','closed'].includes(t.status));$('support-open-count').textContent=`${open.length} abiertos`;if(!open.length){root.innerHTML='<div class="creator-empty">Sin tickets abiertos. Todo bajo control.</div>';return}root.replaceChildren(...open.slice(0,10).map(t=>{const a=document.createElement('article');a.className=`platform-ticket ${t.priority}`;const dot=document.createElement('i');const text=document.createElement('div');const b=document.createElement('b');const biz=platformState.businesses.find(x=>x.id===t.business_id);b.textContent=t.subject;const sm=document.createElement('small');sm.textContent=`${biz?.name||'Negocio'} · ${t.category} · ${new Date(t.created_at).toLocaleDateString('es-MX')}`;text.append(b,sm);const select=document.createElement('select');[['new','Nuevo'],['in_review','En revisión'],['waiting_customer','Esperando cliente'],['resolved','Resuelto']].forEach(([v,l])=>{const o=document.createElement('option');o.value=v;o.textContent=l;o.selected=t.status===v;select.appendChild(o)});select.onchange=()=>updateTicketStatus(t.id,select.value);const actions=document.createElement('div');actions.className='platform-ticket-actions';actions.appendChild(select);const reply=document.createElement('button');reply.type='button';reply.textContent='Responder';reply.onclick=()=>replyTicket(t);actions.appendChild(reply);a.append(dot,text,actions);return a}))}
+
+async function createServiceTemplate(){
+  const name=$('template-name')?.value.trim(),category=$('template-category')?.value,duration=Number($('template-duration')?.value)||60,image_url=$('template-image')?.value;
+  if(!name||!category)return toast('Completa nombre y giro');
+  const {error}=await supabaseClient.from('service_templates').insert({business_category_id:category,name,category:'Servicios',duration_minutes:duration,image_url,active:true,sort_order:100});
+  if(error)return toast('No se pudo crear: '+error.message);$('template-name').value='';$('template-create-panel').classList.add('hidden');toast('Plantilla agregada');await loadOperationsModules();
+}
+
+
+async function replyTicket(ticket){const text=prompt(`Responder a: ${ticket.subject}`);if(!text?.trim())return;const session=await supabaseClient.auth.getSession();const {error}=await supabaseClient.from('support_messages').insert({ticket_id:ticket.id,business_id:ticket.business_id,sender_id:session.data.session?.user?.id,sender_type:'platform',message:text.trim()});if(error)return toast('No se pudo responder: '+error.message);await supabaseClient.from('support_tickets').update({status:'waiting_customer',updated_at:new Date().toISOString()}).eq('id',ticket.id);toast('Respuesta enviada al negocio');await loadOperationsModules()}
+
+async function updateTicketStatus(id,status){const payload={status,updated_at:new Date().toISOString(),resolved_at:status==='resolved'?new Date().toISOString():null};const {error}=await supabaseClient.from('support_tickets').update(payload).eq('id',id);if(error)return toast('No se pudo actualizar ticket: '+error.message);toast('Ticket actualizado');await loadOperationsModules()}
+function renderTemplateSummary(loadError){const root=$('platform-template-summary');if(!root)return;if(loadError){root.innerHTML='<div class="creator-empty">Ejecuta APLICAR_EN_SUPABASE.sql para activar plantillas.</div>';return}const cat=$('template-category');if(cat){cat.replaceChildren(...platformState.categories.map(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=c.name;return o}))}const max=Math.max(...platformState.categories.map(c=>platformState.templates.filter(t=>t.business_category_id===c.id&&t.active!==false).length),1);root.replaceChildren(...platformState.categories.map(c=>{const n=platformState.templates.filter(t=>t.business_category_id===c.id&&t.active!==false).length;const d=document.createElement('div');d.className='platform-template-group';const st=document.createElement('strong');st.textContent=c.name;const sp=document.createElement('span');sp.textContent=`${n} servicios precargados`;const bar=document.createElement('div');bar.className='bar';const i=document.createElement('i');i.style.width=`${n/max*100}%`;bar.appendChild(i);d.append(st,sp,bar);return d}))}
+
 function renderKpis(){
  const active=platformState.subs.filter(s=>s.status==='active'&&s.current_period_end>=today());
  const trials=platformState.subs.filter(s=>s.status==='trial'&&(s.trial_end||s.current_period_end)>=today());
@@ -64,7 +90,7 @@ async function extendSubscription(b,s){try{if(typeof LOCAL_NO_LOGIN!=='undefined
 async function changePlan(b,s){try{if(!s)return toast('Primero crea/activa una suscripción.');const id=$('drawer-plan').value;const {error}=await supabaseClient.rpc('change_subscription_plan',{p_business_id:b.id,p_plan_id:id});if(error)throw error;toast('Plan actualizado');closeDrawer();await loadData()}catch(e){console.error(e);toast('No se pudo cambiar: '+e.message)}}
 async function suspendBusiness(b){if(!confirm(`¿Suspender a ${b.name}? Dejará de poder usar el panel hasta reactivarlo.`))return;try{const {error}=await supabaseClient.rpc('suspend_business',{p_business_id:b.id});if(error)throw error;toast('Negocio suspendido');closeDrawer();await loadData()}catch(e){console.error(e);toast('No se pudo suspender: '+e.message)}}
 async function reactivateBusiness(b){try{const {error}=await supabaseClient.rpc('reactivate_business',{p_business_id:b.id,p_days:30});if(error)throw error;toast('Negocio reactivado por 30 días');closeDrawer();await loadData()}catch(e){console.error(e);toast('No se pudo reactivar: '+e.message)}}
-async function init(){if(!await requirePlatformAccess())return;$('creator-date').textContent=new Date().toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long',year:'numeric'});$('btn-logout').onclick=logout;$('refresh-platform').onclick=loadData;$('business-search').oninput=applyBusinessFilters;$('business-filter').onchange=applyBusinessFilters;document.querySelectorAll('[data-close-drawer]').forEach(x=>x.onclick=closeDrawer);await loadData()}
+async function init(){if(!await requirePlatformAccess())return;$('creator-date').textContent=new Date().toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long',year:'numeric'});$('btn-logout').onclick=logout;$('refresh-platform').onclick=loadData;if($('refresh-templates'))$('refresh-templates').onclick=loadOperationsModules;if($('new-template'))$('new-template').onclick=()=>$('template-create-panel').classList.toggle('hidden');if($('save-template'))$('save-template').onclick=createServiceTemplate;$('business-search').oninput=applyBusinessFilters;$('business-filter').onchange=applyBusinessFilters;document.querySelectorAll('[data-close-drawer]').forEach(x=>x.onclick=closeDrawer);await loadData()}
 document.addEventListener('DOMContentLoaded',init);
 
 // CITAGO Platform public render contracts

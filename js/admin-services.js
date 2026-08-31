@@ -7,6 +7,38 @@ let staffItems = [];
 let selectedStaffIds = new Set();
 const $ = id => document.getElementById(id);
 
+
+const assetUrl = file => new URL(`../assets/service-presets/${file}`, location.href).href;
+const SERVICE_TEMPLATE_LIBRARY = {
+  barber:[
+    {name:'Corte clásico',category:'Barbería',duration:30,description:'Corte personalizado con acabado profesional.',image:'barber-cut.svg'},
+    {name:'Corte + barba',category:'Barbería',duration:60,description:'Servicio completo de corte y arreglo de barba.',image:'barber-beard.svg'},
+    {name:'Afeitado',category:'Barbería',duration:30,description:'Afeitado y perfilado con acabado limpio.',image:'barber-beard.svg'},
+    {name:'Corte infantil',category:'Barbería',duration:30,description:'Corte para niñas y niños.',image:'barber-cut.svg'}],
+  beauty:[
+    {name:'Corte dama',category:'Belleza y cuidado',duration:60,description:'Corte, asesoría y acabado.',image:'beauty-hair.svg'},
+    {name:'Peinado',category:'Belleza y cuidado',duration:60,description:'Peinado para ocasión o uso diario.',image:'beauty-hair.svg'},
+    {name:'Tinte',category:'Belleza y cuidado',duration:120,description:'Coloración profesional según diagnóstico.',image:'beauty-hair.svg'}],
+  nails:[
+    {name:'Manicure',category:'Uñas',duration:45,description:'Cuidado de manos y acabado profesional.',image:'nails.svg'},
+    {name:'Gel semipermanente',category:'Uñas',duration:60,description:'Aplicación de gel de larga duración.',image:'nails.svg'},
+    {name:'Pedicure',category:'Uñas',duration:60,description:'Cuidado de pies y acabado profesional.',image:'nails.svg'}],
+  spa:[{name:'Masaje relajante',category:'Spa',duration:60,description:'Sesión de relajación y bienestar.',image:'spa.svg'},{name:'Facial',category:'Spa',duration:60,description:'Cuidado facial personalizado.',image:'spa.svg'}],
+  dental:[{name:'Valoración dental',category:'Consultas',duration:45,description:'Evaluación inicial y plan de tratamiento.',image:'dental.svg'},{name:'Limpieza dental',category:'Consultas',duration:60,description:'Limpieza profesional y recomendaciones.',image:'dental.svg'}],
+  therapy:[{name:'Primera consulta',category:'Consultas',duration:60,description:'Sesión inicial de valoración.',image:'therapy.svg'},{name:'Sesión de seguimiento',category:'Consultas',duration:50,description:'Sesión de seguimiento terapéutico.',image:'therapy.svg'}],
+  nutrition:[{name:'Valoración nutricional',category:'Consultas',duration:60,description:'Evaluación inicial y plan personalizado.',image:'nutrition.svg'},{name:'Seguimiento nutricional',category:'Consultas',duration:45,description:'Revisión de avances y ajustes.',image:'nutrition.svg'}],
+  physio:[{name:'Valoración fisioterapia',category:'Salud y bienestar',duration:60,description:'Evaluación funcional inicial.',image:'physio.svg'},{name:'Sesión de rehabilitación',category:'Salud y bienestar',duration:60,description:'Sesión terapéutica de rehabilitación.',image:'physio.svg'}],
+  veterinary:[{name:'Consulta veterinaria',category:'Consultas',duration:45,description:'Consulta general y valoración.',image:'veterinary.svg'},{name:'Vacunación',category:'Consultas',duration:30,description:'Aplicación y registro de vacuna.',image:'veterinary.svg'}],
+  consulting:[{name:'Consulta inicial',category:'Servicios profesionales',duration:60,description:'Sesión inicial para entender necesidades y alcance.',image:'consulting.svg'},{name:'Sesión de seguimiento',category:'Servicios profesionales',duration:60,description:'Seguimiento y ejecución de acuerdos.',image:'consulting.svg'}],
+  automotive:[{name:'Diagnóstico',category:'Mantenimiento',duration:60,description:'Revisión inicial para identificar la causa del problema.',image:'automotive.svg'},{name:'Mantenimiento preventivo',category:'Mantenimiento',duration:120,description:'Revisión y mantenimiento programado.',image:'automotive.svg'}],
+  photo:[{name:'Sesión fotográfica',category:'Servicios profesionales',duration:90,description:'Sesión personalizada con preparación previa.',image:'photo.svg'}],
+  classes:[{name:'Clase individual',category:'Clases',duration:60,description:'Sesión individual personalizada.',image:'class.svg'},{name:'Clase grupal',category:'Clases',duration:60,description:'Sesión grupal programada.',image:'class.svg'}],
+  other:[{name:'Servicio personalizado',category:'Servicios',duration:60,description:'Personaliza este servicio según tu negocio.',image:'consulting.svg'}]
+};
+let currentTemplateCategory='barber';
+let commercialSettings=null;
+let autoSaveTimer=null;
+
 const DAYS = [
   ['mon','Lunes'],['tue','Martes'],['wed','Miércoles'],['thu','Jueves'],
   ['fri','Viernes'],['sat','Sábado'],['sun','Domingo']
@@ -67,6 +99,64 @@ function localDateLabel(s) {
   const [y,m,d] = s.split('-').map(Number);
   return new Intl.DateTimeFormat('es-MX',{day:'numeric',month:'short',year:'numeric'}).format(new Date(y,m-1,d));
 }
+
+
+function renderServiceTemplates(category=currentTemplateCategory){
+  currentTemplateCategory=category;
+  const root=$('service-template-library'); if(!root)return;
+  const list=SERVICE_TEMPLATE_LIBRARY[category]||SERVICE_TEMPLATE_LIBRARY.other;
+  root.replaceChildren();
+  list.forEach(t=>{
+    const btn=document.createElement('button');btn.type='button';btn.className='svc-template-card';
+    const img=document.createElement('img');img.src=assetUrl(t.image);img.alt='';
+    const b=document.createElement('b');b.textContent=t.name;const small=document.createElement('small');small.textContent=`${t.duration} min · precio por definir`;
+    btn.append(img,b,small);btn.addEventListener('click',()=>applyServiceTemplate(t));root.appendChild(btn);
+  });
+}
+
+function applyServiceTemplate(t){
+  clearForm();
+  $('sname').value=t.name;$('category').value=t.category;$('duration').value=t.duration;$('sdesc').value=t.description||'';
+  selectedPresetImage=assetUrl(t.image);$('preset-image-url').value=selectedPresetImage;
+  updateSummary();calculateServiceIntelligence();saveLocalDraft();
+  $('price').focus();$('price').closest('.svc-field')?.classList.add('svc-price-guide');setTimeout(()=>$('price').closest('.svc-field')?.classList.remove('svc-price-guide'),900);
+  toast(`${t.name}: sólo falta definir el precio`);
+}
+
+function weeklyBusinessMinutes(hours=biz?.opening_hours||{}){
+  return DAYS.reduce((sum,[key])=>{const h=hours?.[key];if(!h||h.closed||!h.open||!h.close)return sum;const [oh,om]=String(h.open).slice(0,5).split(':').map(Number),[ch,cm]=String(h.close).slice(0,5).split(':').map(Number);return sum+Math.max(0,(ch*60+cm)-(oh*60+om))},0);
+}
+function calculateServiceIntelligence(){
+  const price=Number($('price')?.value)||0,duration=Number($('duration')?.value)||0,prep=Number($('prep-minutes')?.value)||0,recovery=Number($('recovery-minutes')?.value)||0,cost=Number($('internal-cost')?.value)||0,tax=Number($('tax-rate')?.value)||0,util=Number($('expected-utilization')?.value)||70;
+  const blocked=duration+prep+recovery;const weeklyMinutes=weeklyBusinessMinutes();const capacity=blocked>0?Math.floor(weeklyMinutes/blocked):0;const weekly=capacity*price;const monthly=weekly*4.33;const netPrice=price/(1+tax/100);const margin=price>0?Math.max(-999,((netPrice-cost)/price)*100):0;const expected=monthly*(util/100);
+  if($('intel-blocked'))$('intel-blocked').textContent=blocked?`${blocked} min`:'—';if($('intel-capacity'))$('intel-capacity').textContent=capacity?`${capacity} citas`:'—';if($('intel-hours'))$('intel-hours').textContent=weeklyMinutes?`${(weeklyMinutes/60).toFixed(1)} h`:'—';if($('intel-daily'))$('intel-daily').textContent=money(weekly/Math.max(1,DAYS.filter(([k])=>biz?.opening_hours?.[k]).length||5));if($('intel-weekly'))$('intel-weekly').textContent=money(weekly);if($('intel-monthly'))$('intel-monthly').textContent=money(monthly);if($('intel-margin'))$('intel-margin').textContent=price?`${margin.toFixed(0)}%`:'—';if($('intel-expected'))$('intel-expected').textContent=money(expected);
+  const alerts=[];let health='Completa precio y duración',healthClass='';
+  if(price>0&&duration>=5){health='Listo para reservar';healthClass='ok'}
+  if(price>0&&cost>0&&margin<10){alerts.push(['warn','El margen estimado es menor al 10%. Revisa el precio o el costo interno.']);health='Margen bajo';healthClass='warn'}
+  if(!weeklyMinutes){alerts.push(['danger','Tu negocio no tiene horarios disponibles. Configura el horario general.']);health='Sin disponibilidad';healthClass='danger'}
+  if(duration>240){alerts.push(['warn','La duración es mayor a 4 horas. Confirma que sea correcta.'])}
+  if(selectedStaffIds.size===0&&staffItems.length){alerts.push(['warn','No hay personal asignado todavía. El servicio podría no ser reservable.'])}
+  if(selectedScheduleMode()==='custom'){alerts.push(['','Horario especial activo. MyCitaGo recomienda heredar el horario general salvo que este servicio realmente necesite una excepción.'])}
+  const h=$('service-health');if(h){h.textContent=health;h.className=`svc-health ${healthClass}`}const pa=$('price-assistant');if(pa){if(price>0&&duration>=5){pa.classList.remove('hidden');pa.innerHTML=`<div><b>Perfecto. MyCitaGo completó una base recomendada.</b><span>${duration} min · ${money(price)} · ${selectedScheduleMode()==='business'?'usa el horario general':'horario especial'} · ${capacity||0} citas máximas/semana</span></div><em>Configuración intuitiva activa</em>`}else pa.classList.add('hidden')}
+  const root=$('service-alerts');if(root){root.replaceChildren(...alerts.map(([kind,text])=>{const d=document.createElement('div');d.className=`svc-intel-alert ${kind}`;d.textContent=(kind==='danger'?'✕ ':'⚠ ')+text;return d}))}
+  return{blocked,weeklyMinutes,capacity,weekly,monthly,margin,expected};
+}
+function draftKey(){return biz?.id?`mycitago:service-draft:${biz.id}`:null}
+function saveLocalDraft(){if(!biz||$('sid')?.value)return;clearTimeout(autoSaveTimer);autoSaveTimer=setTimeout(()=>{const key=draftKey();if(!key)return;const payload={name:$('sname').value,category:$('category').value,price:$('price').value,duration:$('duration').value,description:$('sdesc').value,internal_cost:$('internal-cost')?.value||0,prep:$('prep-minutes')?.value||0,recovery:$('recovery-minutes')?.value||0,image:selectedPresetImage||$('preset-image-url').value,ts:Date.now()};localStorage.setItem(key,JSON.stringify(payload));},350)}
+function restoreLocalDraft(){try{const key=draftKey(),raw=key&&localStorage.getItem(key);if(!raw)return;const d=JSON.parse(raw);if(Date.now()-Number(d.ts||0)>7*86400000)return localStorage.removeItem(key);if(!$('sname').value){$('sname').value=d.name||'';$('category').value=d.category||'Servicios';$('price').value=d.price||'';$('duration').value=d.duration||'';$('sdesc').value=d.description||'';if($('internal-cost'))$('internal-cost').value=d.internal_cost||0;if($('prep-minutes'))$('prep-minutes').value=d.prep||0;if($('recovery-minutes'))$('recovery-minutes').value=d.recovery||0;selectedPresetImage=d.image||'';$('preset-image-url').value=d.image||'';updateSummary();calculateServiceIntelligence();toast('Recuperamos tu borrador automático')}}catch(e){console.warn('[service draft]',e)}}
+function clearLocalDraft(){const key=draftKey();if(key)localStorage.removeItem(key)}
+function selectedScheduleMode(){return document.querySelector('input[name="schedule-mode"]:checked')?.value||'business'}
+function syncScheduleMode(){const mode=selectedScheduleMode(),panel=$('custom-hours-panel');panel?.classList.toggle('hidden',mode!=='custom');document.querySelectorAll('.svc-choice').forEach(x=>x.classList.toggle('active',x.querySelector('input')?.checked));calculateServiceIntelligence()}
+function copyMondayToAll(){const monday=document.querySelector('.svc-hour-row[data-day="mon"]');if(!monday)return;const on=monday.querySelector('.hour-enabled').checked,open=monday.querySelector('.hour-open').value,close=monday.querySelector('.hour-close').value;document.querySelectorAll('.svc-hour-row').forEach(row=>{row.querySelector('.hour-enabled').checked=on;row.querySelector('.hour-open').value=open;row.querySelector('.hour-close').value=close;row.querySelector('.hour-enabled').dispatchEvent(new Event('change'))});toast('Horario del lunes copiado')}
+async function loadCommercialSettings(serviceId){commercialSettings=null;if(!serviceId)return;const {data,error}=await supabaseClient.from('service_commercial_settings').select('*').eq('service_id',serviceId).maybeSingle();if(error){console.warn('[commercial settings]',error.message);return}commercialSettings=data||null;if(!data)return;const set=(id,v)=>{if($(id)&&v!==null&&v!==undefined)$(id).value=v};set('internal-cost',data.internal_cost);set('tax-rate',Number(data.tax_rate||0)*100);set('expected-utilization',data.expected_utilization);set('prep-minutes',data.prep_minutes);set('recovery-minutes',data.recovery_minutes);set('min-booking-hours',Math.round((data.min_booking_notice_minutes||0)/60));set('max-booking-days',data.max_booking_window_days);set('service-tags',Array.isArray(data.tags)?data.tags.join(', '):'');set('cancellation-policy',data.cancellation_policy||'');set('refund-policy',data.refund_policy||'');const radio=document.querySelector(`input[name="schedule-mode"][value="${data.schedule_mode||'business'}"]`);if(radio)radio.checked=true;syncScheduleMode();calculateServiceIntelligence()}
+async function saveCommercialSettings(serviceId){const tags=($('service-tags')?.value||'').split(',').map(x=>x.trim()).filter(Boolean);const payload={service_id:serviceId,business_id:biz.id,internal_cost:Number($('internal-cost')?.value)||0,tax_rate:(Number($('tax-rate')?.value)||0)/100,deposit_mode:Number($('deposit').value)>0?'fixed':'none',deposit_value:Number($('deposit').value)||0,cancellation_policy:$('cancellation-policy')?.value.trim()||null,refund_policy:$('refund-policy')?.value.trim()||null,min_booking_notice_minutes:(Number($('min-booking-hours')?.value)||0)*60,max_booking_window_days:Number($('max-booking-days')?.value)||60,prep_minutes:Number($('prep-minutes')?.value)||0,recovery_minutes:Number($('recovery-minutes')?.value)||0,expected_utilization:Number($('expected-utilization')?.value)||70,schedule_mode:selectedScheduleMode(),tags,updated_at:new Date().toISOString()};const {error}=await supabaseClient.from('service_commercial_settings').upsert(payload,{onConflict:'service_id'});if(error)console.warn('[service commercial settings]',error.message)}
+async function saveServiceVersion(serviceId,payload){try{const session=await supabaseClient.auth.getSession();await supabaseClient.from('service_versions').insert({service_id:serviceId,business_id:biz.id,snapshot:{...payload,commercial:{internal_cost:Number($('internal-cost')?.value)||0,prep_minutes:Number($('prep-minutes')?.value)||0,recovery_minutes:Number($('recovery-minutes')?.value)||0}},changed_by:session.data.session?.user?.id||null,change_summary:'Servicio guardado desde MyCitaGo'})}catch(e){console.warn('[service version]',e)}}
+
+async function loadServiceHistory(serviceId){const root=$('service-history');if(!root)return;if(!serviceId){root.innerHTML='<div class="svc-empty">Guarda el servicio para comenzar su historial.</div>';return}const {data,error}=await supabaseClient.from('service_versions').select('id,snapshot,change_summary,created_at').eq('service_id',serviceId).order('created_at',{ascending:false}).limit(10);if(error){root.innerHTML='<div class="svc-empty">Activa el historial ejecutando APLICAR_EN_SUPABASE.sql.</div>';return}if(!data?.length){root.innerHTML='<div class="svc-empty">Aún no hay versiones anteriores.</div>';return}root.replaceChildren(...data.map(v=>{const row=document.createElement('div');row.className='svc-history-row';const d=document.createElement('div');const b=document.createElement('b');b.textContent=v.change_summary||'Cambio guardado';const sm=document.createElement('small');sm.textContent=new Date(v.created_at).toLocaleString('es-MX');d.append(b,sm);const bt=document.createElement('button');bt.type='button';bt.textContent='Restaurar';bt.onclick=()=>restoreServiceVersion(v.snapshot);row.append(d,bt);return row}))}
+function restoreServiceVersion(snapshot){if(!snapshot)return;const set=(id,v)=>{if($(id)&&v!==undefined&&v!==null)$(id).value=v};set('sname',snapshot.name);set('category',snapshot.category);set('price',snapshot.price);set('duration',snapshot.duration_minutes);set('buffer',snapshot.buffer_minutes||0);set('deposit',snapshot.deposit_amount||0);set('sdesc',snapshot.description||'');set('internal-cost',snapshot.commercial?.internal_cost||0);set('prep-minutes',snapshot.commercial?.prep_minutes||0);set('recovery-minutes',snapshot.commercial?.recovery_minutes||0);if(snapshot.image_url){selectedPresetImage=snapshot.image_url;$('preset-image-url').value=snapshot.image_url}updateSummary();calculateServiceIntelligence();toast('Versión restaurada en el editor. Guarda para confirmar el cambio.')}
+async function bulkSetActive(active){if(!items.length)return toast('No hay servicios para actualizar');const {error}=await supabaseClient.from('services').update({active}).eq('business_id',biz.id);if(error)return toast(error.message);toast(active?'Servicios activados':'Servicios ocultos');await loadServices()}
+async function bulkUseBusinessHours(){if(!items.length)return toast('No hay servicios');try{for(const s of items){await supabaseClient.from('service_commercial_settings').upsert({service_id:s.id,business_id:biz.id,schedule_mode:'business',updated_at:new Date().toISOString()},{onConflict:'service_id'})}toast('Todos los servicios usarán el horario general')}catch(e){toast('No se pudo aplicar: '+e.message)}}
+
 
 function renderPresets() {
   const grid = $('preset-images');
@@ -212,6 +302,7 @@ function updateSummary() {
   $('sum-active').className = $('active').checked ? 'svc-ok' : '';
   $('sum-detail').textContent = `${duration ? duration+' min · ' : ''}${money(price)}`;
 
+  calculateServiceIntelligence();
   const image = selectedPresetImage || $('preset-image-url').value;
   const box = $('sum-image');
   box.replaceChildren();
@@ -236,6 +327,7 @@ function clearForm() {
   $('buffer').value = '0';
   $('deposit').value = '0';
   $('sdesc').value = '';
+  ['internal-cost','tax-rate','prep-minutes','recovery-minutes'].forEach(id=>{if($(id))$(id).value='0'});if($('expected-utilization'))$('expected-utilization').value='70';if($('min-booking-hours'))$('min-booking-hours').value='2';if($('max-booking-days'))$('max-booking-days').value='60';if($('service-tags'))$('service-tags').value='';if($('cancellation-policy'))$('cancellation-policy').value='';if($('refund-policy'))$('refund-policy').value='';const businessRadio=document.querySelector('input[name="schedule-mode"][value="business"]');if(businessRadio)businessRadio.checked=true;syncScheduleMode();
   $('simage').value = '';
   $('active').checked = true;
   $('featured').checked = false;
@@ -409,6 +501,8 @@ function editService(id) {
   $('preset-image-url').value = s.image_url || '';
   updateSummary();
   loadServiceStaff(s.id);
+  loadCommercialSettings(s.id);
+  loadServiceHistory(s.id);
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -478,6 +572,9 @@ async function saveService() {
     if (!saved?.id) throw new Error('No se pudo confirmar el guardado del servicio');
 
     await saveServiceStaff(saved.id);
+    await saveCommercialSettings(saved.id);
+    await saveServiceVersion(saved.id,payload);
+    clearLocalDraft();
 
     toast('Servicio guardado');
     clearForm();
@@ -590,7 +687,7 @@ function previewClient() {
 }
 
 function bindUI() {
-  ['sname','category','price','duration','deposit','buffer','sdesc'].forEach(id => $(id).addEventListener('input',updateSummary));
+  ['sname','category','price','duration','deposit','buffer','sdesc','internal-cost','tax-rate','expected-utilization','prep-minutes','recovery-minutes','min-booking-hours','max-booking-days','service-tags','cancellation-policy','refund-policy'].forEach(id => $(id)?.addEventListener('input',()=>{updateSummary();saveLocalDraft()}));
   $('active').addEventListener('change',updateSummary);
   $('simage').addEventListener('change', () => {
     const file = $('simage').files[0];
@@ -600,6 +697,12 @@ function bindUI() {
   });
 
   document.querySelectorAll('.svc-template').forEach(btn => btn.addEventListener('click',() => applyTemplate(btn.dataset.template)));
+  $('business-type')?.addEventListener('change',e=>renderServiceTemplates(e.target.value));
+  document.querySelectorAll('input[name="schedule-mode"]').forEach(r=>r.addEventListener('change',syncScheduleMode));
+  $('copy-monday')?.addEventListener('click',copyMondayToAll);
+  $('bulk-activate')?.addEventListener('click',()=>bulkSetActive(true));
+  $('bulk-hide')?.addEventListener('click',()=>bulkSetActive(false));
+  $('bulk-copy-hours')?.addEventListener('click',bulkUseBusinessHours);
   $('save-hours').addEventListener('click',saveHours);
   $('save-service').addEventListener('click',saveService);
   $('duplicate-service').addEventListener('click',duplicateService);
@@ -633,6 +736,7 @@ async function init() {
   biz = await getMyBusiness(session.user);
   if (!biz) return;
 
+  const category=biz.business_category_id||'barber';if($('business-type'))$('business-type').value=SERVICE_TEMPLATE_LIBRARY[category]?category:'barber';renderServiceTemplates($('business-type')?.value||'barber');
   renderPresets();
   renderHours(biz.opening_hours || HOUR_TEMPLATES.office);
   bindUI();
@@ -655,6 +759,7 @@ async function init() {
   $('block-time-date').min = iso;
 
   await Promise.all([loadServices(),loadBlocks(),loadStaff()]);
+  restoreLocalDraft();calculateServiceIntelligence();syncScheduleMode();
   window.lucide?.createIcons();
 }
 document.addEventListener('DOMContentLoaded',init);

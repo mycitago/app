@@ -34,7 +34,7 @@ function toast(msg){
 
 function setBusinessIdentity(){
   const b=dashState.business;
-  const name=b?.name || 'CITAS';
+  const name=b?.name || 'MyCitaGo';
   $('sidebar-biz').textContent=name;
   $('mobile-biz-name').textContent=name;
 
@@ -152,6 +152,26 @@ function statsByDay(filterFn,mapper=()=>1){
     vals.push(dashState.appointments.filter(a=>a.appointment_date===key && filterFn(a)).reduce((s,a)=>s+mapper(a),0));
   }
   return vals;
+}
+
+
+async function renderBusinessHealth(){
+  const activeServices=dashState.services.filter(s=>s.active!==false).length;
+  let brandingPublished=false,supportOpen=0,teamCount=0;
+  const [branding,support,team]=await Promise.allSettled([
+    supabaseClient.from('business_branding').select('published_at').eq('business_id',dashState.business.id).maybeSingle(),
+    supabaseClient.from('support_tickets').select('id',{count:'exact',head:true}).eq('business_id',dashState.business.id).not('status','in','("resolved","closed")'),
+    supabaseClient.from('staff').select('id',{count:'exact',head:true}).eq('business_id',dashState.business.id).eq('active',true)
+  ]);
+  if(branding.status==='fulfilled'&&!branding.value.error)brandingPublished=Boolean(branding.value.data?.published_at);
+  if(support.status==='fulfilled'&&!support.value.error)supportOpen=support.value.count||0;
+  if(team.status==='fulfilled'&&!team.value.error)teamCount=team.value.count||0;
+  const checks=[activeServices>0,brandingPublished,teamCount>0,Boolean(dashState.business?.opening_hours),Boolean(dashState.business?.whatsapp||dashState.business?.phone)];
+  const score=Math.round(checks.filter(Boolean).length/checks.length*100);
+  const scoreEl=$('health-score'),progress=$('health-progress');if(scoreEl)scoreEl.textContent=`${score}% listo`;if(progress)progress.style.width=`${score}%`;
+  if($('health-services'))$('health-services').textContent=activeServices;if($('health-branding'))$('health-branding').textContent=brandingPublished?'Publicada':'Pendiente';if($('health-support'))$('health-support').textContent=supportOpen;
+  if($('health-title'))$('health-title').textContent=score===100?'Tu negocio está listo para crecer':score>=60?'Completa los últimos pasos de tu negocio':'Termina la configuración esencial';
+  const missing=[];if(!activeServices)missing.push('agrega un servicio');if(!teamCount)missing.push('agrega equipo');if(!brandingPublished)missing.push('publica tu página');if($('health-note'))$('health-note').textContent=missing.length?`Siguiente recomendado: ${missing[0]}.`:'Todo lo esencial está configurado. Revisa reportes y reseñas para seguir creciendo.';
 }
 
 function renderKPIs(){
@@ -439,6 +459,7 @@ function performSearch(){
 async function refreshData(){
   try{
     await Promise.all([fetchAppointments(),fetchServices(),fetchCustomers()]);
+    await renderBusinessHealth();
     renderKPIs();renderToday();renderUpcoming();renderActivity();renderTopServices();
     window.lucide?.createIcons();
   }catch(e){

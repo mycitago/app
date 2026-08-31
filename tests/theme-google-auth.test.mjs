@@ -1,0 +1,30 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+const read=p=>fs.readFileSync(p,'utf8');
+assert.ok(fs.existsSync('js/ui-theme.js'),'missing ui theme controller');
+assert.ok(fs.existsSync('css/mycitago-themes.css'),'missing shared theme css');
+const theme=read('js/ui-theme.js');
+for(const token of ['mycitago-ui-theme','data-theme','toggle','dark','light']) assert.ok(theme.includes(token),token);
+const shell=read('js/citago-shell.js');
+assert.match(shell,/ct-theme-toggle/);
+const login=read('admin/login.html');
+assert.match(login,/btn-google/);
+assert.match(login,/signInWithOAuth/);
+assert.match(login,/provider:\s*['"]google['"]/);
+assert.match(login,/country-code/);
+assert.match(login,/\+52/);
+const css=read('css/mycitago-themes.css');
+assert.match(css,/html\[data-theme=['"]dark['"]\]/);
+assert.match(css,/html\[data-theme=['"]light['"]\]/);
+const landing=read('index.html');
+assert.match(landing,/theme-toggle/);
+assert.match(landing,/ui-theme\.js/);
+const adminPages=fs.readdirSync('admin').filter(f=>f.endsWith('.html'));
+for(const page of adminPages){
+  const html=read('admin/'+page);
+  if(page==='login.html') continue;
+  assert.ok(html.includes('../css/mycitago-themes.css'),`${page}: missing theme css`);
+  assert.ok(html.includes('../js/ui-theme.js'),`${page}: missing theme js`);
+}
+assert.ok(fs.existsSync('supabase/functions/complete-onboarding/index.ts'),'missing oauth onboarding edge function');
+console.log('theme + Google auth contract OK');
