@@ -1,14 +1,112 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mi negocio · Configuración</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght;500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="../css/styles.css"><link rel="stylesheet" href="../css/admin.css">
-<style>
-.theme-grid{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0 4px}
-.theme-swatch{width:44px;height:44px;border-radius:50%;border:3px solid transparent;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.15);position:relative}
-.theme-swatch.active{border-color:#231F20}
-.theme-swatch.active::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;text-shadow:0 1px 2px rgba(0,0,0,.4)}
-.theme-name{font-size:12px;color:#6b5a5e;margin-top:2px}
-</style>
-<link rel="stylesheet" href="../css/citago-admin.css"></head><body><div id="citago-shell"></div>
-<header class="adm-topbar"><div><div class="adm-topbar-title">Mi negocio</div><div class="adm-topbar-sub">Identidad, contacto y experiencia pública</div></div><div class="adm-topbar-actions"><a class="btn btn-ghost" href="index.html">Dashboard</a><a class="btn btn-ghost" href="servicios.html">Servicios</a><button id="btn-logout" class="btn btn-ghost">Salir</button></div></header>
-<a href="mi-pagina.html" class="ct-btn ct-btn-primary" style="position:fixed;right:24px;bottom:24px;z-index:40">Diseñar mi página</a><main class="adm-main"><div class="pro-grid"><section class="adm-form"><h2 class="adm-h2">Identidad</h2><label>Nombre</label><input id="name"><label>Descripción</label><textarea id="description" rows="4"></textarea><label>WhatsApp</label><input id="whatsapp"><label>Teléfono</label><input id="phone"><label>Email</label><input id="email" type="email"><label>Dirección</label><input id="address"><label>Instagram</label><input id="instagram"><label>Slug / enlace</label><input id="slug"><label>Aviso al reservar</label><textarea id="booking_notice" rows="3"></textarea><label>Política de cancelación</label><textarea id="cancellation_policy" rows="3"></textarea><button id="save" class="btn btn-primary">Guardar cambios</button></section>
-<section><div class="adm-form"><h2 class="adm-h2">Imagen profesional</h2><label>Logo</label><input id="logo-file" type="file" accept="image/png,image/jpeg,image/webp"><div id="logo-preview" class="media-preview"></div><label>Portada</label><input id="cover-file" type="file" accept="image/png,image/jpeg,image/webp"><div id="cover-preview" class="media-preview wide"></div><p class="adm-note">JPG, PNG o WebP. Máximo 5 MB.</p></div><div class="adm-form mt-16"><h2 class="adm-h2">Color de tu página</h2><p class="adm-note">Así se verá tu página pública de reservación. El cambio se guarda junto con el resto de tus datos.</p><div id="theme-grid" class="theme-grid"></div><div id="theme-name" class="theme-name"></div></div><div class="adm-form mt-16"><h2 class="adm-h2">Estado de configuración</h2><div class="setup-track"><div id="setup-bar"></div></div><strong id="setup-label">0% completo</strong><p class="adm-note">Puedes publicar aunque falten datos y completarlos manualmente después.</p></div></section></div></main><div id="toast" class="toast hidden"></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="../js/config.js"></script>
-<script src="../js/supabase.js"></script><script src="../js/theme.js"></script><script src="../js/admin-auth.js"></script><script src="../js/admin-settings.js"></script><script src="../js/citago-shell.js"></script><script>document.addEventListener('DOMContentLoaded',()=>CitagoShell.mount({mode:'tenant',activePage:'configuracion'}));</script></body></html>
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Configuración · CITAGO</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/citago-admin.css">
+  <link rel="stylesheet" href="../css/admin-settings.css">
+</head>
+<body>
+  <div id="citago-shell"></div>
+  <main>
+    <div class="settings-page">
+      <header class="settings-head">
+        <div>
+          <span class="ct-eyebrow">CONFIGURACIÓN DEL NEGOCIO</span>
+          <h1>Tu negocio, bien presentado</h1>
+          <p>Administra la información que usa CITAGO en reservas, comunicaciones y tu página pública.</p>
+        </div>
+        <a class="ct-btn ct-btn-secondary" href="mi-pagina.html">Diseñar página pública →</a>
+      </header>
+
+      <div class="settings-layout">
+        <div class="settings-main">
+          <section class="settings-section">
+            <div class="settings-section-head">
+              <div><h2>Información general</h2><p>Los datos principales de tu establecimiento.</p></div>
+              <div class="settings-icon">01</div>
+            </div>
+            <div class="settings-grid">
+              <div class="settings-field"><label for="name">Nombre comercial</label><input id="name" autocomplete="organization" placeholder="Ej. Periquito Barber"></div>
+              <div class="settings-field"><label for="slug">Enlace público</label><input id="slug" placeholder="periquito-barber"><small>Se usará en tu link de reservación.</small></div>
+              <div class="settings-field full"><label for="description">Descripción</label><textarea id="description" placeholder="Describe brevemente tu negocio y lo que lo hace especial."></textarea></div>
+            </div>
+          </section>
+
+          <section class="settings-section">
+            <div class="settings-section-head">
+              <div><h2>Contacto</h2><p>Información para clientes, confirmaciones y seguimiento.</p></div>
+              <div class="settings-icon">02</div>
+            </div>
+            <div class="settings-grid">
+              <div class="settings-field"><label for="whatsapp">WhatsApp</label><input id="whatsapp" inputmode="tel" placeholder="52 229 000 0000"></div>
+              <div class="settings-field"><label for="phone">Teléfono</label><input id="phone" inputmode="tel" placeholder="229 000 0000"></div>
+              <div class="settings-field"><label for="email">Correo</label><input id="email" type="email" autocomplete="email" placeholder="contacto@negocio.com"></div>
+              <div class="settings-field"><label for="instagram">Instagram</label><input id="instagram" placeholder="@tunegocio"></div>
+              <div class="settings-field full"><label for="address">Dirección</label><input id="address" autocomplete="street-address" placeholder="Calle, número, colonia, ciudad"></div>
+            </div>
+          </section>
+
+          <section class="settings-section">
+            <div class="settings-section-head">
+              <div><h2>Reglas de reservación</h2><p>Textos que verá el cliente antes y después de reservar.</p></div>
+              <div class="settings-icon">03</div>
+            </div>
+            <div class="settings-grid">
+              <div class="settings-field full"><label for="booking_notice">Aviso al reservar</label><textarea id="booking_notice" placeholder="Ej. Llega 10 minutos antes de tu cita."></textarea></div>
+              <div class="settings-field full"><label for="cancellation_policy">Política de cancelación</label><textarea id="cancellation_policy" placeholder="Ej. Cancela con al menos 4 horas de anticipación."></textarea></div>
+            </div>
+          </section>
+        </div>
+
+        <aside class="settings-side">
+          <section class="settings-section">
+            <div class="settings-section-head"><div><h2>Imagen profesional</h2><p>Logo y portada visibles en la experiencia pública.</p></div><div class="settings-icon">✦</div></div>
+            <div class="settings-media-grid">
+              <div class="settings-media-card logo">
+                <div id="logo-preview" class="settings-media-preview"><div class="settings-media-empty">◈<strong>Logo del negocio</strong><span>PNG, JPG o WebP · máx. 5 MB</span></div></div>
+                <div class="settings-media-overlay"><span id="logo-file-name">Sin archivo nuevo</span><label class="settings-file-button">Cambiar<input id="logo-file" type="file" accept="image/png,image/jpeg,image/webp"></label></div>
+              </div>
+              <div class="settings-media-card cover">
+                <div id="cover-preview" class="settings-media-preview"><div class="settings-media-empty">▣<strong>Portada</strong><span>Horizontal recomendado · máx. 5 MB</span></div></div>
+                <div class="settings-media-overlay"><span id="cover-file-name">Sin archivo nuevo</span><label class="settings-file-button">Cambiar<input id="cover-file" type="file" accept="image/png,image/jpeg,image/webp"></label></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="settings-section">
+            <div class="settings-section-head"><div><h2>Estilo rápido</h2><p>Paleta base. La personalización avanzada vive en “Mi página”.</p></div></div>
+            <div id="theme-grid" class="settings-theme-grid"></div>
+            <div id="theme-name" class="settings-theme-label"></div>
+            <a class="settings-link-card" href="mi-pagina.html"><div><strong>Editor visual completo</strong><span>Colores, tipografía, portada y secciones.</span></div><b>→</b></a>
+          </section>
+
+          <section class="settings-section">
+            <div class="settings-status-row"><div><strong>Estado del perfil</strong><div class="settings-theme-label">Completa tu información para una mejor experiencia.</div></div><span id="setup-label">0% completo</span></div>
+            <div class="settings-progress"><div id="setup-bar"></div></div>
+          </section>
+        </aside>
+      </div>
+
+      <div class="settings-savebar">
+        <div><strong>Guardar configuración</strong><br><small>Los cambios de datos e imágenes se guardan en Supabase.</small></div>
+        <div class="settings-savebar-actions"><a class="ct-btn ct-btn-secondary" href="index.html">Cancelar</a><button id="save" class="ct-btn ct-btn-primary">Guardar cambios</button></div>
+      </div>
+    </div>
+  </main>
+  <div id="toast" class="toast hidden"></div>
+  <button id="btn-logout" hidden></button>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/config.js"></script>
+  <script src="../js/supabase.js"></script>
+  <script src="../js/theme.js"></script>
+  <script src="../js/admin-auth.js"></script>
+  <script src="../js/media-manager.js"></script>
+  <script src="../js/admin-settings.js"></script>
+  <script src="../js/citago-shell.js"></script>
+  <script>document.addEventListener('DOMContentLoaded',()=>CitagoShell.mount({mode:'tenant',activePage:'configuracion'}));</script>
+</body>
+</html>

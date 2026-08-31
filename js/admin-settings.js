@@ -32,11 +32,11 @@ function renderThemePicker(){
   }));
 }
 
-function preview(inputId,targetId){
-  const input=$(inputId),target=$(targetId);if(!input||!target)return;
+function preview(inputId,targetId,fileNameId){
+  const input=$(inputId),target=$(targetId),fileName=$(fileNameId);if(!input||!target)return;
   input.accept='image/jpeg,image/png,image/webp';
   input.addEventListener('change',()=>{
-    const f=input.files?.[0];if(!f)return;
+    const f=input.files?.[0];if(!f)return;if(fileName)fileName.textContent=f.name;
     if(!['image/jpeg','image/png','image/webp'].includes(f.type)||f.size>5*1024*1024){
       input.value='';toast('Usa JPG, PNG o WEBP de máximo 5 MB.','error');return;
     }
@@ -55,7 +55,7 @@ async function init(){
   if(biz.cover_image_url&&$('cover-preview'))$('cover-preview').innerHTML=`<img src="${biz.cover_image_url}" alt="Portada">`;
   selectedTheme=biz.theme||DEFAULT_THEME;applyTheme(selectedTheme);renderThemePicker();
   document.querySelectorAll('input,textarea').forEach(x=>x.addEventListener('input',progress));
-  preview('logo-file','logo-preview');preview('cover-file','cover-preview');
+  preview('logo-file','logo-preview','logo-file-name');preview('cover-file','cover-preview','cover-file-name');
   progress();if($('save'))$('save').onclick=save;if($('btn-logout'))$('btn-logout').onclick=logout;
 }
 
@@ -82,6 +82,10 @@ async function save(){
     if(error)throw error;if(!data?.id)throw new Error('Supabase no confirmó el guardado.');
 
     biz={...biz,...data};
+    if(logo&&$('logo-preview'))$('logo-preview').innerHTML=`<img src="${logo}" alt="Logo">`;
+    if(cover&&$('cover-preview'))$('cover-preview').innerHTML=`<img src="${cover}" alt="Portada">`;
+    if($('logo-file'))$('logo-file').value='';if($('cover-file'))$('cover-file').value='';
+    if($('logo-file-name'))$('logo-file-name').textContent='Guardado';if($('cover-file-name'))$('cover-file-name').textContent='Guardado';
     await supabaseClient.from('businesses').update({setup_completed:progress()===100}).eq('id',biz.id);
     toast('Cambios guardados correctamente','success');
   }catch(e){
