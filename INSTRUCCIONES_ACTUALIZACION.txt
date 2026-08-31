@@ -1,0 +1,33 @@
+CITAGO PREMIUM — APLICACIÓN DE LA ACTUALIZACIÓN
+
+Archivos preparados sobre la estructura pública actual de:
+https://github.com/mycitago/app
+
+CAMBIOS PRINCIPALES
+1. Reemplaza `css/admin.css` por el archivo de este paquete.
+2. En `js/admin-auth.js`, NO borres la lógica existente. Copia y pega al FINAL
+   el contenido de `js/APPEND_TO_admin-auth.js`.
+   Esto inyecta sidebar de escritorio y navegación inferior móvil.
+3. Sube `js/media-manager.js`.
+4. Reemplaza `js/admin-settings.js`.
+5. En `admin/configuracion.html`, antes de admin-settings.js agrega:
+   <script src="../js/media-manager.js"></script>
+6. Sube `admin/resenas.html`.
+7. Ejecuta/revisa `sql/STORAGE_PUBLIC_MEDIA_CHECK.sql` en Supabase.
+
+SERVICIOS
+El repositorio actual ya usa `business-public-media` en Servicios. La siguiente
+migración debe reutilizar `CitagoMedia.uploadPublicImage` dentro de
+admin-services.js; no sustituyo ese archivo completo en este paquete porque el
+archivo real tiene 660 líneas y reemplazarlo sin clonar el repo completo tendría
+más riesgo de romper horarios, bloqueos, empleados y presets.
+
+PUBLICACIÓN
+Al hacer commit en la rama que GitHub Pages publica, los cambios del CSS común
+afectarán inmediatamente Dashboard, Clientes, Equipo, Contabilidad,
+Integraciones, Planes, Plataforma, Servicios y Configuración.
+
+RESEÑAS GOOGLE
+`resenas.html` deja el módulo visual listo, pero el botón está intencionalmente
+desactivado. La conexión real requiere OAuth + Supabase Edge Functions y
+credenciales de Google Business Profile; no deben incrustarse en GitHub Pages.

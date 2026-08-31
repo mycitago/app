@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Reseñas | CITAGO</title>
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+  <header class="adm-topbar">
+    <div><div class="adm-topbar-title">Reseñas</div><div class="adm-topbar-sub">Reputación y comentarios de tus clientes</div></div>
+    <div class="adm-topbar-actions"><button id="btn-logout" class="btn btn-ghost">Salir</button></div>
+  </header>
+  <main class="adm-main">
+    <div class="page-hero"><div><div class="eyebrow">REPUTACIÓN</div><h1>Reseñas</h1><p>Consulta tu reputación y prepara la conexión con Google Business Profile.</p></div></div>
+    <section class="ct-review-summary">
+      <article class="ct-rating-card"><div class="ct-rating-number">—</div><div class="ct-stars">★★★★★</div><p class="adm-note" style="margin:10px 0 0">Conecta Google para sincronizar tu calificación real.</p></article>
+      <article class="ct-connect-card"><span class="eyebrow">GOOGLE</span><h2 style="margin:8px 0">Conecta tu Perfil de Empresa</h2><p style="color:#727887">La conexión segura se realizará mediante Supabase Edge Functions. Las credenciales privadas nunca se guardarán en esta página.</p><button class="btn btn-primary" id="google-connect" disabled>Conectar Google · Próxima fase</button></article>
+    </section>
+    <h2 class="adm-h2">Comentarios recientes</h2>
+    <div class="ct-review-list">
+      <div class="empty-state">Aún no hay reseñas sincronizadas. CITAGO seguirá funcionando normalmente sin Google conectado.</div>
+    </div>
+  </main>
+  <div id="toast" class="hidden"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/config.js"></script>
+  <script src="../js/admin-auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async()=>{ const s=await requireAuth(); if(!s)return; document.getElementById('btn-logout').onclick=logout; });
+  </script>
+</body>
+</html>
