@@ -243,6 +243,7 @@ function renderSuccess() {
   });
 }
 
+async function loadPublicReviews(businessId){const host=document.getElementById('public-reviews'),section=document.getElementById('public-reviews-section');if(!host||!section)return;const {data,error}=await supabaseClient.from('business_google_reviews_public').select('reviewer_name,star_rating,comment,create_time,reply_comment').eq('business_id',businessId).order('create_time',{ascending:false}).limit(5);if(error||!data?.length)return;host.replaceChildren();data.forEach(r=>{const c=document.createElement('article');c.className='public-review-card';const h=document.createElement('strong');h.textContent=`${'★'.repeat(Number(r.star_rating||0))} ${r.reviewer_name||'Cliente'}`;const p=document.createElement('p');p.textContent=r.comment||'';c.append(h,p);host.appendChild(c)});const avg=data.reduce((a,r)=>a+Number(r.star_rating||0),0)/data.length;document.getElementById('public-rating').textContent=`${avg.toFixed(1)} ★`;section.hidden=false}
 async function init() {
   const result = await loadBusiness();
 
@@ -252,6 +253,10 @@ async function init() {
   }
   state.business = result.business;
   applyTheme(state.business.theme);
+  if (typeof loadPublishedBranding === 'function') {
+    const branding = await loadPublishedBranding(state.business.id);
+    if (branding) { applyPublishedBranding(branding); renderPublicSections(branding); }
+  }
 
   renderHero();
   state.services = await loadActiveServices(state.business.id);
@@ -268,6 +273,7 @@ async function init() {
     });
   }
   renderDateScroller();
+  loadPublicReviews(state.business.id);
 
   el.btnAgendar.addEventListener('click', () => {
     if (!state.selectedService) return;

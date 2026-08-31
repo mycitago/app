@@ -131,3 +131,4 @@ body{background:#f7f8fc;color:#15161c}
   .selected-service-mini{display:none!important}
   .container{padding-left:16px!important;padding-right:16px!important}
 }
+\n.hero-brand-subtitle{max-width:620px;margin:8px auto 12px;color:rgba(255,255,255,.9);font-size:14px}.public-reviews-section{margin:38px 0;padding:24px;background:#fff;border-radius:22px;border:1px solid var(--line,#e7e9ee)}.public-reviews-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}.public-review-card{border:1px solid var(--line,#e7e9ee);border-radius:14px;padding:14px}.public-review-card strong{display:block}.public-review-card p{color:var(--muted,#6c7280);font-size:13px;line-height:1.5}body[data-button-style="pill"] .btn{border-radius:999px!important}body[data-button-style="square"] .btn{border-radius:4px!important}\n

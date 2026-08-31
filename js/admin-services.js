@@ -658,3 +658,8 @@ async function init() {
   window.lucide?.createIcons();
 }
 document.addEventListener('DOMContentLoaded',init);
+
+// Unified Services workspace contracts
+function renderServiceCatalog(services){ if(typeof renderCatalog==='function') return renderCatalog(services); return services||[]; }
+function openServiceEditor(service){ if(typeof edit==='function') return edit(service?.id||service); return service; }
+async function saveServiceEditor(){ if(typeof saveService==='function') return saveService(); if(typeof save==='function') return save(); return null; }

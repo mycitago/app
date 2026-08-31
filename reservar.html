@@ -18,7 +18,7 @@
       <img id="hero-logo" class="hero-logo hidden" alt="Logotipo">
       <h1 class="hero-name" id="hero-name">Cargando…</h1>
       <div class="hero-eyebrow">Reserva online</div>
-      <div class="hero-meta">
+      <p id="brand-hero-subtitle" class="hero-brand-subtitle" hidden></p><div class="hero-meta">
         <span id="hero-address"></span>
         <span id="hero-schedule"></span>
       </div>
@@ -28,7 +28,7 @@
   <main class="container">
 
     <!-- ============ PASO 0: SERVICIOS ============ -->
-    <section id="step-services">
+    <section id="step-services" data-brand-section="services">
       <div class="booking-intro">
         <div>
           <span class="section-kicker">Elige tu experiencia</span>
@@ -160,6 +160,7 @@
       </a>
     </section>
 
+    <section id="public-reviews-section" data-brand-section="reviews" class="public-reviews-section" hidden><div class="services-heading-row"><h3>Reseñas</h3><span id="public-rating"></span></div><div id="public-reviews" class="public-reviews-grid"></div></section>
   </main>
 </div>
 
@@ -172,6 +173,7 @@
 <script src="js/theme.js"></script>
 <script src="js/services.js"></script>
 <script src="js/appointments.js"></script>
+<script src="js/public-branding.js"></script>
 <script src="js/app.js"></script>
 <script src="js/public-booking-pro.js"></script>
 </body>

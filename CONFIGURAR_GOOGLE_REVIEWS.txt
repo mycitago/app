@@ -1,0 +1,16 @@
+CITAGO / Google Business Profile
+
+1. Crear proyecto en Google Cloud y habilitar APIs de Business Profile necesarias.
+2. Crear OAuth Client Web.
+3. Configurar redirect URI exactamente con la URL desplegada de la Edge Function google-oauth-callback.
+4. En Supabase Edge Function Secrets guardar:
+   GOOGLE_CLIENT_ID
+   GOOGLE_CLIENT_SECRET
+   GOOGLE_STATE_SECRET (cadena aleatoria larga)
+   GOOGLE_REDIRECT_URI
+   PUBLIC_APP_URL=https://mycitago.github.io/app
+5. Desplegar las 7 funciones de supabase/functions/.
+6. Ejecutar APLICAR_EN_SUPABASE.sql.
+7. En Reseñas, conectar Google.
+
+Los secretos no deben copiarse a js/config.js ni a GitHub Pages.

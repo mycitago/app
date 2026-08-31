@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+assert.ok(fs.existsSync('sql/platform_dashboard_rpc.sql'),'missing platform RPC');
+const sql=fs.readFileSync('sql/platform_dashboard_rpc.sql','utf8');
+assert.ok(sql.includes('platform_dashboard_snapshot'),'missing snapshot function');
+assert.ok(sql.includes('platform_admins'),'snapshot must authorize platform admin');
+const js=fs.readFileSync('js/admin-platform.js','utf8');
+assert.ok(js.includes("rpc('platform_dashboard_snapshot')"),'platform UI must use server snapshot RPC');
+assert.ok(!js.includes("safeSelect('businesses','*')"),'platform must not directly select all businesses');
+console.log('platform security contract OK');

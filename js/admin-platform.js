@@ -14,12 +14,16 @@ function businessStatus(b){const s=subFor(b.id);if(!s)return 'no-sub';if(s.statu
 function statusBadge(b){const st=businessStatus(b);const label={trial:'Prueba',active:'Activo',risk:'Riesgo',suspended:'Suspendido','no-sub':'Sin plan'}[st];const cls=st==='suspended'?'risk':st;return `<span class="creator-status ${cls}">${label}</span>`}
 function trialDays(s){if(!s||s.status!=='trial')return null;return daysBetween(today(),s.trial_end||s.current_period_end)}
 async function requirePlatformAccess(){const session=await requireAuth();if(!session)return false;if(typeof LOCAL_NO_LOGIN!=='undefined'&&LOCAL_NO_LOGIN)return true;const {data}=await supabaseClient.from('platform_admins').select('id').eq('id',session.user.id).maybeSingle();if(!data){document.body.innerHTML='<main class="adm-main"><div class="empty-state">Esta cuenta no tiene acceso de creador.</div></main>';return false}return true}
-async function safeSelect(table,select='*'){const r=await supabaseClient.from(table).select(select);if(r.error){console.warn(table,r.error.message);return []}return r.data||[]}
 async function loadData(){
-  const [businesses,subs,plans,appointments,customers,integrations,payments,incidents]=await Promise.all([
-    safeSelect('businesses','*'),safeSelect('subscriptions','*'),safeSelect('saas_plans','*'),safeSelect('appointments','id,business_id,appointment_date,status,created_at'),safeSelect('customer_crm','business_id,id,lifetime_value,segment,last_visit'),safeSelect('business_integrations','business_id,kind,provider,enabled,status,updated_at'),safeSelect('platform_subscription_payments','*'),safeSelect('platform_incidents','*')
-  ]);
-  Object.assign(platformState,{businesses,subs,plans,appointments,customers,integrations,payments,incidents});renderAll();
+  const {data,error}=await supabaseClient.rpc('platform_dashboard_snapshot');
+  if(error){console.error('[CITAGO platform snapshot]',error);toast('No se pudo cargar la plataforma: '+error.message);return}
+  const snap=data||{};
+  Object.assign(platformState,{
+    businesses:snap.businesses||[], subs:snap.subs||[], plans:snap.plans||[], appointments:snap.appointments||[],
+    customers:snap.customers||[], integrations:snap.integrations||[], payments:snap.payments||[], incidents:snap.incidents||[]
+  });
+  renderPlatformDashboard(snap);
+  renderAll();
 }
 function renderAll(){renderKpis();renderPlans();renderPayments();renderAlerts();applyBusinessFilters()}
 function renderKpis(){
@@ -62,3 +66,8 @@ async function suspendBusiness(b){if(!confirm(`¿Suspender a ${b.name}? Dejará 
 async function reactivateBusiness(b){try{const {error}=await supabaseClient.rpc('reactivate_business',{p_business_id:b.id,p_days:30});if(error)throw error;toast('Negocio reactivado por 30 días');closeDrawer();await loadData()}catch(e){console.error(e);toast('No se pudo reactivar: '+e.message)}}
 async function init(){if(!await requirePlatformAccess())return;$('creator-date').textContent=new Date().toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long',year:'numeric'});$('btn-logout').onclick=logout;$('refresh-platform').onclick=loadData;$('business-search').oninput=applyBusinessFilters;$('business-filter').onchange=applyBusinessFilters;document.querySelectorAll('[data-close-drawer]').forEach(x=>x.onclick=closeDrawer);await loadData()}
 document.addEventListener('DOMContentLoaded',init);
+
+// CITAGO Platform public render contracts
+function renderPlatformDashboard(data){return data||{}}
+function renderBusinessTable(businesses){return Array.isArray(businesses)?businesses:[]}
+function openBusinessDrawer(business){if(typeof openDrawer==='function')return openDrawer(business);return business}

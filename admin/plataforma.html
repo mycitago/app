@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html><div id="citago-shell"></div>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -8,10 +8,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/styles.css">
 <link rel="stylesheet" href="../css/admin.css">
-  <link rel="stylesheet" href="../css/admin-design-system.css">
-</head>
+<link rel="stylesheet" href="../css/citago-admin.css"><link rel="stylesheet" href="../css/admin-platform.css"></head>
 <body class="creator-body">
-  <div id="app-shell"></div>
 <header class="creator-topbar">
   <div class="creator-brand"><span class="creator-logo">N</span><div><strong>Super Admin</strong><small>Control de la plataforma</small></div></div>
   <div class="creator-top-actions">
@@ -94,6 +92,5 @@
 <script src="../js/supabase.js"></script>
 <script src="../js/admin-auth.js"></script>
 <script src="../js/admin-platform.js"></script>
-  <script src="../js/admin-nav.js"></script>
-</body>
+<script src="../js/citago-shell.js"></script><script>document.addEventListener('DOMContentLoaded',()=>CitagoShell.mount({mode:'platform',activePage:'resumen'}));</script></body>
 </html>

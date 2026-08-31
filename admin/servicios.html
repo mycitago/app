@@ -10,10 +10,8 @@
   <link rel="stylesheet" href="../css/admin.css">
   <link rel="stylesheet" href="../css/admin-services-pro.css">
 <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
-  <link rel="stylesheet" href="../css/admin-design-system.css">
-</head>
-<body class="svc-body">
-  <div id="app-shell"></div>
+<link rel="stylesheet" href="../css/citago-admin.css"><link rel="stylesheet" href="../css/admin-services.css"></head>
+<body class="svc-body"><div id="citago-shell"></div>
 
 <header class="svc-mobile-topbar">
   <div class="svc-brand-mark">C</div>
@@ -260,6 +258,5 @@
 <script src="../js/admin-auth.js"></script>
 <script src="../js/admin-services.js"></script>
 <script>document.addEventListener("DOMContentLoaded",()=>window.lucide?.createIcons());</script>
-  <script src="../js/admin-nav.js"></script>
-</body>
+<script src="../js/citago-shell.js"></script><script>document.addEventListener('DOMContentLoaded',()=>CitagoShell.mount({mode:'tenant',activePage:'servicios'}));</script></body>
 </html>
