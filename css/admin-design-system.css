@@ -1,0 +1,412 @@
+/* ============================================================
+   CITAGO — Sistema de diseño del panel admin
+   Un solo archivo de referencia para TODAS las páginas del admin
+   (index, citas, calendario, clientes, servicios, equipo,
+   reportes, mensajes, configuración, contabilidad, etc.)
+
+   Cómo usarlo:
+   1. Incluir este archivo en el <head> de cada página:
+      <link rel="stylesheet" href="/css/admin-design-system.css">
+   2. Usar las clases de abajo en vez de estilos inline o CSS
+      repetido por página.
+   3. No declarar colores, radios ni sombras "a mano" en ninguna
+      página — siempre referenciar las variables de aquí.
+   ============================================================ */
+
+:root {
+  /* Color */
+  --color-primary: #7c3aed;
+  --color-primary-dark: #6d28d9;
+  --color-primary-light: #ede9fe;
+  --color-bg: #f7f6fb;
+  --color-surface: #ffffff;
+  --color-border: #e6e4ee;
+  --color-text: #1e1b2e;
+  --color-text-muted: #6b7280;
+  --color-success: #16a34a;
+  --color-success-bg: #dcfce7;
+  --color-warning: #d97706;
+  --color-warning-bg: #fef3c7;
+  --color-danger: #dc2626;
+  --color-danger-bg: #fee2e2;
+
+  /* Tipografía */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.25rem;
+  --font-size-xl: 1.75rem;
+
+  /* Espaciado (múltiplos de 4px) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-8: 48px;
+
+  /* Bordes y sombras */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --shadow-sm: 0 1px 2px rgba(30, 27, 46, 0.06);
+  --shadow-md: 0 4px 12px rgba(30, 27, 46, 0.08);
+  --shadow-lg: 0 8px 24px rgba(30, 27, 46, 0.12);
+
+  /* Layout */
+  --sidebar-width: 240px;
+  --topbar-height: 64px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font-family);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: var(--font-size-base);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Layout general (shell de todas las páginas admin) ---------- */
+
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.app-main {
+  flex: 1;
+  margin-left: var(--sidebar-width);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-content {
+  padding: var(--space-5);
+  max-width: 1200px;
+  width: 100%;
+}
+
+@media (max-width: 900px) {
+  .app-main { margin-left: 0; }
+}
+
+/* ---------- Sidebar (única, compartida por admin-nav.js) ---------- */
+
+.sidebar {
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  width: var(--sidebar-width);
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-5) var(--space-3);
+  z-index: 20;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0 var(--space-2) var(--space-5);
+}
+
+.sidebar-brand .logo-badge {
+  width: 36px; height: 36px;
+  border-radius: var(--radius-sm);
+  background: var(--color-primary);
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700;
+}
+
+.sidebar-brand .brand-name { font-weight: 700; font-size: var(--font-size-sm); }
+.sidebar-brand .brand-sub { font-size: var(--font-size-xs); color: var(--color-text-muted); }
+
+.nav-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+
+.nav-item a {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-3);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  text-decoration: none;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+}
+
+.nav-item a:hover { background: var(--color-bg); color: var(--color-text); }
+
+.nav-item.active a {
+  background: var(--color-primary-light);
+  color: var(--color-primary-dark);
+  font-weight: 600;
+}
+
+.sidebar-plan {
+  margin-top: auto;
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+}
+
+.sidebar-plan .plan-label { font-size: var(--font-size-xs); color: var(--color-text-muted); text-transform: uppercase; }
+.sidebar-plan .plan-name { font-weight: 700; margin: var(--space-1) 0; }
+.sidebar-plan .plan-expiry { font-size: var(--font-size-xs); color: var(--color-text-muted); margin-bottom: var(--space-3); }
+
+/* ---------- Topbar ---------- */
+
+.topbar {
+  height: var(--topbar-height);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-5);
+  position: sticky; top: 0; z-index: 10;
+}
+
+.topbar-search {
+  flex: 1;
+  max-width: 420px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.topbar-actions { display: flex; align-items: center; gap: var(--space-4); }
+
+.topbar-user { display: flex; align-items: center; gap: var(--space-2); }
+.topbar-user .avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--color-primary); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: var(--font-size-xs); font-weight: 700;
+}
+.topbar-user .user-name { font-size: var(--font-size-sm); font-weight: 600; }
+.topbar-user .user-role { font-size: var(--font-size-xs); color: var(--color-text-muted); }
+
+/* ---------- Botones ---------- */
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
+  border: none; border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--font-size-sm); font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-primary { background: var(--color-primary); color: #fff; }
+.btn-primary:hover { background: var(--color-primary-dark); }
+
+.btn-secondary { background: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-border); }
+.btn-secondary:hover { background: var(--color-bg); }
+
+.btn-danger { background: var(--color-danger-bg); color: var(--color-danger); }
+.btn-danger:hover { background: #fecaca; }
+
+.btn-sm { padding: var(--space-2) var(--space-3); font-size: var(--font-size-xs); }
+.btn-block { width: 100%; }
+
+/* ---------- Tarjetas ---------- */
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-5);
+}
+
+.card-title { font-weight: 700; margin: 0 0 var(--space-1); }
+.card-subtitle { font-size: var(--font-size-sm); color: var(--color-text-muted); margin: 0 0 var(--space-4); }
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-4);
+}
+
+.stat-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+}
+
+.stat-card .stat-value { font-size: var(--font-size-xl); font-weight: 700; }
+.stat-card .stat-label { font-size: var(--font-size-sm); color: var(--color-text-muted); margin-top: var(--space-1); }
+
+/* ---------- Formularios (arregla el problema de configuración.html) ---------- */
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-4);
+}
+
+.form-field { display: flex; flex-direction: column; gap: var(--space-1); }
+
+.form-field label {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.form-field .hint { font-size: var(--font-size-xs); color: var(--color-text-muted); }
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  width: 100%;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+.form-field textarea { resize: vertical; min-height: 80px; }
+
+.form-section { margin-bottom: var(--space-6); }
+.form-section-title { font-size: var(--font-size-lg); font-weight: 700; margin-bottom: var(--space-4); }
+
+/* ---------- Tablas y listas ---------- */
+
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th {
+  text-align: left; font-size: var(--font-size-xs); text-transform: uppercase;
+  color: var(--color-text-muted); padding: var(--space-3); border-bottom: 1px solid var(--color-border);
+}
+.data-table td { padding: var(--space-3); border-bottom: 1px solid var(--color-border); font-size: var(--font-size-sm); }
+.data-table tr:last-child td { border-bottom: none; }
+
+/* ---------- Badges de estado ---------- */
+
+.badge {
+  display: inline-flex; align-items: center;
+  padding: 2px var(--space-2);
+  border-radius: 999px;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+.badge-success { background: var(--color-success-bg); color: var(--color-success); }
+.badge-warning { background: var(--color-warning-bg); color: var(--color-warning); }
+.badge-danger  { background: var(--color-danger-bg); color: var(--color-danger); }
+.badge-neutral { background: var(--color-bg); color: var(--color-text-muted); }
+
+/* ---------- Grid de tarjetas de catálogo (arregla servicios.html) ---------- */
+
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-4);
+}
+
+.catalog-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.catalog-card img { width: 100%; height: 140px; object-fit: cover; display: block; }
+.catalog-card .catalog-card-body { padding: var(--space-4); }
+.catalog-card .catalog-card-title { font-weight: 700; margin: 0 0 var(--space-1); }
+.catalog-card .catalog-card-meta { font-size: var(--font-size-sm); color: var(--color-text-muted); margin-bottom: var(--space-3); }
+.catalog-card .catalog-card-actions { display: flex; gap: var(--space-2); }
+
+
+/* ============================================================
+   CITAGO — Compatibilidad con el panel actual + responsive
+   Esta capa permite migrar página por página sin romper IDs/JS.
+   ============================================================ */
+
+/* El shell compartido es la única navegación visible. */
+.legacy-shell-hidden { display: none !important; }
+
+/* Compatibilidad con clases existentes del repo CITAGO. */
+.adm-main, .page-main, .content-wrap { width:100%; max-width:1200px; margin:0; padding:0; }
+.adm-kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:var(--space-4); }
+.adm-kpi { background:var(--color-surface); border:1px solid var(--color-border); border-radius:var(--radius-md); padding:var(--space-5); }
+.adm-kpi-num { font-size:var(--font-size-xl); font-weight:700; }
+.adm-kpi-label, .adm-note, .muted { color:var(--color-text-muted); font-size:var(--font-size-sm); }
+.adm-form, .panel, .notice-card, .integration-card, .price-card, .customer-row,
+.svc-panel, .svc-card, .svc-catalog-card, .adm-chart-card {
+  background:var(--color-surface); border:1px solid var(--color-border);
+  border-radius:var(--radius-md); box-shadow:var(--shadow-sm);
+}
+.svc-grid, .service-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:var(--space-4); }
+.svc-card, .svc-catalog-card { overflow:hidden; }
+
+/* Formularios legacy: se ven consistentes incluso antes de envolverlos en form-field. */
+form label { font-size:var(--font-size-sm); font-weight:600; color:var(--color-text); }
+form input:not([type="checkbox"]):not([type="radio"]), form select, form textarea {
+  font-family:inherit; font-size:var(--font-size-sm); padding:var(--space-3);
+  border:1px solid var(--color-border); border-radius:var(--radius-sm);
+  background:var(--color-surface); color:var(--color-text);
+}
+form input:focus, form select:focus, form textarea:focus {
+  outline:none; border-color:var(--color-primary); box-shadow:0 0 0 3px var(--color-primary-light);
+}
+
+/* Mobile shell */
+.mobile-nav { display:none; }
+@media (max-width: 900px) {
+  body { padding-bottom:76px; }
+  .sidebar { display:none; }
+  .app-main { margin-left:0; }
+  .app-content { padding:var(--space-4); max-width:none; }
+  .topbar { padding:0 var(--space-4); }
+  .topbar-search { display:none; }
+  .topbar-user .user-name, .topbar-user .user-role { display:none; }
+  .mobile-nav {
+    position:fixed; left:10px; right:10px; bottom:10px; z-index:50;
+    display:grid; grid-template-columns:repeat(5,1fr); gap:4px;
+    padding:6px; border:1px solid var(--color-border); border-radius:18px;
+    background:rgba(255,255,255,.96); box-shadow:var(--shadow-lg); backdrop-filter:blur(14px);
+  }
+  .mobile-nav a {
+    min-height:50px; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:2px; color:var(--color-text-muted); text-decoration:none; border-radius:12px;
+    font-size:10px; font-weight:600;
+  }
+  .mobile-nav a.active { color:var(--color-primary-dark); background:var(--color-primary-light); }
+  .mobile-nav .mobile-add {
+    width:44px; height:44px; min-height:44px; margin:auto; border-radius:50%;
+    background:var(--color-primary); color:white; font-size:22px;
+  }
+}
+@media (max-width: 520px) {
+  .app-content { padding:var(--space-3); }
+  .stat-grid, .adm-kpis, .form-grid { grid-template-columns:1fr; }
+  .catalog-grid, .svc-grid, .service-grid { grid-template-columns:1fr; }
+  .topbar-actions { gap:var(--space-2); }
+  .topbar-actions .btn { padding:var(--space-2) var(--space-3); }
+}
