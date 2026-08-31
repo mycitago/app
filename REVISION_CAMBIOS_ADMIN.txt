@@ -1,0 +1,16 @@
+CITAGO - revisión del problema de actualización
+
+Causa encontrada:
+Los archivos admin-design-system.css y admin-nav.js estaban en el repositorio,
+pero los HTML del admin no los estaban cargando. GitHub Pages sí desplegaba,
+pero desplegaba las páginas antiguas.
+
+Esta copia ya tiene integradas las 9 páginas:
+index, clientes, configuracion, contabilidad, equipo, integraciones,
+planes, servicios y plataforma.
+
+También se corrigió la convivencia con los shells antiguos del Dashboard y
+Super Admin para evitar navegación duplicada.
+
+Después de reemplazar el contenido del repo, espera a que Pages termine
+y usa Ctrl+F5.

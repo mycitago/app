@@ -41,7 +41,11 @@
   })
  }
  function hideLegacy(){
-  const selectors=['.adm-sidebar','.legacy-sidebar','.adm-topbar','.adm-header','.admin-header','.site-header','.navbar','.top-nav'];
+  const selectors=[
+    '.adm-sidebar','.legacy-sidebar','.adm-topbar','.adm-header','.admin-header','.site-header','.navbar','.top-nav',
+    '.dash-mobile-top','.dash-sidebar','.dash-topbar','.dash-mobile-nav','.dash-app',
+    '.creator-topbar','.creator-sidebar','.creator-mobile-nav','.creator-layout'
+  ];
   document.querySelectorAll(selectors.join(',')).forEach(el=>{if(!el.closest('#app-shell'))el.classList.add('legacy-shell-hidden')});
   [...document.body.children].forEach(el=>{
    if(el.id==='app-shell'||['SCRIPT','STYLE','LINK'].includes(el.tagName))return;
@@ -52,8 +56,8 @@
   const host=document.getElementById('app-shell'); if(!host||host.dataset.ready)return;
   const isPlatform=platform(); const a=active(); const items=isPlatform?PLATFORM:TENANT;
   document.body.classList.add('ct-shell-ready'); if(isPlatform)document.body.classList.add('ct-platform');
-  hideLegacy();
   const content=findContent(); if(isPlatform)markPlatformSections(content);
+  hideLegacy();
   const brand=isPlatform?'CITAGO Platform':'CITAGO';
   const sub=isPlatform?'Super Administrador':'Panel de control';
   host.innerHTML=`<aside class="ct-sidebar"><div class="ct-brand"><div class="ct-logo">C</div><div><div class="ct-brand-name" id="ct-business">${brand}</div><div class="ct-brand-sub">${sub}</div></div></div><ul class="ct-nav">${nav(items,a)}</ul><div class="ct-sidebar-footer"><strong>${isPlatform?'Control de plataforma':'Cuenta activa'}</strong><small>${isPlatform?'Negocios, planes, cobros y operación':'Gestión segura de tu negocio'}</small><a class="ct-btn ct-btn-secondary" href="${isPlatform?'index.html':'planes.html'}">${isPlatform?'Abrir panel negocio':'Ver plan'}</a></div></aside><div class="ct-main"><header class="ct-topbar"><div class="ct-search">${isPlatform?'⌕ Buscar negocios, pagos, incidencias…':'⌕ Buscar clientes, citas, servicios…'}</div><div class="ct-actions">${isPlatform?'':'<a class="ct-btn ct-btn-primary" href="index.html#nueva-cita">+ Nueva cita</a>'}<div class="ct-user"><div class="ct-avatar">SA</div><div class="ct-user-text"><div class="ct-user-name" id="ct-user">${isPlatform?'Super Admin':'Administrador'}</div><div class="ct-user-role">${isPlatform?'Plataforma CITAGO':'Negocio'}</div></div></div></div></header><main class="ct-content" id="app-content"></main></div><nav class="ct-mobile">${(isPlatform?PLATFORM.slice(0,5):TENANT.slice(0,5)).map(([id,label,href,icon])=>`<a class="${id===a?'active':''}" href="${href}"><b>${icon}</b><span>${label.split(' ')[0]}</span></a>`).join('')}</nav>`;
