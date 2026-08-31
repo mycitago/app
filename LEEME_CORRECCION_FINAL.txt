@@ -1,0 +1,28 @@
+CITAGO — CORRECCIÓN FINAL ADMIN + SUPER ADMIN
+
+PROBLEMAS CORREGIDOS
+1. plataforma.html ahora entra en el sistema de diseño.
+2. El Super Administrador tiene shell propio "CITAGO Platform".
+3. Se normalizan rutas /css/* y /js/* a ../css/* y ../js/* para GitHub Pages /app/.
+4. Se ocultan headers/nav/aside antiguos aunque usen nombres de clase diferentes.
+5. clientes.html deja de mostrar el menú horizontal legacy.
+6. Las páginas mantienen sus scripts, IDs y contenido funcional.
+7. No toca Supabase, RLS ni tablas.
+
+INSTALACIÓN
+Sube a la raíz del repo:
+.github/workflows/fix-admin-final.yml
+css/admin-design-system.css
+js/admin-nav.js
+tools/fix_all_admin_pages.py
+
+Haz commit en main.
+En Actions ejecuta "CITAGO - Corregir Admin y Super Admin" si no arranca solo.
+Si falla por permisos:
+Settings > Actions > General > Workflow permissions > Read and write permissions.
+
+VERIFICAR
+https://mycitago.github.io/app/admin/clientes.html
+https://mycitago.github.io/app/admin/plataforma.html
+
+Recarga con Ctrl+F5.

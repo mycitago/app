@@ -1,80 +1,74 @@
-/* CITAGO — navegación única del panel admin */
 (function(global){
-  const NAV_ITEMS=[
-    {id:'resumen',label:'Resumen',href:'index.html',icon:'⌂'},
-    {id:'clientes',label:'Clientes',href:'clientes.html',icon:'👥'},
-    {id:'servicios',label:'Servicios',href:'servicios.html',icon:'✂'},
-    {id:'equipo',label:'Equipo',href:'equipo.html',icon:'♟'},
-    {id:'contabilidad',label:'Contabilidad',href:'contabilidad.html',icon:'$'},
-    {id:'integraciones',label:'Integraciones',href:'integraciones.html',icon:'⛓'},
-    {id:'planes',label:'Planes',href:'planes.html',icon:'◇'},
-    {id:'configuracion',label:'Configuración',href:'configuracion.html',icon:'⚙'}
-  ];
-  const PAGE_MAP={
-    'index.html':'resumen','':'resumen','clientes.html':'clientes','servicios.html':'servicios',
-    'equipo.html':'equipo','contabilidad.html':'contabilidad','integraciones.html':'integraciones',
-    'planes.html':'planes','configuracion.html':'configuracion'
-  };
-  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const currentFile=()=>location.pathname.split('/').pop().toLowerCase();
-  const inferActive=()=>PAGE_MAP[currentFile()]||'resumen';
-  function sidebar(active,o){
-    const items=NAV_ITEMS.map(i=>`<li class="nav-item ${i.id===active?'active':''}"><a href="${i.href}"><span class="nav-icon">${i.icon}</span><span>${i.label}</span></a></li>`).join('');
-    return `<aside class="sidebar"><div class="sidebar-brand"><div class="logo-badge">${esc((o.businessInitial||o.businessName||'C').slice(0,1).toUpperCase())}</div><div><div class="brand-name" id="admin-nav-business">${esc(o.businessName||'CITAGO')}</div><div class="brand-sub">Panel de control</div></div></div><ul class="nav-list">${items}</ul><div class="sidebar-plan"><div class="plan-label">Plan actual</div><div class="plan-name" id="admin-nav-plan">${esc(o.planName||'')}</div><div class="plan-expiry" id="admin-nav-expiry">${esc(o.planExpiry||'')}</div><a class="btn btn-secondary btn-block btn-sm" href="planes.html">Ver mi plan</a></div></aside>`;
-  }
-  function topbar(o){
-    const initials=(o.userName||'?').slice(0,2).toUpperCase();
-    return `<header class="topbar"><div class="topbar-search">⌕ Buscar clientes, citas, servicios…</div><div class="topbar-actions"><a class="btn btn-primary btn-sm" href="index.html#nueva-cita">+ Nueva cita</a><div class="topbar-user"><div class="avatar">${esc(initials)}</div><div><div class="user-name" id="admin-nav-user">${esc(o.userName||'')}</div><div class="user-role" id="admin-nav-role">${esc(o.userRole||'Administrador')}</div></div></div></div></header>`;
-  }
-  function mobile(active){
-    return `<nav class="mobile-nav" aria-label="Navegación móvil"><a href="index.html" class="${active==='resumen'?'active':''}"><b>⌂</b><span>Inicio</span></a><a href="servicios.html" class="${active==='servicios'?'active':''}"><b>✂</b><span>Servicios</span></a><a href="index.html#nueva-cita" class="mobile-add" aria-label="Nueva cita">＋</a><a href="clientes.html" class="${active==='clientes'?'active':''}"><b>👥</b><span>Clientes</span></a><a href="configuracion.html" class="${active==='configuracion'?'active':''}"><b>•••</b><span>Más</span></a></nav>`;
-  }
-  function hideLegacy(){
-    document.querySelectorAll('.adm-sidebar,.legacy-sidebar,body > aside:not(.sidebar),.adm-topbar,body > header:not(.topbar)').forEach(el=>el.classList.add('legacy-shell-hidden'));
-  }
-  function findContent(){
-    const selectors=['main','.adm-main','.page-main','.content-wrap','.adm-content'];
-    for(const selector of selectors){
-      const el=[...document.querySelectorAll(selector)].find(n=>!n.closest('#app-shell'));
-      if(el) return el;
-    }
-    return null;
-  }
-  function render(opts){
-    opts=opts||{};
-    const shell=document.getElementById('app-shell');
-    if(!shell) return;
-    if(shell.dataset.rendered==='1') return;
-    const active=opts.activePage||inferActive();
-    hideLegacy();
-    const contentNode=findContent();
-    shell.innerHTML=`${sidebar(active,opts)}<div class="app-main">${topbar(opts)}<main class="app-content" id="app-content"></main></div>${mobile(active)}`;
-    shell.dataset.rendered='1';
-    const host=document.getElementById('app-content');
-    if(opts.contentHTML) host.innerHTML=opts.contentHTML;
-    else if(contentNode){contentNode.classList.add('page-content-host');host.appendChild(contentNode);}
-    hydrate(opts);
-  }
-  async function hydrate(opts){
-    try{
-      if(typeof requireAuth!=='function'||typeof getMyBusiness!=='function') return;
-      const session=await requireAuth(); if(!session) return;
-      const biz=await getMyBusiness(session.user);
-      if(biz?.name){const e=document.getElementById('admin-nav-business');if(e)e.textContent=biz.name;}
-      const u=document.getElementById('admin-nav-user');
-      if(u)u.textContent=session.user?.user_metadata?.name||session.user?.email?.split('@')[0]||'Usuario';
-      if(typeof getMySubscription==='function'&&biz?.id){
-        const sub=await getMySubscription(biz.id);
-        const p=document.getElementById('admin-nav-plan');if(p&&sub?.plan)p.textContent=sub.plan;
-        const x=document.getElementById('admin-nav-expiry');
-        if(x&&sub?.current_period_end)x.textContent=`Vigente hasta ${new Date(sub.current_period_end+'T12:00:00').toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'})}`;
-      }
-    }catch(err){console.warn('[AdminNav] Contexto no disponible',err);}
-  }
-  function autoRender(){
-    if(document.getElementById('app-shell')) render({});
-  }
-  global.AdminNav={render,hydrate,NAV_ITEMS,inferActive};
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',autoRender,{once:true});
-  else autoRender();
+ const TENANT=[
+  ['resumen','Resumen','index.html','⌂'],['clientes','Clientes','clientes.html','👥'],
+  ['servicios','Servicios','servicios.html','✂'],['equipo','Equipo','equipo.html','♟'],
+  ['contabilidad','Contabilidad','contabilidad.html','$'],['integraciones','Integraciones','integraciones.html','⛓'],
+  ['planes','Planes','planes.html','◇'],['configuracion','Configuración','configuracion.html','⚙']
+ ];
+ const PLATFORM=[
+  ['plataforma','Resumen plataforma','plataforma.html','⌂'],
+  ['negocios','Negocios','plataforma.html#negocios','▦'],
+  ['suscripciones','Suscripciones','plataforma.html#suscripciones','◇'],
+  ['pagos','Pagos','plataforma.html#pagos','$'],
+  ['incidencias','Incidencias','plataforma.html#incidencias','!'],
+  ['panel-negocio','Panel de negocio','index.html','↗']
+ ];
+ const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const file=()=>location.pathname.split('/').pop().toLowerCase();
+ const platform=()=>file()==='plataforma.html';
+ const active=()=>{
+  const f=file(); const m={'':'resumen','index.html':'resumen','clientes.html':'clientes','servicios.html':'servicios','equipo.html':'equipo','contabilidad.html':'contabilidad','integraciones.html':'integraciones','planes.html':'planes','configuracion.html':'configuracion','plataforma.html':'plataforma'};
+  if(platform() && location.hash) return location.hash.slice(1);
+  return m[f]||'resumen'
+ };
+ function nav(items,a){return items.map(([id,label,href,icon])=>`<li><a class="${id===a?'active':''}" href="${href}"><span class="ct-nav-icon">${icon}</span><span>${label}</span></a></li>`).join('')}
+ function findContent(){
+  const sels=['main','.adm-main','.page-main','.content-wrap','.adm-content','.platform-main','#platform-content'];
+  for(const s of sels){const n=[...document.querySelectorAll(s)].find(x=>!x.closest('#app-shell'));if(n)return n}
+  // fallback: move all meaningful direct body children except scripts/style/shell
+  const wrapper=document.createElement('main'); wrapper.className='page-content-host';
+  const nodes=[...document.body.children].filter(n=>n.id!=='app-shell'&&!['SCRIPT','STYLE','LINK'].includes(n.tagName));
+  if(nodes.length){nodes.forEach(n=>wrapper.appendChild(n));document.body.appendChild(wrapper);return wrapper}
+  return null
+ }
+ function markPlatformSections(content){
+  if(!content)return;
+  const textMap=[['negocios','negocio'],['suscripciones','suscrip'],['pagos','pago'],['incidencias','inciden']];
+  const headings=[...content.querySelectorAll('h1,h2,h3')];
+  textMap.forEach(([id,key])=>{
+   const h=headings.find(x=>x.textContent.toLowerCase().includes(key));
+   if(h && !document.getElementById(id)){h.id=id;h.style.scrollMarginTop='88px'}
+  })
+ }
+ function hideLegacy(){
+  const selectors=['.adm-sidebar','.legacy-sidebar','.adm-topbar','.adm-header','.admin-header','.site-header','.navbar','.top-nav'];
+  document.querySelectorAll(selectors.join(',')).forEach(el=>{if(!el.closest('#app-shell'))el.classList.add('legacy-shell-hidden')});
+  [...document.body.children].forEach(el=>{
+   if(el.id==='app-shell'||['SCRIPT','STYLE','LINK'].includes(el.tagName))return;
+   if((el.tagName==='HEADER'||el.tagName==='NAV'||el.tagName==='ASIDE')&&!el.closest('main'))el.classList.add('legacy-shell-hidden')
+  })
+ }
+ function shell(){
+  const host=document.getElementById('app-shell'); if(!host||host.dataset.ready)return;
+  const isPlatform=platform(); const a=active(); const items=isPlatform?PLATFORM:TENANT;
+  document.body.classList.add('ct-shell-ready'); if(isPlatform)document.body.classList.add('ct-platform');
+  hideLegacy();
+  const content=findContent(); if(isPlatform)markPlatformSections(content);
+  const brand=isPlatform?'CITAGO Platform':'CITAGO';
+  const sub=isPlatform?'Super Administrador':'Panel de control';
+  host.innerHTML=`<aside class="ct-sidebar"><div class="ct-brand"><div class="ct-logo">C</div><div><div class="ct-brand-name" id="ct-business">${brand}</div><div class="ct-brand-sub">${sub}</div></div></div><ul class="ct-nav">${nav(items,a)}</ul><div class="ct-sidebar-footer"><strong>${isPlatform?'Control de plataforma':'Cuenta activa'}</strong><small>${isPlatform?'Negocios, planes, cobros y operación':'Gestión segura de tu negocio'}</small><a class="ct-btn ct-btn-secondary" href="${isPlatform?'index.html':'planes.html'}">${isPlatform?'Abrir panel negocio':'Ver plan'}</a></div></aside><div class="ct-main"><header class="ct-topbar"><div class="ct-search">${isPlatform?'⌕ Buscar negocios, pagos, incidencias…':'⌕ Buscar clientes, citas, servicios…'}</div><div class="ct-actions">${isPlatform?'':'<a class="ct-btn ct-btn-primary" href="index.html#nueva-cita">+ Nueva cita</a>'}<div class="ct-user"><div class="ct-avatar">SA</div><div class="ct-user-text"><div class="ct-user-name" id="ct-user">${isPlatform?'Super Admin':'Administrador'}</div><div class="ct-user-role">${isPlatform?'Plataforma CITAGO':'Negocio'}</div></div></div></div></header><main class="ct-content" id="app-content"></main></div><nav class="ct-mobile">${(isPlatform?PLATFORM.slice(0,5):TENANT.slice(0,5)).map(([id,label,href,icon])=>`<a class="${id===a?'active':''}" href="${href}"><b>${icon}</b><span>${label.split(' ')[0]}</span></a>`).join('')}</nav>`;
+  const dst=document.getElementById('app-content'); if(content){content.classList.add('page-content-host');dst.appendChild(content)}
+  host.dataset.ready='1'; hydrate(isPlatform)
+ }
+ async function hydrate(isPlatform){
+  if(isPlatform)return;
+  try{
+   if(typeof requireAuth!=='function'||typeof getMyBusiness!=='function')return;
+   const session=await requireAuth();if(!session)return;
+   const biz=await getMyBusiness(session.user);if(biz?.name){const e=document.getElementById('ct-business');if(e)e.textContent=biz.name}
+   const u=document.getElementById('ct-user');if(u)u.textContent=session.user?.user_metadata?.name||session.user?.email?.split('@')[0]||'Administrador'
+  }catch(e){console.warn('[CITAGO shell]',e)}
+ }
+ global.AdminNav={render:shell};
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',shell,{once:true});else shell()
 })(window);
