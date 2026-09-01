@@ -56,6 +56,7 @@
 <script src="../js/supabase.js"></script>
 <script src="../js/theme.js"></script>
 <script src="../js/starter-kit.js"></script>
+<script src="../js/oauth-login-flow.js"></script>
 <script>
   if (typeof LOCAL_NO_LOGIN !== 'undefined' && LOCAL_NO_LOGIN) window.location.replace('index.html');
   const views=['login','register','forgot','reset'];
@@ -79,7 +80,7 @@
 
   async function handleGoogle(){
     hideMsgs();const btn=$('btn-google');btn.disabled=true;btn.querySelector('strong').textContent='Abriendo Google…';
-    const invite=new URLSearchParams(location.search).get('invite')||localStorage.getItem('mycitago:invite')||'';const redirectTo=`${getAppBaseUrl()}admin/login.html?oauth=1${invite?'&invite='+encodeURIComponent(invite):''}`;
+    const invite=MyCitaGoOAuth.inviteForOAuth(location.href);const redirectTo=`${getAppBaseUrl()}admin/login.html?oauth=1${invite?'&invite='+encodeURIComponent(invite):''}`;
     const{error}=await supabaseClient.auth.signInWithOAuth({provider:'google',options:{redirectTo,queryParams:{prompt:'select_account'}}});
     if(error){btn.disabled=false;btn.querySelector('strong').textContent='Continuar con Google';showError(error.message)}
   }
@@ -116,8 +117,32 @@
 
   (async function start(){
     if(location.hash.includes('type=recovery')){showView('reset');return}
-    const params=new URLSearchParams(location.search);if(params.get('invite'))localStorage.setItem('mycitago:invite',params.get('invite'));const{data}=await supabaseClient.auth.getUser();const user=data?.user;
-    if(user){if(await platformAdminFor(user.id)){location.replace('plataforma.html');return}const member=await membershipFor(user.id);if(member){const token=localStorage.getItem('mycitago:invite');if(token){await supabaseClient.rpc('claim_business_invite',{p_token:token,p_business_id:member.business_id}).catch(()=>{});localStorage.removeItem('mycitago:invite')}location.replace('index.html');return}prepareOAuthRegistration(user);return}
+    const params=new URLSearchParams(location.search);
+    const currentInvite=params.get('invite')||'';
+    if(currentInvite)localStorage.setItem('mycitago:invite',currentInvite);
+    else if(params.get('oauth')==='1')localStorage.removeItem('mycitago:invite');
+
+    const oauthReturn=MyCitaGoOAuth.isOAuthCallback(location.href);
+    const session=await MyCitaGoOAuth.waitForAuthSession(supabaseClient,{timeoutMs:oauthReturn?5000:0});
+    const user=session?.user||null;
+
+    if(oauthReturn && history?.replaceState){
+      history.replaceState({},document.title,MyCitaGoOAuth.cleanOAuthUrl(location.href));
+    }
+
+    if(user){
+      if(await platformAdminFor(user.id)){location.replace('plataforma.html');return}
+      const member=await membershipFor(user.id);
+      if(member){
+        if(currentInvite){
+          await supabaseClient.rpc('claim_business_invite',{p_token:currentInvite,p_business_id:member.business_id}).catch(()=>{});
+          localStorage.removeItem('mycitago:invite');
+        }
+        location.replace('index.html');return
+      }
+      prepareOAuthRegistration(user);return
+    }
+    if(oauthReturn){showError('Google confirmó tu cuenta, pero MyCitaGo no pudo restaurar la sesión. Recarga la página una vez; si continúa, vuelve a iniciar con Google.');return}
     if(params.get('view')==='register')showView('register');
   })();
 </script>
