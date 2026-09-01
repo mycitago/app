@@ -11,7 +11,14 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
 }
 
 // El SDK de Supabase se carga vía CDN en index.html (window.supabase)
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: {
+    flowType: 'implicit',
+    detectSessionInUrl: true,
+    persistSession: true,
+    autoRefreshToken: true
+  }
+});
 
 // =========================================================
 // MODO LOCAL DE DESARROLLO (sin contraseña)

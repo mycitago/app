@@ -78,11 +78,28 @@
   async function platformAdminFor(userId){const{data}=await supabaseClient.from('platform_admins').select('id').eq('id',userId).maybeSingle();return !!data}
   async function membershipFor(userId){const{data}=await supabaseClient.from('business_members').select('business_id').eq('user_id',userId).eq('status','active').limit(1);return data?.[0]||null}
 
-  async function handleGoogle(){
-    hideMsgs();const btn=$('btn-google');btn.disabled=true;btn.querySelector('strong').textContent='Abriendo Google…';
-    const invite=MyCitaGoOAuth.inviteForOAuth(location.href);const redirectTo=`${getAppBaseUrl()}admin/login.html?oauth=1${invite?'&invite='+encodeURIComponent(invite):''}`;
-    const{error}=await supabaseClient.auth.signInWithOAuth({provider:'google',options:{redirectTo,queryParams:{prompt:'select_account'}}});
-    if(error){btn.disabled=false;btn.querySelector('strong').textContent='Continuar con Google';showError(error.message)}
+  function resetGoogleButton(btn){
+    if(!btn)return;
+    btn.disabled=false;
+    const label=btn.querySelector('strong');
+    if(label)label.textContent=btn.id==='btn-google-register'?'Crear cuenta con Google':'Continuar con Google';
+  }
+  function resetGoogleButtons(){resetGoogleButton($('btn-google'));resetGoogleButton($('btn-google-register'))}
+
+  async function handleGoogle(event){
+    hideMsgs();
+    const btn=event?.currentTarget||$('btn-google');
+    resetGoogleButtons();
+    btn.disabled=true;
+    btn.querySelector('strong').textContent='Abriendo Google…';
+    const invite=MyCitaGoOAuth.inviteForOAuth(location.href);
+    const redirectTo=`${getAppBaseUrl()}admin/login.html?oauth=1${invite?'&invite='+encodeURIComponent(invite):''}`;
+    try{
+      const{error}=await supabaseClient.auth.signInWithOAuth({provider:'google',options:{redirectTo,queryParams:{prompt:'select_account'}}});
+      if(error){resetGoogleButton(btn);showError(error.message)}
+    }catch(error){
+      resetGoogleButton(btn);showError(error?.message||'No se pudo abrir Google. Intenta de nuevo.');
+    }
   }
 
   async function handleLogin(){hideMsgs();const btn=$('btn-login');btn.disabled=true;btn.textContent='Entrando…';const email=$('login-email').value.trim(),password=$('login-password').value;const{data,error}=await supabaseClient.auth.signInWithPassword({email,password});btn.disabled=false;btn.textContent='Entrar';if(error)return showError(mapLoginError(error.message));if(await platformAdminFor(data.user.id))return location.replace('plataforma.html');location.replace('index.html')}
@@ -113,7 +130,9 @@
   function prepareOAuthRegistration(user){oauthMode=true;showView('register');$('email-register-fields').classList.add('hidden');$('register-google-option').classList.add('hidden');$('oauth-profile').classList.remove('hidden');$('oauth-name').textContent=user.user_metadata?.full_name||user.user_metadata?.name||'Cuenta Google conectada';$('oauth-email').textContent=user.email||'';$('oauth-avatar').textContent=($('oauth-name').textContent||'G').slice(0,1).toUpperCase();$('card-title').textContent='Completa tu negocio';$('card-sub').textContent='Google ya verificó tu identidad. Sólo faltan los datos de tu negocio.';$('btn-register').textContent='Crear mi negocio'}
 
   document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{oauthMode=false;$('email-register-fields').classList.remove('hidden');$('register-google-option').classList.remove('hidden');$('oauth-profile').classList.add('hidden');showView(b.dataset.view)}));
-  $('btn-google').addEventListener('click',handleGoogle);$('btn-google-register').addEventListener('click',handleGoogle);$('btn-login').addEventListener('click',handleLogin);$('btn-register').addEventListener('click',handleRegister);$('btn-forgot').addEventListener('click',handleForgot);$('btn-reset').addEventListener('click',handleReset);$('login-password').addEventListener('keydown',e=>{if(e.key==='Enter')handleLogin()});
+  $('btn-google').addEventListener('click',handleGoogle);$('btn-google-register').addEventListener('click',handleGoogle);
+  window.addEventListener('pageshow',resetGoogleButtons);
+  resetGoogleButtons();$('btn-login').addEventListener('click',handleLogin);$('btn-register').addEventListener('click',handleRegister);$('btn-forgot').addEventListener('click',handleForgot);$('btn-reset').addEventListener('click',handleReset);$('login-password').addEventListener('keydown',e=>{if(e.key==='Enter')handleLogin()});
 
   (async function start(){
     if(location.hash.includes('type=recovery')){showView('reset');return}
@@ -131,7 +150,7 @@
       return;
     }
 
-    const session=await MyCitaGoOAuth.waitForAuthSession(supabaseClient,{timeoutMs:oauthReturn?8000:0});
+    const session=await MyCitaGoOAuth.waitForAuthSession(supabaseClient,{timeoutMs:oauthReturn?8000:250});
     const user=session?.user||null;
 
     if(oauthReturn && history?.replaceState){
