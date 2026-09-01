@@ -1,35 +1,7 @@
-<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="../css/styles.css"><link rel="stylesheet" href="../css/admin.css"><title>Equipo</title><link rel="stylesheet" href="../css/citago-admin.css"><link rel="stylesheet" href="../css/mycitago-themes.css">
-<script src="../js/ui-theme.js"></script>
-</head><body><div id="citago-shell"></div>
-<header class="adm-topbar"><div><div class="adm-topbar-title" id="biz-name">Cargando…</div><div class="adm-topbar-sub">Crecimiento y automatización</div></div><div class="adm-topbar-actions"><a href="index.html" class="btn btn-ghost">Dashboard</a><a href="servicios.html" class="btn btn-ghost">Servicios</a><a href="clientes.html" class="btn btn-ghost">Clientes</a><a href="configuracion.html" class="btn btn-ghost">Mi negocio</a></div></header>
-<main class="adm-main">
-  <div class="page-hero"><div><span class="eyebrow">Roles</span><h1>Tu equipo</h1><p>Solo el dueño puede invitar, cambiar rol o quitar personas. Los permisos se revisan en el servidor, no solo aquí.</p></div></div>
-
-  <div id="not-owner-notice" class="notice-card hidden"><b>Solo lectura</b><p>Tu rol actual no permite gestionar el equipo. Pide al dueño del negocio que haga estos cambios.</p></div>
-
-  <section id="invite-card" class="integration-card hidden">
-    <h2>Invitar a alguien</h2>
-    <p>La persona debe haber iniciado sesión al menos una vez en MyCitaGo con el correo que pongas aquí.</p>
-    <label>Correo<input id="inv-email" class="input" type="email" placeholder="correo@ejemplo.com"></label>
-    <label>Rol
-      <select id="inv-role" class="input">
-        <option value="MANAGER">Manager — operación general</option>
-        <option value="RECEPTIONIST">Recepcionista — agenda y clientes</option>
-        <option value="PROFESSIONAL">Profesional</option>
-        <option value="ACCOUNTING">Contabilidad — finanzas y reportes</option>
-      </select>
-    </label>
-    <button id="btn-invite" class="btn btn-primary">Agregar al equipo</button>
-    <small id="invite-status"></small>
-  </section>
-
-  <h2 class="adm-h2">Miembros actuales</h2>
-  <div id="members" class="adm-list"></div>
-</main>
-<div id="toast" class="toast hidden"></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="../js/config.js"></script>
-<script src="../js/supabase.js"></script>
-<script src="../js/admin-auth.js"></script>
-<script src="../js/admin-team.js"></script>
-<script src="../js/citago-shell.js"></script><script>document.addEventListener('DOMContentLoaded',()=>CitagoShell.mount({mode:'tenant',activePage:'equipo'}));</script></body></html>
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Equipo · MyCitaGo</title><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="../css/citago-admin.css"><link rel="stylesheet" href="../css/admin-team.css"></head><body><div id="citago-shell"></div><main class="team-page">
+<header class="ct-page-head"><div><span class="ct-eyebrow">PERSONAS</span><h1>Tu equipo</h1><p>Organiza profesionales, roles, sucursales, horarios y comisiones desde un solo lugar.</p></div><button id="new-staff" class="ct-btn ct-btn-primary">+ Añadir persona</button></header>
+<section class="team-kpis"><div><span>Personas activas</span><strong id="staff-count">0</strong></div><div><span>Sucursales</span><strong id="staff-branches">1</strong></div><div><span>Servicios cubiertos</span><strong id="staff-services-count">0</strong></div></section>
+<section class="team-toolbar ct-card"><input id="staff-search" placeholder="Buscar persona…"><select id="staff-branch-filter"><option value="">Todas las sucursales</option></select><select id="staff-status-filter"><option value="active">Activos</option><option value="all">Todos</option><option value="inactive">Inactivos</option></select></section>
+<section id="members" class="team-grid"></section>
+<div id="staff-dialog" class="team-modal hidden"><div class="team-backdrop" data-staff-close></div><form id="staff-form" class="team-form"><button type="button" class="team-close" data-staff-close>×</button><span class="ct-eyebrow">EQUIPO</span><h2 id="staff-dialog-title">Añadir persona</h2><input id="staff-id" type="hidden"><div class="team-form-grid"><label>Nombre<input id="staff-name" required></label><label>Correo<input id="staff-email" type="email"></label><label>Teléfono<input id="staff-phone" inputmode="tel"></label><label>Rol<select id="staff-role"><option value="PROFESSIONAL">Profesional</option><option value="RECEPTIONIST">Recepción</option><option value="MANAGER">Manager</option><option value="ACCOUNTING">Contabilidad</option></select></label><label>Sucursal<select id="staff-branch"><option value="">Sucursal principal</option></select></label><label>Comisión %<input id="staff-commission" type="number" min="0" max="100" step="0.1"></label><fieldset class="full"><legend>Servicios que realiza</legend><div id="staff-service-options" class="service-check-grid"></div></fieldset><label class="full switch-line"><input id="staff-active" type="checkbox" checked> Persona activa y disponible</label></div><div class="team-form-actions"><button type="button" class="ct-btn ct-btn-secondary" data-staff-close>Cancelar</button><button class="ct-btn ct-btn-primary" type="submit">Guardar persona</button></div></form></div>
+</main><div id="toast" class="toast hidden"></div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="../js/config.js"></script><script src="../js/supabase.js"></script><script src="../js/admin-auth.js"></script><script src="../js/admin-team.js"></script><script src="../js/citago-shell.js"></script><script>document.addEventListener('DOMContentLoaded',()=>CitagoShell.mount({mode:'tenant',activePage:'equipo'}));</script></body></html>

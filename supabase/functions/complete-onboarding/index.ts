@@ -22,6 +22,7 @@ Deno.serve(async (req) => {
     const phone = String(body.business_phone || '').trim();
     const requestedSlug = String(body.slug || '').trim().toLowerCase();
     const planId = String(body.plan_id || 'reserva').trim();
+    const inviteToken = String(body.invite_token || '').trim();
     if (!name) throw new Error('Nombre del negocio requerido.');
     if (!/^\+[1-9]\d{7,14}$/.test(phone)) throw new Error('Teléfono internacional inválido.');
 
@@ -50,6 +51,11 @@ Deno.serve(async (req) => {
     const endDate = end.toISOString().slice(0, 10);
     const { error: subError } = await admin.from('subscriptions').insert({ business_id: business.id, status: 'trial', plan_id: planId, price_monthly: 0, trial_end: endDate, current_period_end: endDate });
     if (subError) console.error('subscription bootstrap:', subError.message);
+
+    if (inviteToken) {
+      const { error: inviteError } = await admin.from('business_invites').update({ status: 'accepted', accepted_by: authData.user.id, accepted_business_id: business.id, accepted_at: new Date().toISOString() }).eq('token', inviteToken).eq('status', 'pending');
+      if (inviteError) console.error('invite claim:', inviteError.message);
+    }
 
     return Response.json({ ok: true, business_id: business.id, slug: business.slug }, { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   } catch (error) {

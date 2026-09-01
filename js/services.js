@@ -77,6 +77,24 @@ function formatDuration(minutes) {
 // y con el placeholder del admin en admin-services.js).
 const DEFAULT_CATEGORY = 'Servicios';
 
+function serviceFallbackImage(service){
+  const text=`${service?.name||''} ${service?.category||''}`.toLocaleLowerCase('es-MX');
+  let file='consulting.svg';
+  if(/corte|barba|barber/.test(text))file='barber-cut.svg';
+  else if(/uña|manicure|pedicure|gel|acrí/.test(text))file='nails.svg';
+  else if(/cabello|peinado|tinte|salón|estética/.test(text))file='beauty-hair.svg';
+  else if(/masaje|spa|facial/.test(text))file='spa.svg';
+  else if(/dental|dent|limpieza/.test(text))file='dental.svg';
+  else if(/psic|terapia/.test(text))file='therapy.svg';
+  else if(/nutri/.test(text))file='nutrition.svg';
+  else if(/fisio|rehab/.test(text))file='physio.svg';
+  else if(/veter|mascota/.test(text))file='veterinary.svg';
+  else if(/auto|mecán|manten|diagnóstico/.test(text))file='automotive.svg';
+  else if(/foto/.test(text))file='photo.svg';
+  else if(/clase|curso/.test(text))file='class.svg';
+  return new URL(`assets/service-presets/${file}`,location.href).href;
+}
+
 /**
  * Devuelve las categorías presentes en `services`, en el orden en que
  * aparece cada una por primera vez (no alfabético, para respetar el
@@ -152,7 +170,7 @@ function renderServices(services, container, onSelect, activeCategory, searchTer
     el.className = 'card service-card';
     el.dataset.serviceId = service.id;
     el.innerHTML = `
-      ${service.image_url ? `<img class="service-card-img" src="${service.image_url}" alt="">` : ''}
+      <img class="service-card-img" src="${service.image_url || serviceFallbackImage(service)}" alt="">
       <div class="service-card-body">
         <div class="service-card-topline">
           <span class="service-category-label">${escapeHtml(service.category || DEFAULT_CATEGORY)}</span>

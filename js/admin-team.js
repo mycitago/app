@@ -1,100 +1,12 @@
-let biz, myRole;
-const $ = id => document.getElementById(id);
-const API = (window.CITAS_CONFIG?.apiUrl || '').replace(/\/$/, '');
-const ROLE_LABEL = { OWNER: 'Dueño', MANAGER: 'Manager', RECEPTIONIST: 'Recepcionista', PROFESSIONAL: 'Profesional', ACCOUNTING: 'Contabilidad' };
-
-function toast(t) { $('toast').textContent = t; $('toast').classList.remove('hidden'); setTimeout(() => $('toast').classList.add('hidden'), 2600); }
-function esc(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
-
-async function authHeader() {
-  const { data } = await supabaseClient.auth.getSession();
-  const token = data?.session?.access_token;
-  if (!token) throw new Error('No hay sesión activa');
-  return { Authorization: `Bearer ${token}` };
-}
-
-async function api(path, opts = {}) {
-  if (!API) throw new Error('Backend no configurado para producción');
-  const headers = { 'Content-Type': 'application/json', ...(await authHeader()) };
-  const r = await fetch(`${API}${path}`, { ...opts, headers });
-  const j = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error(j.detail || `Error ${r.status}`);
-  return j;
-}
-
-function renderMembers(members) {
-  $('members').innerHTML = members.map(m => `
-    <article class="customer-row">
-      <div class="customer-avatar">${esc((m.email || '?').slice(0, 1).toUpperCase())}</div>
-      <div class="customer-main">
-        <b>${esc(m.email || m.user_id)}</b>
-        <span>${ROLE_LABEL[m.role] || m.role}${m.status === 'suspended' ? ' · suspendido' : ''}</span>
-      </div>
-      ${myRole === 'OWNER' && m.role !== 'OWNER' ? `
-        <select class="input role-select" data-id="${m.id}">
-          ${Object.keys(ROLE_LABEL).filter(r => r !== 'OWNER').map(r => `<option value="${r}" ${r === m.role ? 'selected' : ''}>${ROLE_LABEL[r]}</option>`).join('')}
-        </select>
-        <button class="btn btn-ghost" data-remove="${m.id}">Quitar</button>
-      ` : ''}
-    </article>
-  `).join('') || '<p class="empty-state">Solo estás tú por ahora.</p>';
-
-  $('members').querySelectorAll('.role-select').forEach(sel => {
-    sel.onchange = async () => {
-      try {
-        await api(`/api/business/${biz.id}/members/${sel.dataset.id}`, { method: 'PATCH', body: JSON.stringify({ role: sel.value }) });
-        toast('Rol actualizado');
-        load();
-      } catch (e) { toast('No se pudo actualizar: ' + e.message); load(); }
-    };
-  });
-  $('members').querySelectorAll('[data-remove]').forEach(btn => {
-    btn.onclick = async () => {
-      if (!confirm('¿Quitar a esta persona del negocio?')) return;
-      try {
-        await api(`/api/business/${biz.id}/members/${btn.dataset.remove}`, { method: 'DELETE' });
-        toast('Miembro eliminado');
-        load();
-      } catch (e) { toast('No se pudo quitar: ' + e.message); }
-    };
-  });
-}
-
-async function load() {
-  try {
-    const { members } = await api(`/api/business/${biz.id}/members`);
-    myRole = (members.find(m => m.user_id === window.__currentUserId))?.role || myRole;
-    $('invite-card').classList.toggle('hidden', myRole !== 'OWNER');
-    $('not-owner-notice').classList.toggle('hidden', myRole === 'OWNER' || myRole === 'MANAGER');
-    renderMembers(members);
-  } catch (e) {
-    $('members').innerHTML = `<p class="empty-state">No se pudo cargar el equipo (¿el backend está corriendo?). ${esc(e.message)}</p>`;
-  }
-}
-
-async function init() {
-  const s = await requireAuth();
-  if (!s) return;
-  window.__currentUserId = s.user.id;
-  biz = await getMyBusiness(s.user);
-  if (!biz) return;
-  $('biz-name').textContent = biz.name;
-
-  $('btn-invite').onclick = async () => {
-    const email = $('inv-email').value.trim();
-    const role = $('inv-role').value;
-    if (!email) { $('invite-status').textContent = 'Escribe un correo'; return; }
-    $('invite-status').textContent = 'Guardando…';
-    try {
-      await api(`/api/business/${biz.id}/members`, { method: 'POST', body: JSON.stringify({ business_id: biz.id, email, role }) });
-      $('invite-status').textContent = '✓ Agregado';
-      $('inv-email').value = '';
-      load();
-    } catch (e) {
-      $('invite-status').textContent = 'Error: ' + e.message;
-    }
-  };
-
-  await load();
-}
-document.addEventListener('DOMContentLoaded', init);
+let teamBiz=null,teamStaff=[],teamBranches=[],teamServices=[],staffLinks=[];const T=id=>document.getElementById(id);const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function teamToast(m){const e=T('toast');if(!e)return;e.textContent=m;e.classList.remove('hidden');setTimeout(()=>e.classList.add('hidden'),2600)}
+async function loadTeamData(){const [st,br,sv,ln]=await Promise.all([supabaseClient.from('business_staff').select('*').eq('business_id',teamBiz.id).order('name'),supabaseClient.from('business_branches').select('id,name,is_primary,active').eq('business_id',teamBiz.id).order('is_primary',{ascending:false}),supabaseClient.from('services').select('id,name,active').eq('business_id',teamBiz.id).eq('active',true).order('name'),supabaseClient.from('staff_services').select('staff_id,service_id').eq('business_id',teamBiz.id)]);if(st.error)throw st.error;teamStaff=st.data||[];teamBranches=br.data||[];teamServices=sv.data||[];staffLinks=ln.error?[]:(ln.data||[]);fillTeamFilters();renderMembers()}
+function fillTeamFilters(){const options=teamBranches.filter(x=>x.active!==false).map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join('');T('staff-branch-filter').innerHTML='<option value="">Todas las sucursales</option>'+options;T('staff-branch').innerHTML='<option value="">Sin sucursal específica</option>'+options;T('staff-service-options').innerHTML=teamServices.map(s=>`<label><input type="checkbox" value="${s.id}">${esc(s.name)}</label>`).join('');T('staff-count').textContent=teamStaff.filter(x=>x.active).length;T('staff-branches').textContent=teamBranches.filter(x=>x.active).length||1;T('staff-services-count').textContent=new Set(staffLinks.map(x=>x.service_id)).size}
+function filteredTeam(){const q=T('staff-search').value.trim().toLowerCase(),branch=T('staff-branch-filter').value,status=T('staff-status-filter').value;return teamStaff.filter(s=>(!q||[s.name,s.email,s.role].some(x=>String(x||'').toLowerCase().includes(q)))&&(!branch||s.branch_id===branch)&&(status==='all'||(status==='active'?s.active:!s.active)))}
+function renderMembers(){const list=filteredTeam();T('members').innerHTML=list.length?list.map(s=>{const branch=teamBranches.find(b=>b.id===s.branch_id);const n=staffLinks.filter(x=>x.staff_id===s.id).length;return `<article class="staff-card"><div class="staff-avatar">${esc((s.name||'?')[0])}</div><div class="staff-main"><div class="staff-title"><div><strong>${esc(s.name)}</strong><span>${esc(s.role||'Profesional')} · ${esc(branch?.name||'Todas las sucursales')}</span></div><span class="staff-status ${s.active?'on':'off'}">${s.active?'Activo':'Inactivo'}</span></div><div class="staff-meta"><span>${n} servicios</span><span>${s.commission_rate!=null?`${Number(s.commission_rate)}% comisión`:'Sin comisión'}</span><span>${esc(s.email||s.phone||'Sin contacto')}</span></div><div class="staff-actions"><button data-edit-staff="${s.id}">Editar</button><button data-toggle-staff="${s.id}">${s.active?'Desactivar':'Activar'}</button></div></div></article>`}).join(''):'<div class="team-empty"><b>Aún no has agregado personas.</b><span>Agrega profesionales para asignar servicios y organizar la agenda.</span><button class="ct-btn ct-btn-primary" id="empty-new-staff">+ Añadir persona</button></div>';T('members').querySelectorAll('[data-edit-staff]').forEach(b=>b.onclick=()=>openStaff(b.dataset.editStaff));T('members').querySelectorAll('[data-toggle-staff]').forEach(b=>b.onclick=()=>toggleStaff(b.dataset.toggleStaff));T('empty-new-staff')?.addEventListener('click',()=>openStaff())}
+function openStaff(id=null){const s=teamStaff.find(x=>x.id===id);T('staff-id').value=s?.id||'';T('staff-name').value=s?.name||'';T('staff-email').value=s?.email||'';T('staff-phone').value=s?.phone||'';T('staff-role').value=s?.role||'PROFESSIONAL';T('staff-branch').value=s?.branch_id||'';T('staff-commission').value=s?.commission_rate??'';T('staff-active').checked=s?.active!==false;T('staff-dialog-title').textContent=s?'Editar persona':'Añadir persona';const linked=new Set(staffLinks.filter(x=>x.staff_id===id).map(x=>x.service_id));T('staff-service-options').querySelectorAll('input').forEach(x=>x.checked=linked.has(x.value));T('staff-dialog').classList.remove('hidden')}
+function closeStaff(){T('staff-dialog').classList.add('hidden')}
+async function saveStaff(ev){ev.preventDefault();const id=T('staff-id').value||null,payload={business_id:teamBiz.id,name:T('staff-name').value.trim(),email:T('staff-email').value.trim()||null,phone:T('staff-phone').value.trim()||null,role:T('staff-role').value,branch_id:T('staff-branch').value||null,commission_rate:T('staff-commission').value===''?null:Number(T('staff-commission').value),active:T('staff-active').checked,updated_at:new Date().toISOString()};if(!payload.name)return teamToast('Escribe el nombre.');let saved;if(id){const {data,error}=await supabaseClient.from('business_staff').update(payload).eq('id',id).eq('business_id',teamBiz.id).select().single();if(error)throw error;saved=data}else{const {data,error}=await supabaseClient.from('business_staff').insert(payload).select().single();if(error)throw error;saved=data}const selected=[...T('staff-service-options').querySelectorAll('input:checked')].map(x=>x.value);await supabaseClient.from('staff_services').delete().eq('staff_id',saved.id).eq('business_id',teamBiz.id);if(selected.length){const {error}=await supabaseClient.from('staff_services').insert(selected.map(service_id=>({business_id:teamBiz.id,staff_id:saved.id,service_id})));if(error)throw error}closeStaff();teamToast('Equipo actualizado');await loadTeamData()}
+async function toggleStaff(id){const s=teamStaff.find(x=>x.id===id);if(!s)return;const {error}=await supabaseClient.from('business_staff').update({active:!s.active,updated_at:new Date().toISOString()}).eq('id',id).eq('business_id',teamBiz.id);if(error)return teamToast(error.message);await loadTeamData()}
+async function initTeam(){const s=await requireAuth();if(!s)return;teamBiz=await getMyBusiness(s.user);if(!teamBiz)return;T('new-staff').onclick=()=>openStaff();T('staff-form').onsubmit=e=>saveStaff(e).catch(err=>teamToast(err.message));document.querySelectorAll('[data-staff-close]').forEach(x=>x.onclick=closeStaff);['staff-search','staff-branch-filter','staff-status-filter'].forEach(id=>T(id).addEventListener(id==='staff-search'?'input':'change',renderMembers));try{await loadTeamData()}catch(e){T('members').innerHTML='<div class="team-empty"><b>Activa el nuevo módulo de Equipo</b><span>Ejecuta APLICAR_EN_SUPABASE.sql y vuelve a cargar.</span></div>';console.error(e)}}
+document.addEventListener('DOMContentLoaded',initTeam);

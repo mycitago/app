@@ -13,7 +13,6 @@
 <script src="../js/ui-theme.js"></script>
 </head>
 <body class="adm-login-body">
-<button class="login-theme-toggle ct-theme-toggle" type="button" data-theme-toggle aria-label="Cambiar tema" title="Cambiar tema"><span data-theme-icon>☾</span></button>
 
 <main class="adm-login-card">
   <img class="mycitago-login-logo" src="../assets/brand/mycitago-logo.png" alt="MyCitaGo">
@@ -80,7 +79,7 @@
 
   async function handleGoogle(){
     hideMsgs();const btn=$('btn-google');btn.disabled=true;btn.querySelector('strong').textContent='Abriendo Google…';
-    const redirectTo=`${getAppBaseUrl()}admin/login.html?oauth=1`;
+    const invite=new URLSearchParams(location.search).get('invite')||localStorage.getItem('mycitago:invite')||'';const redirectTo=`${getAppBaseUrl()}admin/login.html?oauth=1${invite?'&invite='+encodeURIComponent(invite):''}`;
     const{error}=await supabaseClient.auth.signInWithOAuth({provider:'google',options:{redirectTo,queryParams:{prompt:'select_account'}}});
     if(error){btn.disabled=false;btn.querySelector('strong').textContent='Continuar con Google';showError(error.message)}
   }
@@ -91,7 +90,7 @@
 
   async function completeOAuthBusiness(user,bizName,phone,selectedPlan){
     const slug=await generateUniqueSlug(bizName);
-    const{data,error}=await supabaseClient.functions.invoke('complete-onboarding',{body:{business_name:bizName,business_phone:phone.e164,slug,plan_id:selectedPlan}});
+    const{data,error}=await supabaseClient.functions.invoke('complete-onboarding',{body:{business_name:bizName,business_phone:phone.e164,slug,plan_id:selectedPlan,invite_token:new URLSearchParams(location.search).get('invite')||localStorage.getItem('mycitago:invite')||null}});
     if(error)throw error;if(data?.error)throw new Error(data.error);return data;
   }
 
@@ -102,7 +101,7 @@
     try{
       if(oauthMode){const{data:auth}=await supabaseClient.auth.getUser();if(!auth?.user)throw new Error('La sesión de Google expiró. Vuelve a ingresar.');await completeOAuthBusiness(auth.user,bizName,phone,selectedPlan);location.replace('onboarding.html');return}
       if(!email)throw new Error('Escribe tu correo.');if(password.length<10)throw new Error('Usa una contraseña de al menos 10 caracteres.');
-      const{data,error}=await supabaseClient.auth.signUp({email,password,options:{emailRedirectTo:`${getAppBaseUrl()}admin/login.html`,data:{business_name:bizName,business_whatsapp:phone.e164,business_phone:phone.e164,plan_id:selectedPlan}}});
+      const{data,error}=await supabaseClient.auth.signUp({email,password,options:{emailRedirectTo:`${getAppBaseUrl()}admin/login.html`,data:{business_name:bizName,business_whatsapp:phone.e164,business_phone:phone.e164,plan_id:selectedPlan,invite_token:new URLSearchParams(location.search).get('invite')||localStorage.getItem('mycitago:invite')||null}}});
       if(error)throw error;if(!data.session){showInfo('Cuenta creada. Revisa tu correo, confirma tu cuenta y luego inicia sesión.');return}location.replace('onboarding.html');
     }catch(error){showError(error.message||'No se pudo completar el registro.')}finally{btn.disabled=false;btn.textContent=oauthMode?'Crear mi negocio':'Crear cuenta y negocio'}
   }
@@ -117,8 +116,8 @@
 
   (async function start(){
     if(location.hash.includes('type=recovery')){showView('reset');return}
-    const params=new URLSearchParams(location.search);const{data}=await supabaseClient.auth.getUser();const user=data?.user;
-    if(user){if(await platformAdminFor(user.id)){location.replace('plataforma.html');return}const member=await membershipFor(user.id);if(member){location.replace('index.html');return}prepareOAuthRegistration(user);return}
+    const params=new URLSearchParams(location.search);if(params.get('invite'))localStorage.setItem('mycitago:invite',params.get('invite'));const{data}=await supabaseClient.auth.getUser();const user=data?.user;
+    if(user){if(await platformAdminFor(user.id)){location.replace('plataforma.html');return}const member=await membershipFor(user.id);if(member){const token=localStorage.getItem('mycitago:invite');if(token){await supabaseClient.rpc('claim_business_invite',{p_token:token,p_business_id:member.business_id}).catch(()=>{});localStorage.removeItem('mycitago:invite')}location.replace('index.html');return}prepareOAuthRegistration(user);return}
     if(params.get('view')==='register')showView('register');
   })();
 </script>

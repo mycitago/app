@@ -30,7 +30,7 @@
       asesoria: ['#171f3b','#4a5eaa','#bec8f3','PRO'],
       educacion: ['#30255a','#7a64c7','#d5ccfa','CLASS'],
       fotografia: ['#17171b','#4f405b','#d6aacd','STUDIO'],
-      otro: ['#171820','#514f69','#a89fd8','CITAS']
+      otro: ['#171820','#514f69','#a89fd8','MyCitaGo']
     };
     const c = configs[type] || configs.otro;
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="620" viewBox="0 0 1600 620">

@@ -147,6 +147,7 @@ async function injectPlatformLink() {
  * no se muestra nada — ver sql/08_business_slug_backfill.sql.
  */
 function injectPublicLinkButton(business) {
+  if(document.getElementById('citago-shell')) return;
   const url = buildPublicBookingUrl(business);
   if (!url) return;
 
@@ -180,6 +181,7 @@ async function logout() {
 }
 
 function injectCommercialNav(){
+  if(document.getElementById('citago-shell')) return;
  if((location.pathname.split('/').pop()||'').toLowerCase()==='plataforma.html') return;
  const actions=document.querySelector('.adm-topbar-actions'); if(!actions)return;
  const links=[['clientes.html','Clientes'],['integraciones.html','Integraciones'],['planes.html','Planes']];
@@ -190,6 +192,7 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(injectCommercialNav,
 
 // Responsive V1: navegación inferior única para el Panel de Negocio.
 function injectMobileBusinessNav(){
+  if(document.getElementById('citago-shell')) return;
   if((location.pathname.split('/').pop()||'').toLowerCase()==='plataforma.html') return;
   if(document.querySelector('.mobile-bottom-nav')) return;
   const file=(location.pathname.split('/').pop()||'index.html').toLowerCase();

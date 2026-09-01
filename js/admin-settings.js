@@ -46,6 +46,23 @@ function preview(inputId,targetId,fileNameId){
   });
 }
 
+async function loadLockedCategory(){
+  const [current,cats,requests]=await Promise.all([
+    biz.business_category_id?supabaseClient.from('business_categories').select('id,name').eq('id',biz.business_category_id).maybeSingle():Promise.resolve({data:null}),
+    supabaseClient.from('business_categories').select('id,name').eq('active',true).order('sort_order'),
+    supabaseClient.from('business_category_change_requests').select('id,status,requested_category_id,created_at').eq('business_id',biz.id).eq('status','pending').order('created_at',{ascending:false}).limit(1)
+  ]);
+  if($('business-category-name'))$('business-category-name').textContent=current.data?.name||'Sin giro definido';
+  if($('requested-category'))$('requested-category').innerHTML=(cats.data||[]).filter(c=>c.id!==biz.business_category_id).map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  const pending=requests.data?.[0];
+  if(pending&&$('request-category-change')){$('request-category-change').textContent='Solicitud en revisión';$('request-category-change').disabled=true}
+}
+async function sendCategoryChange(){
+  const requested=$('requested-category')?.value,reason=$('category-change-reason')?.value.trim();if(!requested)return toast('Selecciona el nuevo giro.','error');if(!reason)return toast('Explica brevemente el motivo.','error');
+  const {data:{user}}=await supabaseClient.auth.getUser();const {error}=await supabaseClient.from('business_category_change_requests').insert({business_id:biz.id,current_category_id:biz.business_category_id||null,requested_category_id:requested,reason,requested_by:user.id});
+  if(error)return toast('No se pudo enviar: '+error.message,'error');$('category-change-panel').classList.add('hidden');$('request-category-change').textContent='Solicitud en revisión';$('request-category-change').disabled=true;toast('Solicitud enviada a soporte MyCitaGo.','success');
+}
+
 async function init(){
   const s=await requireAuth();if(!s)return;
   biz=await getMyBusiness(s.user);if(!biz)return;
@@ -54,6 +71,10 @@ async function init(){
   if(biz.logo_url&&$('logo-preview'))$('logo-preview').innerHTML=`<img src="${biz.logo_url}" alt="Logo">`;
   if(biz.cover_image_url&&$('cover-preview'))$('cover-preview').innerHTML=`<img src="${biz.cover_image_url}" alt="Portada">`;
   selectedTheme=biz.theme||DEFAULT_THEME;applyTheme(selectedTheme);renderThemePicker();
+  await loadLockedCategory();
+  if($('request-category-change'))$('request-category-change').onclick=()=>$('category-change-panel').classList.remove('hidden');
+  if($('cancel-category-change'))$('cancel-category-change').onclick=()=>$('category-change-panel').classList.add('hidden');
+  if($('send-category-change'))$('send-category-change').onclick=sendCategoryChange;
   document.querySelectorAll('input,textarea').forEach(x=>x.addEventListener('input',progress));
   preview('logo-file','logo-preview','logo-file-name');preview('cover-file','cover-preview','cover-file-name');
   progress();if($('save'))$('save').onclick=save;if($('btn-logout'))$('btn-logout').onclick=logout;

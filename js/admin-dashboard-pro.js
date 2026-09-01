@@ -418,9 +418,8 @@ function actionButton(label,status,cls){
 function closeDrawer(){ $('appointment-drawer').classList.add('hidden'); }
 
 function publicBooking(){
-  const url=buildPublicBookingUrl(dashState.business);
-  if(!url) return toast('Configura primero el enlace público de tu negocio.');
-  window.open(url,'_blank','noopener,noreferrer');
+  if(window.CitagoAdminActions?.openAppointment) return window.CitagoAdminActions.openAppointment();
+  location.href='agenda.html';
 }
 
 function renderPlan(){
