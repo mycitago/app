@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+const js=fs.readFileSync('js/admin-platform.js','utf8');
+const html=fs.readFileSync('admin/plataforma.html','utf8');
+assert.ok(js.includes('Promise.allSettled'),'platform operations must isolate widget failures');
+assert.ok(js.includes('data-platform-retry'),'platform errors must expose retry');
+assert.ok(!js.includes('APLICAR_EN_SUPABASE.sql'),'legacy SQL guidance must be removed');
+for(const id of ['pagos','incidencias','integraciones','auditoria']) assert.ok(html.includes(`id="${id}"`),`missing platform section ${id}`);
+for(const text of ['No se pudo cargar','Reintentar']) assert.ok(js.includes(text),`missing visible error copy ${text}`);
+console.log('phase7 platform stability contract OK');
