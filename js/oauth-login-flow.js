@@ -50,6 +50,15 @@
     return `${url.pathname}${url.search}`;
   }
 
+
+  function buildOAuthAuthorizeUrl(supabaseUrl, provider, redirectTo) {
+    const base = String(supabaseUrl || '').replace(/\/+$/, '');
+    const url = new URL(`${base}/auth/v1/authorize`);
+    url.searchParams.set('provider', provider || 'google');
+    if (redirectTo) url.searchParams.set('redirect_to', redirectTo);
+    return url.toString();
+  }
+
   function waitForAuthSession(client, options) {
     const timeoutMs = Math.max(0, Number(options?.timeoutMs ?? 4000));
 
@@ -85,6 +94,7 @@
     isOAuthCallback,
     oauthErrorFromHash,
     cleanOAuthUrl,
+    buildOAuthAuthorizeUrl,
     waitForAuthSession
   };
 });
