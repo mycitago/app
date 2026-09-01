@@ -51,7 +51,7 @@
   <div class="login-trust"><span>✓ Sin tarjeta</span><span>✓ Configuración guiada</span><span>✓ Acceso seguro</span></div>
 </main>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script>
 <script src="../js/config.js"></script>
 <script src="../js/supabase.js"></script>
 <script src="../js/theme.js"></script>
@@ -123,7 +123,15 @@
     else if(params.get('oauth')==='1')localStorage.removeItem('mycitago:invite');
 
     const oauthReturn=MyCitaGoOAuth.isOAuthCallback(location.href);
-    const session=await MyCitaGoOAuth.waitForAuthSession(supabaseClient,{timeoutMs:oauthReturn?5000:0});
+    const oauthError=MyCitaGoOAuth.oauthErrorFromHash(location.href);
+
+    if(oauthReturn && oauthError){
+      if(history?.replaceState)history.replaceState({},document.title,MyCitaGoOAuth.cleanOAuthUrl(location.href));
+      showError(`Google no completó el inicio de sesión: ${oauthError}`);
+      return;
+    }
+
+    const session=await MyCitaGoOAuth.waitForAuthSession(supabaseClient,{timeoutMs:oauthReturn?8000:0});
     const user=session?.user||null;
 
     if(oauthReturn && history?.replaceState){
@@ -142,7 +150,7 @@
       }
       prepareOAuthRegistration(user);return
     }
-    if(oauthReturn){showError('Google confirmó tu cuenta, pero MyCitaGo no pudo restaurar la sesión. Recarga la página una vez; si continúa, vuelve a iniciar con Google.');return}
+    if(oauthReturn){showError('Google regresó a MyCitaGo, pero no se recibió una sesión válida. Intenta de nuevo. Si Google muestra un error, MyCitaGo lo mostrará aquí.');return}
     if(params.get('view')==='register')showView('register');
   })();
 </script>
