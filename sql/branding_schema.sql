@@ -12,6 +12,7 @@ drop policy if exists branding_member_select on public.business_branding;create 
 drop policy if exists branding_member_insert on public.business_branding;create policy branding_member_insert on public.business_branding for insert to authenticated with check (exists(select 1 from public.business_members bm where bm.business_id=business_branding.business_id and bm.user_id=auth.uid()));
 drop policy if exists branding_member_update on public.business_branding;create policy branding_member_update on public.business_branding for update to authenticated using (exists(select 1 from public.business_members bm where bm.business_id=business_branding.business_id and bm.user_id=auth.uid())) with check (exists(select 1 from public.business_members bm where bm.business_id=business_branding.business_id and bm.user_id=auth.uid()));
 create or replace function public.publish_business_branding(p_business_id uuid) returns public.business_branding language plpgsql security invoker as $$ declare r public.business_branding; begin if not exists(select 1 from public.business_members bm where bm.business_id=p_business_id and bm.user_id=auth.uid()) then raise exception 'forbidden'; end if; update public.business_branding set published_config=draft_config,published_at=now(),updated_at=now() where business_id=p_business_id returning * into r; return r; end $$;
+drop view if exists public.business_branding_public;
 create or replace view public.business_branding_public as
 select
   business_id,

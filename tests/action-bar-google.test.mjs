@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+const shell=fs.readFileSync('js/citago-shell.js','utf8');
+const actions=fs.readFileSync('js/admin-actions.js','utf8');
+const reviews=fs.readFileSync('js/admin-reviews.js','utf8');
+const reviewHtml=fs.readFileSync('admin/resenas.html','utf8');
+assert.ok(!shell.includes('data-theme-toggle'), 'admin shell must not render dark-mode toggle');
+assert.ok(shell.includes('ct-share-trigger'), 'admin shell must expose professional share action');
+assert.ok(shell.includes('ct-new-appointment-trigger'), 'admin shell must expose functional new appointment action');
+assert.ok(shell.includes('ct-share-dialog'), 'share dialog must exist');
+assert.ok(shell.includes('ct-appointment-dialog'), 'new appointment dialog must exist');
+assert.ok(actions.includes('wa.me'), 'share flow must support WhatsApp without paid API');
+assert.ok(actions.includes("rpc('create_appointment'"), 'new appointment flow must create the appointment');
+assert.ok(reviewHtml.includes('google-connect-card'), 'Google integration must use a modern connection card');
+assert.ok(reviews.includes('FunctionsFetchError') && reviews.includes('No se pudo contactar'), 'Google failures must distinguish an unavailable Edge Function');
+assert.ok(reviews.includes('google-oauth-start'), 'Google OAuth start function must still be invoked');
+console.log('action bar + Google integration contract OK');
