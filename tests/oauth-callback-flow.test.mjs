@@ -102,3 +102,20 @@ test('login pins an exact Supabase JS SDK version and handles provider callback 
   assert.match(html, /oauthErrorFromHash\(location\.href\)/);
   assert.match(html, /Google no completó el inicio de sesión/);
 });
+
+test('Google login builds a direct Supabase authorize URL instead of calling signInWithOAuth', () => {
+  const oauth = require(path.join(root, 'js/oauth-login-flow.js'));
+  const url = oauth.buildOAuthAuthorizeUrl(
+    'https://demo.supabase.co',
+    'google',
+    'https://site.test/app/admin/login.html?oauth=1'
+  );
+  assert.equal(
+    url,
+    'https://demo.supabase.co/auth/v1/authorize?provider=google&redirect_to=https%3A%2F%2Fsite.test%2Fapp%2Fadmin%2Flogin.html%3Foauth%3D1'
+  );
+
+  const html = fs.readFileSync(path.join(root, 'admin/login.html'), 'utf8');
+  assert.match(html, /buildOAuthAuthorizeUrl\(/);
+  assert.doesNotMatch(html, /auth\.signInWithOAuth\(/);
+});

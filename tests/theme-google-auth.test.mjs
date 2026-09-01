@@ -10,8 +10,8 @@ assert.ok(!shell.includes('data-theme-toggle'),'admin shell must not expose them
 const login=read('admin/login.html');
 assert.ok(!login.includes('login-theme-toggle'),'login must not expose theme switch');
 assert.match(login,/btn-google/);
-assert.match(login,/signInWithOAuth/);
-assert.match(login,/provider:\s*['"]google['"]/);
+assert.match(login,/buildOAuthAuthorizeUrl/);
+assert.match(login,/buildOAuthAuthorizeUrl\(SUPABASE_URL,['"]google['"]/);
 assert.match(login,/country-code/);
 assert.match(login,/\+52/);
 const landing=read('index.html');

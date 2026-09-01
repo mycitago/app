@@ -95,8 +95,8 @@
     const invite=MyCitaGoOAuth.inviteForOAuth(location.href);
     const redirectTo=`${getAppBaseUrl()}admin/login.html?oauth=1${invite?'&invite='+encodeURIComponent(invite):''}`;
     try{
-      const{error}=await supabaseClient.auth.signInWithOAuth({provider:'google',options:{redirectTo,queryParams:{prompt:'select_account'}}});
-      if(error){resetGoogleButton(btn);showError(error.message)}
+      const authorizeUrl=MyCitaGoOAuth.buildOAuthAuthorizeUrl(SUPABASE_URL,'google',redirectTo);
+      window.location.assign(authorizeUrl);
     }catch(error){
       resetGoogleButton(btn);showError(error?.message||'No se pudo abrir Google. Intenta de nuevo.');
     }
