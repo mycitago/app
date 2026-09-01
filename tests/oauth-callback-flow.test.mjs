@@ -71,6 +71,25 @@ test('OAuth session wait times out even when getSession never resolves', async (
   assert.equal(result, null);
 });
 
+
+
+test('OAuth session waiter never starts getSession that can hold the auth lock', async () => {
+  const oauth = require(path.join(root, 'js/oauth-login-flow.js'));
+  let getSessionCalls = 0;
+  const client = {
+    auth: {
+      getSession(){ getSessionCalls++; return new Promise(() => {}); },
+      onAuthStateChange(){
+        return { data: { subscription: { unsubscribe(){} } } };
+      }
+    }
+  };
+  const result = await oauth.waitForAuthSession(client, { timeoutMs: 10 });
+  await new Promise(resolve => setTimeout(resolve, 0));
+  assert.equal(result, null);
+  assert.equal(getSessionCalls, 0);
+});
+
 test('Supabase client pins implicit OAuth flow explicitly', () => {
   const js = fs.readFileSync(path.join(root, 'js/supabase.js'), 'utf8');
   assert.match(js, /flowType\s*:\s*['\"]implicit['\"]/);
