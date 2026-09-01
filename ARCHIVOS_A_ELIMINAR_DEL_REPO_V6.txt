@@ -1,0 +1,6 @@
+Si estos archivos siguen físicamente en GitHub después de subir V6, elimínalos para dejar el repositorio consolidado:
+
+APLICAR_EN_SUPABASE.sql
+js/oauth-login-flow.js
+
+No forman parte del paquete V6 oficial.

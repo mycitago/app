@@ -11,7 +11,6 @@ const state = { business: null, month: currentMonthKey(), appointments: [], expe
 let financeChart = null;
 
 const el = {
-  bizName: document.getElementById('biz-name'),
   monthPicker: document.getElementById('month-picker'),
   kpiIncome: document.getElementById('kpi-income'),
   kpiExpenses: document.getElementById('kpi-expenses'),
@@ -71,11 +70,10 @@ async function init() {
 
   const business = await getMyBusiness(session.user);
   if (!business) {
-    el.bizName.textContent = 'No tienes un negocio asignado.';
+    showToast('No tienes un negocio asignado.');
     return;
   }
   state.business = business;
-  el.bizName.textContent = business.name;
 
   el.monthPicker.value = state.month;
   el.monthPicker.addEventListener('change', () => {
@@ -85,7 +83,6 @@ async function init() {
     }
   });
 
-  document.getElementById('btn-logout').addEventListener('click', logout);
   document.getElementById('btn-add-expense').addEventListener('click', addExpense);
   document.getElementById('open-expense')?.addEventListener('click',()=>document.getElementById('expense-panel').classList.remove('hidden'));
   document.querySelectorAll('[data-close-expense]').forEach(x=>x.addEventListener('click',()=>document.getElementById('expense-panel').classList.add('hidden')));
@@ -100,7 +97,7 @@ async function loadData() {
   const [apptsRes, expRes] = await Promise.all([
     supabaseClient
       .from('appointments')
-      .select('appointment_date, status, services(id,name,price)')
+      .select('appointment_date, status, price_charged, services(id,name)')
       .eq('business_id', state.business.id)
       .gte('appointment_date', from),
     supabaseClient
@@ -169,9 +166,9 @@ function renderAll() {
   const perMonth = months.map((key) => {
     const appts = state.appointments.filter((a) => (a.appointment_date || '').startsWith(key));
     const income = appts.filter((a) => a.status === 'completada')
-      .reduce((s, a) => s + Number(a.services?.price || 0), 0);
+      .reduce((s, a) => s + Number(a.price_charged || 0), 0);
     const projected = appts.filter((a) => a.status === 'confirmada')
-      .reduce((s, a) => s + Number(a.services?.price || 0), 0);
+      .reduce((s, a) => s + Number(a.price_charged || 0), 0);
     const doneCount = appts.filter((a) => a.status === 'completada').length;
     const activeCount = appts.filter((a) => a.status === 'confirmada' || a.status === 'pendiente').length;
     const expenses = state.expenses.filter((x) => (x.expense_date || '').startsWith(key))
