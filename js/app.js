@@ -256,6 +256,7 @@ async function init() {
   if (typeof loadPublishedBranding === 'function') {
     const branding = await loadPublishedBranding(state.business.id);
     if (branding) { applyPublishedBranding(branding); renderPublicSections(branding); }
+    if (typeof loadPublicBusinessReviews === 'function') await loadPublicBusinessReviews(state.business.slug);
   }
 
   renderHero();

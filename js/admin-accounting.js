@@ -7,7 +7,7 @@ function currentMonthKey() {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
 }
 
-const state = { business: null, month: currentMonthKey(), appointments: [], expenses: [] };
+const state = { business: null, month: currentMonthKey(), appointments: [], expenses: [], reviews: [] };
 let financeChart = null;
 
 const el = {
@@ -94,10 +94,10 @@ async function init() {
 async function loadData() {
   const from = `${lastMonthKeys(6)[0]}-01`;
 
-  const [apptsRes, expRes] = await Promise.all([
+  const [apptsRes, expRes, reviewsRes] = await Promise.all([
     supabaseClient
       .from('appointments')
-      .select('appointment_date, status, price_charged, services(id,name)')
+      .select('appointment_date, status, price_charged, booking_source, services(id,name)')
       .eq('business_id', state.business.id)
       .gte('appointment_date', from),
     supabaseClient
@@ -106,9 +106,10 @@ async function loadData() {
       .eq('business_id', state.business.id)
       .gte('expense_date', from)
       .order('expense_date', { ascending: false }),
+    supabaseClient.from('reviews').select('rating,created_at,status').eq('business_id', state.business.id).eq('status','published').gte('created_at', from),
   ]);
 
-  if (apptsRes.error || expRes.error) {
+  if (apptsRes.error || expRes.error || reviewsRes.error) {
     console.error('Error cargando contabilidad:', apptsRes.error || expRes.error);
     showToast('No se pudo cargar la contabilidad.');
     return;
@@ -116,6 +117,7 @@ async function loadData() {
 
   state.appointments = apptsRes.data || [];
   state.expenses = expRes.data || [];
+  state.reviews = reviewsRes.data || [];
   renderAll();
 }
 
@@ -182,6 +184,11 @@ function renderAll() {
   el.kpiExpenses.textContent = formatMoney(current.expenses);
   if(el.kpiDone)el.kpiDone.textContent=current.doneCount;
   if(el.kpiProjected)el.kpiProjected.textContent=formatMoney(current.projected);
+  const monthReviews=state.reviews.filter(r=>String(r.created_at||'').startsWith(state.month));
+  const shared=state.appointments.filter(a=>(a.appointment_date||'').startsWith(state.month)&&a.booking_source).length;
+  const avg=monthReviews.length?monthReviews.reduce((a,r)=>a+Number(r.rating||0),0)/monthReviews.length:0;
+  const nr=document.getElementById('kpi-new-reviews'), rr=document.getElementById('kpi-review-rating'), sb=document.getElementById('kpi-shared-bookings');
+  if(nr)nr.textContent=monthReviews.length;if(rr)rr.textContent=monthReviews.length?avg.toFixed(1)+' ★':'—';if(sb)sb.textContent=shared;
   el.kpiProfit.textContent = formatMoney(current.profit);
   el.kpiProfit.className = 'adm-kpi-num ' + (current.profit >= 0 ? 'adm-green' : 'adm-red');
   el.kpiNote.textContent =

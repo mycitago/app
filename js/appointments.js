@@ -155,6 +155,7 @@ function validateWhatsapp(raw) {
  * Devuelve { ok: true, appointment } o { ok: false, reason }.
  */
 async function bookAppointment({ business, service, dateKey, startTime, endTime, name, whatsappDigits, notes }) {
+  const bookingSource=(new URLSearchParams(location.search).get('src')||'').toLowerCase().replace(/[^a-z0-9_-]/g,'').slice(0,32);
   const whatsappFull = `52${whatsappDigits}`;
 
   const { data, error } = await supabaseClient.rpc('create_appointment', {
@@ -203,6 +204,10 @@ async function bookAppointment({ business, service, dateKey, startTime, endTime,
   // Nota: create_appointment ahora regresa una tabla (appointment_id, access_token)
   // — ver sql/07_customer_portal.sql — por eso se lee la primera fila.
   const row = Array.isArray(data) ? data[0] : data;
+  if(bookingSource&&row?.appointment_id&&row?.access_token){
+    const tracked=await supabaseClient.rpc('track_booking_source',{p_appointment_id:row.appointment_id,p_access_token:row.access_token,p_source:bookingSource});
+    if(tracked.error)console.warn('[MyCitaGo source]',tracked.error);
+  }
   return { ok: true, appointmentId: row?.appointment_id, accessToken: row?.access_token };
 }
 
