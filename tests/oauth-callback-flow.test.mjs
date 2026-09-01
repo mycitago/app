@@ -31,9 +31,9 @@ test('normal Google login does not reuse a stale invite from localStorage', () =
   assert.equal(oauth.inviteForOAuth('https://site.test/admin/login.html?invite=fresh-token'), 'fresh-token');
 });
 
-test('login page loads OAuth callback helper and no longer calls getUser immediately in start()', () => {
+test('login page embeds OAuth callback helper and no longer calls getUser immediately in start()', () => {
   const html = fs.readFileSync(path.join(root, 'admin/login.html'), 'utf8');
-  assert.match(html, /oauth-login-flow\.js/);
+  assert.match(html, /window\.MyCitaGoOAuth\s*=/);
   assert.match(html, /waitForAuthSession\(supabaseClient/);
   assert.doesNotMatch(html, /const\{data\}=await supabaseClient\.auth\.getUser\(\);const user=data\?\.user/);
 });
@@ -118,4 +118,15 @@ test('Google login builds a direct Supabase authorize URL instead of calling sig
   const html = fs.readFileSync(path.join(root, 'admin/login.html'), 'utf8');
   assert.match(html, /buildOAuthAuthorizeUrl\(/);
   assert.doesNotMatch(html, /auth\.signInWithOAuth\(/);
+});
+
+
+test('login is self-contained and cannot fail when oauth-login-flow.js is missing', () => {
+  const html = fs.readFileSync(path.join(root, 'admin/login.html'), 'utf8');
+  assert.doesNotMatch(html, /<script[^>]+src=["'][^"']*oauth-login-flow\.js/);
+  const inlineHelper = html.indexOf('window.MyCitaGoOAuth =');
+  const handleGoogle = html.indexOf('async function handleGoogle');
+  assert.ok(inlineHelper >= 0, 'login must define MyCitaGoOAuth inline');
+  assert.ok(inlineHelper < handleGoogle, 'inline OAuth helper must exist before handleGoogle');
+  assert.match(html, /if\(!window\.MyCitaGoOAuth\)/);
 });
