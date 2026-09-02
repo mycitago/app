@@ -30,12 +30,12 @@ function renderAll(){renderKpis();renderPlans();renderPayments();renderAlerts();
 
 async function loadOperationsModules(){
   const tasks={
-    tickets:supabaseClient.from('support_tickets').select('id,business_id,subject,category,priority,status,created_at').order('created_at',{ascending:false}).limit(30),
-    templates:supabaseClient.from('service_templates').select('id,business_category_id,name,active').order('sort_order',{ascending:true}),
-    categories:supabaseClient.from('business_categories').select('id,name,sort_order').eq('active',true).order('sort_order',{ascending:true}),
-    invites:supabaseClient.from('business_invites').select('*').order('created_at',{ascending:false}).limit(30),
-    categoryRequests:supabaseClient.from('business_category_change_requests').select('*').order('created_at',{ascending:false}).limit(30),
-    audit:supabaseClient.from('audit_logs').select('id,actor_user_id,business_id,action,entity,entity_id,metadata,created_at').order('created_at',{ascending:false}).limit(30)
+    tickets:PlatformAPI.readSupport(),
+    templates:PlatformAPI.readServiceTemplates(),
+    categories:PlatformAPI.readBusinessCategories(),
+    invites:PlatformAPI.readBusinessInvites(),
+    categoryRequests:PlatformAPI.readCategoryChangeRequests(),
+    audit:PlatformAPI.readAuditLogs()
   };
   const keys=Object.keys(tasks),settled=await Promise.allSettled(Object.values(tasks));
   const result={};keys.forEach((k,i)=>{const r=settled[i];result[k]=r.status==='fulfilled'?r.value:{data:null,error:r.reason||new Error('request_failed')}});
