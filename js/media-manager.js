@@ -32,5 +32,6 @@
     return {url,path:stored};
   }
 
-  window.CitagoMedia={BUCKET,MAX,uploadPublicImage};
+  async function adoptPublicImage(sourceUrl,{businessId,kind='media'}={}){if(!sourceUrl)return {url:null,path:null};if(!businessId)throw new Error('No se pudo identificar el negocio.');const response=await fetch(sourceUrl,{cache:'no-store'});if(!response.ok)throw new Error('No se pudo copiar la imagen de ejemplo.');const blob=await response.blob();const type=ALLOWED.has(blob.type)?blob.type:'image/jpeg';const file=new File([blob],`example.${ext({type})}`,{type});return uploadPublicImage(file,{businessId,kind})}
+  window.CitagoMedia={BUCKET,MAX,uploadPublicImage,adoptPublicImage};
 })();

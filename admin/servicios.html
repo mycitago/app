@@ -57,6 +57,7 @@
   </aside>
 
   <main class="svc-main">
+    <div class="svc-view-tabs"><button class="active" type="button" data-svc-view="create">+ Agregar servicio</button><button type="button" data-svc-view="catalog">Mis servicios</button></div>
     <section class="svc-page-head">
       <div>
         <span class="svc-eyebrow">SERVICIOS INTELIGENTES</span>
@@ -199,16 +200,16 @@
           </div>
         </section>
 
-        <section class="svc-card">
-          <div class="svc-card-title violet"><span>7</span><div><h2>Tu catálogo</h2><p>Edita, activa u oculta servicios existentes.</p></div></div>
-          <div class="svc-bulk-toolbar"><span>Configuración masiva</span><button id="bulk-activate" type="button">Activar todos</button><button id="bulk-hide" type="button">Ocultar todos</button><button id="bulk-copy-hours" type="button">Usar horario general</button></div>
+        <section class="svc-card svc-catalog-section">
+          <div class="svc-card-title violet"><div><h2>Mis servicios</h2><p>Edita, activa u oculta servicios existentes.</p></div></div>
+          <div class="svc-bulk-toolbar"><span>Configuración masiva</span><button id="bulk-activate" type="button">Activar todos</button><button id="bulk-hide" type="button">Ocultar todos</button><button id="bulk-copy-hours" type="button">Usar horario general</button><button id="bulk-price-adjust" type="button">Ajustar precios por lote</button></div>
           <div id="service-list" class="svc-catalog"></div>
         </section>
       </div>
 
       <div class="svc-column">
         <section class="svc-card">
-          <div class="svc-card-title blue"><span>4</span><div><h2>Disponibilidad</h2><p>Lo más simple es heredar el horario general del negocio.</p></div></div>
+          <div class="svc-card-title blue"><div><h2>Disponibilidad avanzada</h2><p>Lo más simple es heredar el horario general del negocio.</p></div></div>
           <div class="svc-schedule-mode">
             <label class="svc-choice active"><input type="radio" name="schedule-mode" value="business" checked><span><b>Usar horario del negocio</b><small>Recomendado · sin configuración extra</small></span></label>
             <label class="svc-choice"><input type="radio" name="schedule-mode" value="custom"><span><b>Horario especial</b><small>Sólo para este servicio</small></span></label>
@@ -313,6 +314,7 @@
 <script src="../js/config.js"></script>
 <script src="../js/supabase.js"></script>
 <script src="../js/admin-auth.js"></script>
+<script src="../js/media-manager.js"></script>
 <script src="../js/admin-services.js"></script>
 <script>document.addEventListener("DOMContentLoaded",()=>window.lucide?.createIcons());</script>
 <script src="../js/citago-shell.js"></script><script>document.addEventListener('DOMContentLoaded',()=>CitagoShell.mount({mode:'tenant',activePage:'servicios'}));</script></body>

@@ -169,7 +169,7 @@ async function renderBusinessHealth(){
   const checks=[activeServices>0,brandingPublished,teamCount>0,Boolean(dashState.business?.opening_hours),Boolean(dashState.business?.whatsapp||dashState.business?.phone)];
   const score=Math.round(checks.filter(Boolean).length/checks.length*100);
   const scoreEl=$('health-score'),progress=$('health-progress');if(scoreEl)scoreEl.textContent=`${score}% listo`;if(progress)progress.style.width=`${score}%`;
-  if($('health-services'))$('health-services').textContent=activeServices;if($('health-branding'))$('health-branding').textContent=brandingPublished?'Publicada':'Pendiente';if($('health-support'))$('health-support').textContent=supportOpen;
+
   if($('health-title'))$('health-title').textContent=score===100?'Tu negocio está listo para crecer':score>=60?'Completa los últimos pasos de tu negocio':'Termina la configuración esencial';
   const missing=[];if(!activeServices)missing.push('agrega un servicio');if(!teamCount)missing.push('agrega equipo');if(!brandingPublished)missing.push('publica tu página');if($('health-note'))$('health-note').textContent=missing.length?`Siguiente recomendado: ${missing[0]}.`:'Todo lo esencial está configurado. Revisa reportes y reseñas para seguir creciendo.';
 }
@@ -185,7 +185,7 @@ function renderKPIs(){
     .reduce((s,a)=>s+appointmentPrice(a),0);
 
   $('kpi-today').textContent=todayItems.length;
-  $('kpi-upcoming').textContent=upcoming.length;
+  if($('kpi-upcoming'))$('kpi-upcoming').textContent=upcoming.length;
   $('kpi-pending').textContent=pending.length;
   $('kpi-revenue').textContent=money(revenue);
   $('kpi-today-sub').textContent=`${todayItems.filter(a=>a.status==='confirmada').length} confirmada${todayItems.filter(a=>a.status==='confirmada').length===1?'':'s'}`;
@@ -194,11 +194,6 @@ function renderKPIs(){
   const badge=$('notification-count');
   badge.textContent=notify;
   badge.classList.toggle('hidden',!notify);
-
-  renderMiniChart('chart-today',statsByDay(a=>a.status!=='cancelada'),'#6d35ef');
-  renderMiniChart('chart-upcoming',statsByDay(a=>activeStatus(a.status)),'#2384f5');
-  renderMiniChart('chart-pending',statsByDay(a=>a.status==='pendiente'),'#11a36b');
-  renderMiniChart('chart-revenue',statsByDay(a=>['confirmada','completada'].includes(a.status),appointmentPrice),'#f47a21');
 }
 
 function statusPill(status){

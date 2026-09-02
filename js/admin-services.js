@@ -11,33 +11,35 @@ const $ = id => document.getElementById(id);
 const assetUrl = file => new URL(`../assets/service-presets/${file}`, location.href).href;
 const SERVICE_TEMPLATE_LIBRARY = {
   barber:[
-    {name:'Corte clásico',category:'Barbería',duration:30,description:'Corte personalizado con acabado profesional.',image:'barber-cut.svg'},
-    {name:'Corte + barba',category:'Barbería',duration:60,description:'Servicio completo de corte y arreglo de barba.',image:'barber-beard.svg'},
-    {name:'Afeitado',category:'Barbería',duration:30,description:'Afeitado y perfilado con acabado limpio.',image:'barber-beard.svg'},
-    {name:'Corte infantil',category:'Barbería',duration:30,description:'Corte para niñas y niños.',image:'barber-cut.svg'}],
+    {name:'Corte clásico',suggestedPrice:200,category:'Barbería',duration:30,description:'Corte personalizado con acabado profesional.',image:'barber-cut.svg'},
+    {name:'Corte + barba',suggestedPrice:320,category:'Barbería',duration:60,description:'Servicio completo de corte y arreglo de barba.',image:'barber-beard.svg'},
+    {name:'Afeitado',suggestedPrice:150,category:'Barbería',duration:30,description:'Afeitado y perfilado con acabado limpio.',image:'barber-beard.svg'},
+    {name:'Corte infantil',suggestedPrice:180,category:'Barbería',duration:30,description:'Corte para niñas y niños.',image:'barber-cut.svg'}],
   beauty:[
-    {name:'Corte dama',category:'Belleza y cuidado',duration:60,description:'Corte, asesoría y acabado.',image:'beauty-hair.svg'},
-    {name:'Peinado',category:'Belleza y cuidado',duration:60,description:'Peinado para ocasión o uso diario.',image:'beauty-hair.svg'},
-    {name:'Tinte',category:'Belleza y cuidado',duration:120,description:'Coloración profesional según diagnóstico.',image:'beauty-hair.svg'}],
+    {name:'Corte dama',suggestedPrice:300,category:'Belleza y cuidado',duration:60,description:'Corte, asesoría y acabado.',image:'beauty-hair.svg'},
+    {name:'Peinado',suggestedPrice:350,category:'Belleza y cuidado',duration:60,description:'Peinado para ocasión o uso diario.',image:'beauty-hair.svg'},
+    {name:'Tinte',suggestedPrice:800,category:'Belleza y cuidado',duration:120,description:'Coloración profesional según diagnóstico.',image:'beauty-hair.svg'}],
   nails:[
-    {name:'Manicure',category:'Uñas',duration:45,description:'Cuidado de manos y acabado profesional.',image:'nails.svg'},
-    {name:'Gel semipermanente',category:'Uñas',duration:60,description:'Aplicación de gel de larga duración.',image:'nails.svg'},
-    {name:'Pedicure',category:'Uñas',duration:60,description:'Cuidado de pies y acabado profesional.',image:'nails.svg'}],
-  spa:[{name:'Masaje relajante',category:'Spa',duration:60,description:'Sesión de relajación y bienestar.',image:'spa.svg'},{name:'Facial',category:'Spa',duration:60,description:'Cuidado facial personalizado.',image:'spa.svg'}],
-  dental:[{name:'Valoración dental',category:'Consultas',duration:45,description:'Evaluación inicial y plan de tratamiento.',image:'dental.svg'},{name:'Limpieza dental',category:'Consultas',duration:60,description:'Limpieza profesional y recomendaciones.',image:'dental.svg'}],
-  therapy:[{name:'Primera consulta',category:'Consultas',duration:60,description:'Sesión inicial de valoración.',image:'therapy.svg'},{name:'Sesión de seguimiento',category:'Consultas',duration:50,description:'Sesión de seguimiento terapéutico.',image:'therapy.svg'}],
-  nutrition:[{name:'Valoración nutricional',category:'Consultas',duration:60,description:'Evaluación inicial y plan personalizado.',image:'nutrition.svg'},{name:'Seguimiento nutricional',category:'Consultas',duration:45,description:'Revisión de avances y ajustes.',image:'nutrition.svg'}],
-  physio:[{name:'Valoración fisioterapia',category:'Salud y bienestar',duration:60,description:'Evaluación funcional inicial.',image:'physio.svg'},{name:'Sesión de rehabilitación',category:'Salud y bienestar',duration:60,description:'Sesión terapéutica de rehabilitación.',image:'physio.svg'}],
-  veterinary:[{name:'Consulta veterinaria',category:'Consultas',duration:45,description:'Consulta general y valoración.',image:'veterinary.svg'},{name:'Vacunación',category:'Consultas',duration:30,description:'Aplicación y registro de vacuna.',image:'veterinary.svg'}],
-  consulting:[{name:'Consulta inicial',category:'Servicios profesionales',duration:60,description:'Sesión inicial para entender necesidades y alcance.',image:'consulting.svg'},{name:'Sesión de seguimiento',category:'Servicios profesionales',duration:60,description:'Seguimiento y ejecución de acuerdos.',image:'consulting.svg'}],
-  automotive:[{name:'Diagnóstico',category:'Mantenimiento',duration:60,description:'Revisión inicial para identificar la causa del problema.',image:'automotive.svg'},{name:'Mantenimiento preventivo',category:'Mantenimiento',duration:120,description:'Revisión y mantenimiento programado.',image:'automotive.svg'}],
-  photo:[{name:'Sesión fotográfica',category:'Servicios profesionales',duration:90,description:'Sesión personalizada con preparación previa.',image:'photo.svg'}],
-  classes:[{name:'Clase individual',category:'Clases',duration:60,description:'Sesión individual personalizada.',image:'class.svg'},{name:'Clase grupal',category:'Clases',duration:60,description:'Sesión grupal programada.',image:'class.svg'}],
-  other:[{name:'Servicio personalizado',category:'Servicios',duration:60,description:'Personaliza este servicio según tu negocio.',image:'consulting.svg'}]
+    {name:'Manicure',suggestedPrice:250,category:'Uñas',duration:45,description:'Cuidado de manos y acabado profesional.',image:'nails.svg'},
+    {name:'Gel semipermanente',suggestedPrice:300,category:'Uñas',duration:60,description:'Aplicación de gel de larga duración.',image:'nails.svg'},
+    {name:'Pedicure',suggestedPrice:300,category:'Uñas',duration:60,description:'Cuidado de pies y acabado profesional.',image:'nails.svg'}],
+  spa:[{name:'Masaje relajante',suggestedPrice:500,category:'Spa',duration:60,description:'Sesión de relajación y bienestar.',image:'spa.svg'},{name:'Facial',suggestedPrice:500,category:'Spa',duration:60,description:'Cuidado facial personalizado.',image:'spa.svg'}],
+  dental:[{name:'Valoración dental',suggestedPrice:500,category:'Consultas',duration:45,description:'Evaluación inicial y plan de tratamiento.',image:'dental.svg'},{name:'Limpieza dental',suggestedPrice:700,category:'Consultas',duration:60,description:'Limpieza profesional y recomendaciones.',image:'dental.svg'}],
+  therapy:[{name:'Primera consulta',suggestedPrice:600,category:'Consultas',duration:60,description:'Sesión inicial de valoración.',image:'therapy.svg'},{name:'Sesión de seguimiento',suggestedPrice:500,category:'Consultas',duration:50,description:'Sesión de seguimiento terapéutico.',image:'therapy.svg'}],
+  nutrition:[{name:'Valoración nutricional',suggestedPrice:600,category:'Consultas',duration:60,description:'Evaluación inicial y plan personalizado.',image:'nutrition.svg'},{name:'Seguimiento nutricional',suggestedPrice:400,category:'Consultas',duration:45,description:'Revisión de avances y ajustes.',image:'nutrition.svg'}],
+  physio:[{name:'Valoración fisioterapia',suggestedPrice:550,category:'Salud y bienestar',duration:60,description:'Evaluación funcional inicial.',image:'physio.svg'},{name:'Sesión de rehabilitación',suggestedPrice:550,category:'Salud y bienestar',duration:60,description:'Sesión terapéutica de rehabilitación.',image:'physio.svg'}],
+  veterinary:[{name:'Consulta veterinaria',suggestedPrice:400,category:'Consultas',duration:45,description:'Consulta general y valoración.',image:'veterinary.svg'},{name:'Vacunación',suggestedPrice:450,category:'Consultas',duration:30,description:'Aplicación y registro de vacuna.',image:'veterinary.svg'}],
+  consulting:[{name:'Consulta inicial',suggestedPrice:750,category:'Servicios profesionales',duration:60,description:'Sesión inicial para entender necesidades y alcance.',image:'consulting.svg'},{name:'Sesión de seguimiento',suggestedPrice:500,category:'Servicios profesionales',duration:60,description:'Seguimiento y ejecución de acuerdos.',image:'consulting.svg'}],
+  automotive:[{name:'Diagnóstico',suggestedPrice:600,category:'Mantenimiento',duration:60,description:'Revisión inicial para identificar la causa del problema.',image:'automotive.svg'},{name:'Mantenimiento preventivo',suggestedPrice:1200,category:'Mantenimiento',duration:120,description:'Revisión y mantenimiento programado.',image:'automotive.svg'}],
+  photo:[{name:'Sesión fotográfica',suggestedPrice:1200,category:'Servicios profesionales',duration:90,description:'Sesión personalizada con preparación previa.',image:'photo.svg'}],
+  classes:[{name:'Clase individual',suggestedPrice:350,category:'Clases',duration:60,description:'Sesión individual personalizada.',image:'class.svg'},{name:'Clase grupal',suggestedPrice:250,category:'Clases',duration:60,description:'Sesión grupal programada.',image:'class.svg'}],
+  other:[{name:'Servicio personalizado',suggestedPrice:500,category:'Servicios',duration:60,description:'Personaliza este servicio según tu negocio.',image:'consulting.svg'}]
 };
 let currentTemplateCategory='barber';
 let commercialSettings=null;
 let autoSaveTimer=null;
+let platformDefaultAssets=[];
+let selectedTemplateNames=new Set();
 
 const DAYS = [
   ['mon','Lunes'],['tue','Martes'],['wed','Miércoles'],['thu','Jueves'],
@@ -101,27 +103,15 @@ function localDateLabel(s) {
 }
 
 
-function renderServiceTemplates(category=currentTemplateCategory){
-  currentTemplateCategory=category;
-  const root=$('service-template-library'); if(!root)return;
-  const list=SERVICE_TEMPLATE_LIBRARY[category]||SERVICE_TEMPLATE_LIBRARY.other;
-  root.replaceChildren();
-  list.forEach(t=>{
-    const btn=document.createElement('button');btn.type='button';btn.className='svc-template-card';
-    const img=document.createElement('img');img.src=assetUrl(t.image);img.alt='';
-    const b=document.createElement('b');b.textContent=t.name;const small=document.createElement('small');small.textContent=`${t.duration} min · precio por definir`;
-    btn.append(img,b,small);btn.addEventListener('click',()=>applyServiceTemplate(t));root.appendChild(btn);
-  });
-}
-
-function applyServiceTemplate(t){
-  clearForm();
-  $('sname').value=t.name;$('category').value=t.category;$('duration').value=t.duration;$('sdesc').value=t.description||'';
-  selectedPresetImage=assetUrl(t.image);$('preset-image-url').value=selectedPresetImage;
-  updateSummary();calculateServiceIntelligence();saveLocalDraft();
-  $('price').focus();$('price').closest('.svc-field')?.classList.add('svc-price-guide');setTimeout(()=>$('price').closest('.svc-field')?.classList.remove('svc-price-guide'),900);
-  toast(`${t.name}: sólo falta definir el precio`);
-}
+function templateAssetKey(t){return `${currentTemplateCategory}:${String(t.name||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')}`}
+function platformAssetForTemplate(t){return platformDefaultAssets.find(a=>a.kind==='service'&&(a.asset_key===templateAssetKey(t)||a.asset_key===String(t.name||'')))?.image_url||null}
+function suggestedPriceForTemplate(t){const similar=items.filter(x=>x.active!==false&&Number(x.price)>0&&(String(x.category||'').toLowerCase()===String(t.category||'').toLowerCase()||Math.abs(Number(x.duration_minutes||0)-Number(t.duration||0))<=15));return similar.length?Math.round(similar.reduce((a,x)=>a+Number(x.price||0),0)/similar.length):Number(t.suggestedPrice||0)}
+async function loadPlatformDefaultAssets(){const {data,error}=await supabaseClient.from('platform_default_assets').select('kind,asset_key,category,image_url').eq('active',true);if(!error)platformDefaultAssets=data||[]}
+function renderServiceTemplates(category=currentTemplateCategory){currentTemplateCategory=category;selectedTemplateNames.clear();const root=$('service-template-library');if(!root)return;const list=SERVICE_TEMPLATE_LIBRARY[category]||SERVICE_TEMPLATE_LIBRARY.other;root.replaceChildren();const tools=document.createElement('div');tools.className='svc-template-batch-tools';tools.innerHTML='<b>Plantillas recomendadas</b><span>Selecciona varias para agregarlas juntas.</span><button id="add-selected-templates" type="button">Agregar seleccionados</button>';root.appendChild(tools);list.forEach(t=>{const card=document.createElement('label');card.className='svc-template-card svc-template-select';const check=document.createElement('input');check.type='checkbox';check.onchange=()=>check.checked?selectedTemplateNames.add(t.name):selectedTemplateNames.delete(t.name);const img=document.createElement('img');img.src=platformAssetForTemplate(t)||assetUrl(t.image);img.alt='';const body=document.createElement('span'),b=document.createElement('b'),small=document.createElement('small');b.textContent=t.name;const price=suggestedPriceForTemplate(t);small.textContent=`${t.duration} min · ${price?money(price)+' sugerido':'precio por definir'}`;body.append(b,small);const use=document.createElement('button');use.type='button';use.textContent='Usar';use.onclick=e=>{e.preventDefault();applyServiceTemplate(t)};card.append(check,img,body,use);root.appendChild(card)});root.querySelector('#add-selected-templates')?.addEventListener('click',openBatchTemplateReview)}
+function applyServiceTemplate(t){clearForm();$('sname').value=t.name;$('category').value=t.category;$('duration').value=t.duration;$('sdesc').value=t.description||'';const price=suggestedPriceForTemplate(t);$('price').value=price||'';selectedPresetImage=platformAssetForTemplate(t)||assetUrl(t.image);$('preset-image-url').value=selectedPresetImage;updateSummary();calculateServiceIntelligence();saveLocalDraft();$('price').focus();toast(`${t.name}: revisa y confirma el precio sugerido`)}
+function openBatchTemplateReview(){const list=(SERVICE_TEMPLATE_LIBRARY[currentTemplateCategory]||[]).filter(t=>selectedTemplateNames.has(t.name));if(!list.length)return toast('Selecciona al menos una plantilla');let box=$('template-batch-review');if(!box){box=document.createElement('section');box.id='template-batch-review';box.className='svc-card svc-batch-review';$('service-template-library').after(box)}box.innerHTML=`<div class="svc-card-title"><div><h2>Revisa antes de crear</h2><p>Los precios son sugerencias y no se guardan hasta confirmar.</p></div></div>${list.map((t,i)=>`<label>${t.name}<span>${t.duration} min</span><input data-batch-price="${i}" type="number" min="0" step="0.01" value="${suggestedPriceForTemplate(t)}"></label>`).join('')}<button id="confirm-batch-services" class="svc-btn svc-btn-primary" type="button">Confirmar y crear ${list.length} servicios</button>`;$('confirm-batch-services').onclick=()=>createBatchServices(list,box)}
+async function createBatchServices(list,box){const btn=$('confirm-batch-services');btn.disabled=true;try{for(let i=0;i<list.length;i++){const t=list[i],price=Number(box.querySelector(`[data-batch-price="${i}"]`).value)||0;const generic=platformAssetForTemplate(t)||assetUrl(t.image);let image_url=generic;if(platformAssetForTemplate(t)&&window.CitagoMedia){image_url=(await CitagoMedia.adoptPublicImage(generic,{businessId:biz.id,kind:'services'})).url}const {error}=await supabaseClient.from('services').insert({business_id:biz.id,name:t.name,category:t.category,price,duration_minutes:t.duration,description:t.description||'',image_url,active:true});if(error)throw error}toast(`${list.length} servicios creados`);box.remove();await loadServices()}catch(e){toast('No se pudieron crear: '+e.message)}finally{btn.disabled=false}}
+function openBulkPriceAdjust(){const pct=Number(prompt('Ajustar precios por lote. Escribe el porcentaje (ej. 10 o -5):','10'));if(!Number.isFinite(pct)||pct===0)return;const category=prompt('Categoría exacta a ajustar. Déjalo vacío para todos:','')||'';const targets=items.filter(x=>!category||String(x.category||'').toLowerCase()===category.toLowerCase());if(!targets.length)return toast('No hay servicios para ese filtro');const preview=targets.slice(0,5).map(x=>`${x.name}: ${money(x.price)} → ${money(Number(x.price)*(1+pct/100))}`).join('\n');if(!confirm(`Ajustar ${targets.length} servicios ${pct>0?'+':''}${pct}%?\n\n${preview}`))return;Promise.all(targets.map(x=>supabaseClient.from('services').update({price:Math.round(Number(x.price)*(1+pct/100)*100)/100}).eq('id',x.id).eq('business_id',biz.id))).then(async results=>{const bad=results.find(r=>r.error);if(bad)return toast('No se pudo actualizar: '+bad.error.message);toast('Precios actualizados');await loadServices()})}
 
 function weeklyBusinessMinutes(hours=biz?.opening_hours||{}){
   return DAYS.reduce((sum,[key])=>{const h=hours?.[key];if(!h||h.closed||!h.open||!h.close)return sum;const [oh,om]=String(h.open).slice(0,5).split(':').map(Number),[ch,cm]=String(h.close).slice(0,5).split(':').map(Number);return sum+Math.max(0,(ch*60+cm)-(oh*60+om))},0);
@@ -736,7 +726,7 @@ async function init() {
   biz = await getMyBusiness(session.user);
   if (!biz) return;
 
-  const category=biz.business_category_id||'barber';if($('business-type'))$('business-type').value=SERVICE_TEMPLATE_LIBRARY[category]?category:'barber';renderServiceTemplates($('business-type')?.value||'barber');
+  const category=biz.business_category_id||'barber';if($('business-type'))$('business-type').value=SERVICE_TEMPLATE_LIBRARY[category]?category:'barber';await loadPlatformDefaultAssets();renderServiceTemplates($('business-type')?.value||'barber');
   renderPresets();
   renderHours(biz.opening_hours || HOUR_TEMPLATES.office);
   bindUI();
@@ -768,3 +758,5 @@ document.addEventListener('DOMContentLoaded',init);
 function renderServiceCatalog(services){ if(typeof renderCatalog==='function') return renderCatalog(services); return services||[]; }
 function openServiceEditor(service){ if(typeof edit==='function') return edit(service?.id||service); return service; }
 async function saveServiceEditor(){ if(typeof saveService==='function') return saveService(); if(typeof save==='function') return save(); return null; }
+
+document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('[data-svc-view]').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('[data-svc-view]').forEach(x=>x.classList.toggle('active',x===btn));document.querySelector('.svc-main')?.setAttribute('data-view',btn.dataset.svcView)}));document.querySelector('.svc-main')?.setAttribute('data-view','create')});
