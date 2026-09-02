@@ -10,3 +10,55 @@ body.ct-platform .creator-hero{background:linear-gradient(120deg,#17151f,#2b2043
 .platform-default-media{margin-top:20px;padding-top:18px;border-top:1px solid #e8e3ef}.platform-media-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.platform-media-grid label{display:grid;gap:8px;padding:14px;border:1px solid #e8e3ef;border-radius:14px}.platform-media-grid button{border:0;background:#6d35ee;color:#fff;border-radius:9px;padding:8px;font-weight:800}@media(max-width:700px){.platform-media-grid{grid-template-columns:1fr}}
 
 .platform-assets-list,.platform-default-media #platform-default-assets-list{display:grid;gap:8px;margin-top:14px}.platform-asset-row{display:grid;grid-template-columns:58px 1fr auto;gap:10px;align-items:center;padding:9px;border:1px solid #eee;border-radius:12px}.platform-asset-row img,.platform-asset-placeholder{width:58px;height:44px;border-radius:8px;object-fit:cover}.platform-asset-placeholder{display:grid;place-items:center;background:#f2eef8;color:#756b80;font-size:10px}.platform-asset-row small{display:block;color:#81788b}
+
+/* BLOQUE B · Control tower visual language */
+body.creator-body{
+ --platform-base:#0F1417;--platform-surface:#171E22;--platform-line:#28333A;
+ --platform-text:#E7EEEC;--platform-muted:#8FA0A3;--platform-active:#3DDC97;
+ --platform-risk:#F5B841;--platform-error:#EF5D5D;--platform-info:#5AA9E6;
+ --platform-heading:"Space Grotesk",sans-serif;--platform-mono:"IBM Plex Mono",monospace;--platform-ui:"Inter",sans-serif;
+ background:#0F1417;color:#E7EEEC;font-family:var(--platform-ui);
+}
+body.creator-body .creator-topbar{background:#0F1417;border-bottom:1px solid #28333A;box-shadow:none}
+body.creator-body .creator-layout{background:#0F1417}
+body.creator-body .creator-sidebar{background:#0F1417;border-right:1px solid #28333A}
+body.creator-body .creator-sidebar a{color:#8FA0A3;border-radius:4px}
+body.creator-body .creator-sidebar a:hover,body.creator-body .creator-sidebar a.active{background:#171E22;color:#E7EEEC}
+body.creator-body .creator-main{background:#0F1417;padding:24px!important}
+body.creator-body .creator-hero{background:transparent!important;border:0!important;border-bottom:1px solid #28333A!important;border-radius:0!important;box-shadow:none!important;padding:8px 0 22px!important}
+body.creator-body .creator-hero h1,body.creator-body .creator-card-head h2{font-family:var(--platform-heading);color:#E7EEEC}
+body.creator-body .creator-hero p,body.creator-body .creator-date,body.creator-body .creator-soft{color:#8FA0A3}
+body.creator-body .creator-hero .eyebrow,body.creator-body .eyebrow{color:#8FA0A3;font:500 10px var(--platform-ui);letter-spacing:.08em}
+body.creator-body .creator-kpis{gap:0;border:1px solid #28333A;margin:18px 0 20px}
+body.creator-body .creator-kpis article{min-height:106px;background:#171E22!important;border:0;border-right:1px solid #28333A;border-radius:0;box-shadow:none!important;padding:18px}
+body.creator-body .creator-kpis article:last-child{border-right:0}
+body.creator-body .creator-kpis article strong{font-family:var(--platform-mono);font-size:30px;color:#E7EEEC}
+body.creator-body .creator-kpis article:nth-child(3) strong{color:#5AA9E6}
+body.creator-body .creator-kpis article:nth-child(4) strong{color:#3DDC97}
+body.creator-body .creator-kpis article:nth-child(5) strong{color:#F5B841}
+body.creator-body .creator-kpis article span,body.creator-body .creator-kpis article small{color:#8FA0A3}
+body.creator-body .creator-card{background:#171E22!important;border:1px solid #28333A!important;border-radius:0!important;box-shadow:none!important;color:#E7EEEC}
+body.creator-body .creator-grid-2{grid-template-columns:3fr 2fr;gap:12px}
+body.creator-body .creator-business-table{border:1px solid #28333A;border-radius:0;background:#171E22}
+body.creator-body .creator-table-head{background:#11181b;color:#8FA0A3}
+body.creator-body .creator-business-row{background:#171E22;border-color:#28333A;color:#E7EEEC}
+body.creator-body .creator-business-row:hover{background:#1b2428}
+body.creator-body .creator-business-row strong,body.creator-body .creator-inline-stats strong,body.creator-body .creator-detail-kpis strong{font-family:var(--platform-mono)}
+body.creator-body .platform-compact-item,body.creator-body .platform-ticket,body.creator-body .platform-template-group,body.creator-body .platform-asset-row{background:#171E22;border:1px solid #28333A;border-radius:0;color:#E7EEEC}
+body.creator-body .platform-compact-item small,body.creator-body .platform-ticket small,body.creator-body .platform-template-group span,body.creator-body .platform-asset-row small{color:#8FA0A3}
+body.creator-body .platform-template-group .bar{background:#28333A;border-radius:0}
+body.creator-body .platform-template-group .bar i{background:#5AA9E6;border-radius:0}
+body.creator-body .creator-alert.success span,body.creator-body .platform-ticket.normal>i{background:#3DDC97}
+body.creator-body .creator-alert.warning span,body.creator-body .platform-ticket.high>i{background:#F5B841}
+body.creator-body .creator-alert.danger span,body.creator-body .platform-ticket.urgent>i{background:#EF5D5D}
+body.creator-body .input,body.creator-body select,body.creator-body input{background:#11181b!important;color:#E7EEEC!important;border:1px solid #28333A!important;border-radius:6px!important}
+body.creator-body button,body.creator-body .btn,body.creator-body .ct-btn{border-radius:6px}
+body.creator-body button:focus-visible,body.creator-body a:focus-visible,body.creator-body input:focus-visible,body.creator-body select:focus-visible{outline:2px solid #5AA9E6;outline-offset:2px}
+body.creator-body .ct-btn-primary,body.creator-body .btn-primary{background:#E7EEEC;color:#0F1417}
+body.creator-body .ct-btn-secondary,body.creator-body .btn-ghost{background:#171E22;color:#E7EEEC;border:1px solid #28333A}
+body.creator-body .creator-empty{color:#8FA0A3}
+body.creator-body .creator-mobile-nav{background:#0F1417;border-top:1px solid #28333A}
+body.creator-body .creator-mobile-nav a{color:#8FA0A3}
+body.creator-body .creator-mobile-nav a.active{color:#E7EEEC}
+@media(max-width:1000px){body.creator-body .creator-grid-2{grid-template-columns:1fr}body.creator-body .creator-kpis{grid-template-columns:repeat(2,1fr)}body.creator-body .creator-kpis article{border-bottom:1px solid #28333A}}
+@media(max-width:650px){body.creator-body .creator-main{padding:14px!important}body.creator-body .creator-kpis{grid-template-columns:1fr 1fr}body.creator-body .creator-kpis article strong{font-size:24px}}

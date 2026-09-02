@@ -1,0 +1,4 @@
+import test from 'node:test'; import assert from 'node:assert/strict'; import fs from 'node:fs';
+const read=p=>fs.readFileSync(new URL('../'+p, import.meta.url),'utf8');
+test('access distinguishes technical error',()=>{const s=read('js/admin-platform.js');assert.match(s,/const \{data,error\}=await supabaseClient\.from\('platform_admins'\)/);assert.match(s,/No se pudo verificar tu acceso/);});
+test('master has secure RPCs',()=>{const s=read('SUPABASE_PLATFORM_MASTER.sql');assert.match(s,/suspend_business\(p_business_id uuid\)/i);assert.match(s,/reactivate_business\(p_business_id uuid,p_days integer/i);assert.match(s,/approve_business_category_change\(p_request_id uuid,p_approve boolean,p_note text/i);assert.match(s,/insert into public\.audit_logs/i);assert.match(s,/platform-default-media/);});
