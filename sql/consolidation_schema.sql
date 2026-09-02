@@ -14,6 +14,8 @@ create table if not exists public.business_branches (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+alter table public.business_branches
+  add column if not exists opening_hours jsonb not null default '{}'::jsonb;
 create unique index if not exists business_branches_one_primary on public.business_branches(business_id) where is_primary;
 create index if not exists business_branches_business_idx on public.business_branches(business_id,active);
 alter table public.business_branches enable row level security;
