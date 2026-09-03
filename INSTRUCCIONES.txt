@@ -1,57 +1,61 @@
-MYCITAGO · AJUSTE LIMITADO DE SERVICIOS
-========================================
+MYCITAGO · SERVICIOS HOTFIX V2
+==============================
 
-OBJETIVO
---------
-Este paquete corrige el problema detectado en Servicios sin hacer todavía
-el rediseño visual completo.
+CAUSA CONFIRMADA
+----------------
+El negocio CLINICA EL DIENTE tiene:
+- business_category_id = dental
+- business_category_locked = true
+- category_name = Dentista
 
-CORRIGE
--------
-1. Una plantilla que ya existe ACTIVA muestra "Editar" y no se puede duplicar.
-2. Una plantilla que existe DESACTIVADA muestra "Reactivar".
-3. Reactivar reutiliza el mismo registro de services; no crea otro.
-4. La creación por lote vuelve a comprobar si el servicio existe antes de insertar.
-5. Si el giro del negocio quedó bloqueado en onboarding, el selector de giro
-   de Servicios queda bloqueado y se sincroniza con el giro real del negocio.
-6. No cambia tablas, no borra servicios y no modifica servicios de otros negocios.
+El Hotfix V1 no consideraba business_category_id como código directo.
+Por eso no detectó correctamente "dental" y el selector de Servicios
+siguió permitiendo mezclar Barbería/Uñas.
 
-ARCHIVO NUEVO
--------------
+QUÉ CORRIGE V2
+--------------
+1. Lee business_category_id = "dental" directamente.
+2. Si business_category_locked = true:
+   - fuerza el selector a Dentista;
+   - bloquea el selector;
+   - fuerza renderServiceTemplates("dental");
+   - bloquea cualquier intento de aplicar una plantilla ajena al giro;
+   - bloquea también creación por lote de otro giro.
+3. Evita duplicados:
+   - activo => Editar;
+   - inactivo => Reactivar el mismo ID;
+   - nuevo => Crear.
+4. Hace una consulta final a services antes de cada INSERT.
+
+SUBIDA A GITHUB
+---------------
+Reemplaza el archivo:
 js/admin-services-template-guard.js
 
-PASO ÚNICO EN admin/servicios.html
----------------------------------
-Busca esta línea:
+por el archivo V2 incluido en este ZIP.
 
-<script src="../js/admin-services.js"></script>
+NO cambies admin-services.js.
+NO ejecutes SQL para instalar este hotfix.
+NO borres filas todavía.
 
-Justo DESPUÉS agrega:
-
-<script src="../js/admin-services-template-guard.js"></script>
-
-Debe quedar así:
-
+VERIFICA QUE admin/servicios.html YA CONTENGA:
 <script src="../js/admin-services.js"></script>
 <script src="../js/admin-services-template-guard.js"></script>
-<script>document.addEventListener("DOMContentLoaded",()=>window.lucide?.createIcons());</script>
+
+Si ya agregaste esa línea con V1, NO debes volver a agregarla.
+
+PRUEBA
+------
+1. Recarga fuerte: Ctrl+F5.
+2. Entra a Servicios.
+3. "Tipo de negocio" debe mostrar Dentista y quedar bloqueado.
+4. No deben aparecer plantillas Barbería ni Uñas.
+5. Valoración dental y Limpieza dental deben mostrar Editar si están activas.
+6. Desactiva una dental y confirma que la plantilla cambie a Reactivar.
+7. Reactívala y verifica en Supabase que conserve el mismo ID.
 
 IMPORTANTE
 ----------
-No reemplaces admin-services.js.
-No ejecutes SQL para este ajuste.
-No borres servicios existentes.
-
-PRUEBA DESPUÉS DE SUBIR
------------------------
-1. Abre MyCitaGo > Servicios.
-2. En CLINICA EL DIENTE, el giro debe quedar en Dentista y bloqueado si ya fue confirmado.
-3. "Valoración dental" y "Limpieza dental" deben mostrarse como "Editar" si están activas.
-4. Si desactivas una de ellas, la plantilla debe cambiar a "Reactivar".
-5. Al pulsar "Reactivar", debe volver a activar el MISMO registro.
-6. No debe aparecer un segundo registro con el mismo nombre.
-
-REDISEÑO VISUAL
----------------
-No forma parte de este hotfix. Se deja para la fase visual posterior,
-como se acordó.
+Las filas contaminadas ya existentes no se borran con este hotfix.
+Primero validamos que ya no puedan volver a crearse.
+Después limpiamos los registros incorrectos una sola vez.
