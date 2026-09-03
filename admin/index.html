@@ -50,9 +50,28 @@
     <section class="dash-plan-card">
       <div class="plan-kicker"><i data-lucide="crown"></i> Plan actual</div>
       <div id="plan-loading" class="plan-loading"><i></i><i></i></div>
-      <strong id="plan-name" class="hidden"></strong>
-      <small id="plan-date" class="hidden"></small>
-      <a href="planes.html">Ver mi plan</a>
+      <div id="plan-content" class="hidden">
+        <div class="dash-plan-title">
+          <strong id="plan-name">Plan</strong>
+          <span id="plan-status" class="plan-status-badge"></span>
+        </div>
+        <small id="plan-date"></small>
+        <div class="dash-plan-usage">
+          <div>
+            <span>Profesionales</span>
+            <b id="plan-staff-usage">0 / 0</b>
+          </div>
+          <div>
+            <span>Sucursales</span>
+            <b id="plan-branch-usage">0 / 0</b>
+          </div>
+        </div>
+        <div id="plan-trial-mini" class="plan-trial-mini hidden">
+          <i data-lucide="clock-3"></i>
+          <span id="plan-trial-days"></span>
+        </div>
+        <a href="planes.html" class="plan-cta">Ver mi plan</a>
+      </div>
     </section>
 
     <section class="dash-support-card">
@@ -91,6 +110,20 @@
           <p id="today-label">Cargando resumen…</p>
         </div>
         <button id="hero-new-appointment" class="btn-new hero" type="button"><i data-lucide="plus"></i> Nueva cita</button>
+      </section>
+
+      <section id="trial-expiry-banner" class="trial-expiry-banner hidden" aria-live="polite">
+        <div class="trial-expiry-copy">
+          <span class="trial-expiry-icon"><i data-lucide="clock-alert"></i></span>
+          <div>
+            <strong id="trial-expiry-title">Tu prueba termina pronto</strong>
+            <small id="trial-expiry-message"></small>
+          </div>
+        </div>
+        <a href="planes.html" class="trial-expiry-cta">Elegir plan</a>
+        <button id="trial-banner-dismiss" class="trial-expiry-close" type="button" aria-label="Cerrar aviso">
+          <i data-lucide="x"></i>
+        </button>
       </section>
 
       <section class="dash-kpis">
@@ -188,7 +221,6 @@
   <a href="clientes.html"><i data-lucide="users"></i><span>Clientes</span></a>
   <a href="servicios.html"><i data-lucide="scissors"></i><span>Servicios</span></a>
 </nav>
-
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script>
 <script src="../js/config.js"></script>

@@ -1,27 +1,18 @@
-PARCHE CITAS · PORTADA + RESERVACIÓN
+MYCITAGO FASE 1 — LISTO PARA GITHUB
 
-Este parche NO modifica Supabase ni js/config.js.
+Reemplaza exactamente estos 3 archivos en tu repositorio:
 
-ARCHIVOS A REEMPLAZAR / AGREGAR EN GITHUB
------------------------------------------
-1. /index.html                 -> reemplazar
-2. /reservar.html              -> agregar
-3. /js/supabase.js             -> reemplazar
-4. /admin/login.html           -> reemplazar
+1) admin/index.html
+2) js/admin-dashboard-pro.js
+3) css/admin-dashboard-pro.css
 
-RESULTADO
----------
-https://mycitago.github.io/app/
-  Página principal de CITAS
+No subas la carpeta contenedora como una carpeta nueva dentro del repo.
+Conserva las rutas admin/, js/ y css/.
 
-https://mycitago.github.io/app/admin/login.html
-  Acceso administrativo
+No se modifica:
+- admin-auth.js
+- citago-shell.js
+- admin-dashboard.js
+- Supabase
 
-https://mycitago.github.io/app/reservar.html?n=slug-del-negocio
-  Reservación pública de una estética
-
-IMPORTANTE
-----------
-No borres js/config.js.
-No vuelvas a subir el ZIP completo anterior.
-Solo sube estos cuatro archivos respetando sus carpetas.
+Después de subir, abre el panel y fuerza recarga con Ctrl+F5.

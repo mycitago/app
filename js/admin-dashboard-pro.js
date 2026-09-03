@@ -2,6 +2,7 @@
 const dashState = {
   session:null,
   business:null,
+  entitlements:null,
   appointments:[],
   services:[],
   customers:[],
@@ -153,7 +154,6 @@ function statsByDay(filterFn,mapper=()=>1){
   }
   return vals;
 }
-
 
 async function renderBusinessHealth(){
   const activeServices=dashState.services.filter(s=>s.active!==false).length;
@@ -315,7 +315,7 @@ function renderActivity(){
 
   if(!rows.length){root.innerHTML='<div class="empty-card">Todavía no hay actividad reciente.</div>';return}
 
-  rows.forEach((a,i)=>{
+  rows.forEach(a=>{
     const item=document.createElement('div');item.className='activity-row';
     const icon=document.createElement('div');
     icon.className=`activity-icon ${a.status==='confirmada'?'green':a.status==='pendiente'?'purple':'orange'}`;
@@ -417,14 +417,162 @@ function publicBooking(){
   location.href='agenda.html';
 }
 
-function renderPlan(){
-  const sub=dashState.business?.subscription;
-  $('plan-loading')?.remove();
-  $('plan-name').classList.remove('hidden');$('plan-date').classList.remove('hidden');
-  $('plan-name').textContent=sub?.plan_id || sub?.plan || 'Plan activo';
-  $('plan-date').textContent=sub?.current_period_end
-    ? `Activo hasta ${new Date(sub.current_period_end+'T12:00:00').toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'})}`
-    : 'Suscripción activa';
+/* ===== FASE 1: PLAN + ENTITLEMENTS ===== */
+function setPlanText(id,value){
+  const el=$(id);
+  if(el) el.textContent=value;
+}
+
+function formatPlanDate(value){
+  if(!value) return '';
+  const raw=String(value);
+  const date=new Date(raw.includes('T') ? raw : `${raw}T12:00:00`);
+  if(Number.isNaN(date.getTime())) return '';
+  return date.toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric'});
+}
+
+function hideTrialBanner(){
+  $('trial-expiry-banner')?.classList.add('hidden');
+}
+
+function renderTrialBanner(subscription,plan){
+  const banner=$('trial-expiry-banner');
+  if(!banner) return;
+
+  const days=Number(subscription?.trial_days_remaining ?? 0);
+  const dismissed=sessionStorage.getItem('mycitago_trial_banner_dismissed')==='1';
+  const show=subscription?.status==='trial' && days>=0 && days<=3 && !dismissed;
+
+  if(!show){
+    hideTrialBanner();
+    return;
+  }
+
+  const planName=plan?.name || 'tu plan';
+  setPlanText('trial-expiry-title', days===0 ? 'Tu prueba termina hoy' : 'Tu prueba termina pronto');
+  setPlanText(
+    'trial-expiry-message',
+    days===0
+      ? `La prueba de ${planName} termina hoy. Elige un plan para mantener el acceso.`
+      : `Te quedan ${days} día${days===1?'':'s'} de prueba de ${planName}.`
+  );
+
+  banner.classList.remove('hidden');
+  const dismiss=$('trial-banner-dismiss');
+  if(dismiss && !dismiss.dataset.bound){
+    dismiss.dataset.bound='1';
+    dismiss.addEventListener('click',()=>{
+      sessionStorage.setItem('mycitago_trial_banner_dismissed','1');
+      hideTrialBanner();
+    });
+  }
+}
+
+function renderPlanUnavailable(){
+  $('plan-loading')?.classList.add('hidden');
+  $('plan-content')?.classList.remove('hidden');
+  setPlanText('plan-name','Plan no disponible');
+  const status=$('plan-status');
+  if(status){
+    status.textContent='Sin datos';
+    status.className='plan-status-badge unavailable';
+  }
+  setPlanText('plan-date','No pudimos consultar tu plan');
+  setPlanText('plan-staff-usage','— / —');
+  setPlanText('plan-branch-usage','— / —');
+  $('plan-trial-mini')?.classList.add('hidden');
+  hideTrialBanner();
+}
+
+function renderPlanEntitlements(data){
+  $('plan-loading')?.classList.add('hidden');
+  $('plan-content')?.classList.remove('hidden');
+
+  const plan=data?.plan || null;
+  const subscription=data?.subscription || null;
+  const limits=data?.limits || {};
+  const usage=data?.usage || {};
+
+  if(!plan || !subscription){
+    setPlanText('plan-name','Sin plan');
+    const status=$('plan-status');
+    if(status){
+      status.textContent='Inactivo';
+      status.className='plan-status-badge inactive';
+    }
+    setPlanText('plan-date','Sin suscripción vigente');
+    setPlanText('plan-staff-usage',`${Number(usage.staff||0)} / 0`);
+    setPlanText('plan-branch-usage',`${Number(usage.branches||0)} / 0`);
+    $('plan-trial-mini')?.classList.add('hidden');
+    hideTrialBanner();
+    return;
+  }
+
+  setPlanText('plan-name',plan.name || 'Plan');
+
+  const status=$('plan-status');
+  if(status){
+    if(subscription.status==='trial'){
+      status.textContent='Prueba';
+      status.className='plan-status-badge trial';
+    }else if(subscription.status==='active'){
+      status.textContent='Activo';
+      status.className='plan-status-badge active';
+    }else{
+      status.textContent='Inactivo';
+      status.className='plan-status-badge inactive';
+    }
+  }
+
+  const staffUsed=Number(usage.staff||0);
+  const branchesUsed=Number(usage.branches||0);
+  const maxStaff=Number(limits.staff||0);
+  const maxBranches=Number(limits.branches||0);
+
+  setPlanText('plan-staff-usage',`${staffUsed} / ${maxStaff}`);
+  setPlanText('plan-branch-usage',`${branchesUsed} / ${maxBranches}`);
+
+  const trialMini=$('plan-trial-mini');
+  const trialDays=Number(subscription.trial_days_remaining ?? 0);
+
+  if(subscription.status==='trial'){
+    const end=formatPlanDate(subscription.trial_end);
+    setPlanText('plan-date',end ? `Prueba hasta ${end}` : 'Periodo de prueba');
+    setPlanText(
+      'plan-trial-days',
+      trialDays===0 ? 'Termina hoy' : `${trialDays} día${trialDays===1?'':'s'} restante${trialDays===1?'':'s'}`
+    );
+    trialMini?.classList.remove('hidden');
+  }else{
+    const end=formatPlanDate(subscription.current_period_end);
+    setPlanText('plan-date',end ? `Vigente hasta ${end}` : 'Suscripción activa');
+    trialMini?.classList.add('hidden');
+  }
+
+  renderTrialBanner(subscription,plan);
+}
+
+async function renderPlan(){
+  const businessId=dashState.business?.id;
+  if(!businessId){
+    renderPlanUnavailable();
+    return;
+  }
+
+  try{
+    const {data,error}=await supabaseClient.rpc('get_business_entitlements',{
+      p_business_id:businessId
+    });
+    if(error) throw error;
+    dashState.entitlements=data || null;
+    renderPlanEntitlements(data);
+  }catch(error){
+    console.error('Error cargando entitlements del negocio:',error);
+    dashState.entitlements=null;
+    renderPlanUnavailable();
+  }finally{
+    window.lucide?.createIcons();
+  }
 }
 
 function normalizeSearch(v){ return String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
@@ -486,7 +634,8 @@ async function init(){
   if(!business) return;
   dashState.business=business;
 
-  setBusinessIdentity();setUserIdentity();setDates();renderPlan();bind();
+  setBusinessIdentity();setUserIdentity();setDates();bind();
+  renderPlan();
   await refreshData();
 }
 
