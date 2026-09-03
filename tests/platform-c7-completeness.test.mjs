@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+const h=fs.readFileSync('admin/plataforma.html','utf8');
+const j=fs.readFileSync('js/admin-platform.js','utf8');
+assert.ok(j.includes('Sin plantillas en esta categoría'),'explicit empty template category state missing');
+assert.ok(j.includes('data-template-create-category'),'empty category create action missing');
+assert.ok(j.includes('data-category-approve')&&j.includes('data-category-reject'),'category request actions missing');
+assert.ok(j.includes('Historial de pagos'),'business drawer payment history missing');
+assert.ok(j.includes('Tickets de soporte'),'business drawer support links missing');
+assert.ok(j.includes('supportForBusiness('),'business support helper missing');
+assert.ok(j.includes('paymentsForBusiness('),'business payment helper missing');
+assert.ok(h.includes('id="support-history-filter"'),'support business filter target missing');
+console.log('platform C7 completeness contract OK');

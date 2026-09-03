@@ -13,6 +13,8 @@
     readBusinessCategories:()=>rpc('platform_read_business_categories'),
     readBusinessInvites:()=>rpc('platform_read_business_invites'),
     readCategoryChangeRequests:()=>rpc('platform_read_category_change_requests'),
-    readAuditLogs:()=>rpc('platform_read_audit_logs')
+    readAuditLogs:()=>rpc('platform_read_audit_logs'),
+    bulkSuspend:(ids)=>supabaseClient.rpc('platform_bulk_suspend',{p_business_ids:ids}),
+    bulkReactivate:(ids,days=30)=>supabaseClient.rpc('platform_bulk_reactivate',{p_business_ids:ids,p_days:days})
   });
 })(window);
