@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+const h=fs.readFileSync('admin/plataforma.html','utf8');
+const j=fs.readFileSync('js/admin-platform.js','utf8');
+for(const id of ['export-businesses','export-payments','export-audit']) assert.ok(h.includes(`id="${id}"`),`missing ${id}`);
+for(const fn of ['csvCell','downloadCsv','exportBusinessesCsv','exportPaymentsCsv','exportAuditCsv']) assert.ok(j.includes(`function ${fn}`)||j.includes(`async function ${fn}`),`missing ${fn}`);
+assert.ok(j.includes("'\\ufeff'" )||j.includes('"\\ufeff"'),'CSV must use UTF-8 BOM for Excel');
+assert.match(j,/replace\(\/"\/g\s*,\s*'""'\)/,'CSV quote escaping missing');
+assert.ok(j.includes('platformState.filtered'),'business export must use filtered/visible businesses');
+console.log('platform CSV export contract OK');

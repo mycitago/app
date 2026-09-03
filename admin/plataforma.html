@@ -69,28 +69,35 @@
     </section>
 
     <section class="creator-grid-2" id="soporte">
-      <article class="creator-card platform-support-card"><div class="creator-card-head"><div><span class="eyebrow">SOPORTE</span><h2>Soporte · Bandeja de ayuda</h2></div><span id="support-open-count" class="creator-soft">0 abiertos</span></div><div id="platform-support-list" class="platform-support-list"><div class="creator-empty">Cargando tickets…</div></div></article>
+      <article class="creator-card platform-support-card"><div class="creator-card-head"><div><span class="eyebrow">SOPORTE</span><h2>Soporte · Bandeja de ayuda</h2></div><div class="platform-card-actions"><select id="support-history-filter" class="input" aria-label="Filtrar tickets"><option value="open">Abiertos</option><option value="closed">Cerrados</option><option value="all">Todos</option></select><span id="support-open-count" class="creator-soft">0 abiertos</span></div></div><div id="platform-support-list" class="platform-support-list"><div class="creator-empty">Cargando tickets…</div></div></article>
       <article class="creator-card" id="plantillas"><div class="creator-card-head"><div><span class="eyebrow">CATÁLOGO MYCITAGO</span><h2>Plantillas de servicios</h2></div><div style="display:flex;gap:6px"><button id="new-template" class="btn btn-primary" type="button">+ Plantilla</button><button id="refresh-templates" class="btn btn-ghost" type="button">Actualizar</button></div></div><div id="template-create-panel" class="platform-template-form hidden"><select id="template-category" class="input"></select><input id="template-name" class="input" placeholder="Nombre del servicio"><input id="template-duration" class="input" type="number" min="5" step="5" value="60" placeholder="Duración"><select id="template-image" class="input"><option value="/app/assets/service-presets/barber-cut.svg">Corte</option><option value="/app/assets/service-presets/beauty-hair.svg">Belleza</option><option value="/app/assets/service-presets/nails.svg">Uñas</option><option value="/app/assets/service-presets/spa.svg">Spa</option><option value="/app/assets/service-presets/dental.svg">Salud</option><option value="/app/assets/service-presets/consulting.svg">Profesional</option></select><button id="save-template" class="btn btn-primary" type="button">Guardar</button></div><div id="platform-template-summary" class="platform-template-summary"><div class="creator-empty">Cargando catálogo…</div></div><div class="platform-default-media"><h3>Imágenes genéricas de ejemplo</h3><p>Al adoptarlas, se copian al espacio del negocio y quedan congeladas.</p><div class="platform-media-grid"><label>Logo<input id="platform-logo-file" type="file" accept="image/jpeg,image/png,image/webp"><button type="button" data-platform-asset="logo">Subir / reemplazar</button></label><label>Banner<input id="platform-banner-file" type="file" accept="image/jpeg,image/png,image/webp"><button type="button" data-platform-asset="banner">Subir / reemplazar</button></label></div><div id="platform-default-assets-list"></div></div></article>
     </section>
 
     <section class="creator-grid-2 platform-ops-grid"><article class="creator-card"><div class="creator-card-head"><div><span class="eyebrow">INVITACIONES</span><h2>Registros enviados</h2></div><span id="invite-open-count" class="creator-soft">0 pendientes</span></div><div id="platform-invites" class="platform-compact-list"></div></article><article class="creator-card"><div class="creator-card-head"><div><span class="eyebrow">SOLICITUDES</span><h2>Cambios de giro</h2></div><span id="category-request-count" class="creator-soft">0 pendientes</span></div><div id="category-requests" class="platform-compact-list"></div></article></section>
 
     <section class="creator-grid-2 platform-ops-grid">
-      <article class="creator-card" id="pagos"><div class="creator-card-head"><div><span class="eyebrow">PAGOS</span><h2>Movimientos de plataforma</h2></div></div><div id="platform-payments-list" class="platform-compact-list"><div class="creator-empty">Cargando pagos…</div></div></article>
+      <article class="creator-card" id="pagos"><div class="creator-card-head"><div><span class="eyebrow">PAGOS</span><h2>Movimientos de plataforma</h2></div><button id="export-payments" class="btn btn-ghost" type="button">Exportar CSV</button></div><div id="platform-payments-list" class="platform-compact-list"><div class="creator-empty">Cargando pagos…</div></div></article>
       <article class="creator-card" id="incidencias"><div class="creator-card-head"><div><span class="eyebrow">INCIDENCIAS</span><h2>Salud operativa</h2></div></div><div id="platform-incidents-list" class="platform-compact-list"><div class="creator-empty">Cargando incidencias…</div></div></article>
     </section>
     <section class="creator-grid-2 platform-ops-grid">
       <article class="creator-card" id="integraciones"><div class="creator-card-head"><div><span class="eyebrow">INTEGRACIONES</span><h2>Conexiones de negocios</h2></div></div><div id="platform-integrations-list" class="platform-compact-list"><div class="creator-empty">Cargando integraciones…</div></div></article>
-      <article class="creator-card" id="auditoria"><div class="creator-card-head"><div><span class="eyebrow">AUDITORÍA</span><h2>Actividad reciente</h2></div></div><div id="platform-audit-list" class="platform-compact-list"><div class="creator-empty">Cargando auditoría…</div></div></article>
+      <article class="creator-card" id="auditoria"><div class="creator-card-head"><div><span class="eyebrow">AUDITORÍA</span><h2>Actividad reciente</h2></div><button id="export-audit" class="btn btn-ghost" type="button">Exportar CSV</button></div><div id="platform-audit-list" class="platform-compact-list"><div class="creator-empty">Cargando auditoría…</div></div></article>
     </section>
 
     <section class="creator-card" id="negocios">
       <div class="creator-card-head creator-business-head">
         <div><span class="eyebrow">CLIENTES SAAS</span><h2>Negocios</h2></div>
         <div class="creator-controls">
-          <input id="business-search" class="input" placeholder="Buscar negocio, correo o slug">
-          <select id="business-filter" class="input"><option value="all">Todos</option><option value="trial">En prueba</option><option value="active">Pagando</option><option value="risk">En riesgo</option><option value="suspended">Suspendido</option><option value="no-sub">Sin suscripción</option></select>
+          <input id="business-search" class="input" placeholder="Buscar nombre, correo, teléfono o slug" aria-label="Buscar negocios">
+          <select id="business-filter" class="input" aria-label="Filtrar por estado"><option value="all">Todos</option><option value="trial">En prueba</option><option value="active">Pagando</option><option value="risk">En riesgo</option><option value="suspended">Suspendido</option><option value="no-sub">Sin suscripción</option></select>
+          <select id="business-sort" class="input" aria-label="Ordenar negocios"><option value="business-created-desc">Alta: recientes primero</option><option value="business-created-asc">Alta: antiguos primero</option><option value="business-expiry-asc">Vencimiento: próximo primero</option><option value="business-expiry-desc">Vencimiento: lejano primero</option><option value="name-asc">Nombre A-Z</option></select>
+          <button id="export-businesses" class="btn btn-ghost" type="button">Exportar CSV</button>
         </div>
+      </div>
+      <div id="business-bulk-bar" class="platform-bulk-bar" aria-live="polite">
+        <label><input id="business-select-visible" type="checkbox"> Seleccionar visibles</label>
+        <span id="business-selected-count">0 seleccionados</span>
+        <div><button id="bulk-suspend" class="btn btn-ghost" type="button" disabled>Suspender seleccionados</button><button id="bulk-reactivate" class="btn btn-primary" type="button" disabled>Reactivar seleccionados</button></div>
       </div>
       <div id="business-table" class="creator-business-table"></div>
     </section>

@@ -62,3 +62,18 @@ body.creator-body .creator-mobile-nav a{color:#8FA0A3}
 body.creator-body .creator-mobile-nav a.active{color:#E7EEEC}
 @media(max-width:1000px){body.creator-body .creator-grid-2{grid-template-columns:1fr}body.creator-body .creator-kpis{grid-template-columns:repeat(2,1fr)}body.creator-body .creator-kpis article{border-bottom:1px solid #28333A}}
 @media(max-width:650px){body.creator-body .creator-main{padding:14px!important}body.creator-body .creator-kpis{grid-template-columns:1fr 1fr}body.creator-body .creator-kpis article strong{font-size:24px}}
+
+/* BLOQUE C1+C2+C6+C7 · operación de 100-1,000 negocios */
+body.creator-body .creator-controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+body.creator-body .creator-controls #business-search{min-width:240px;flex:1 1 260px}
+body.creator-body .platform-bulk-bar{display:flex;align-items:center;gap:12px;justify-content:space-between;padding:10px 12px;border:1px solid #28333A;border-bottom:0;background:#11181b;color:#8FA0A3}
+body.creator-body .platform-bulk-bar label{display:flex;align-items:center;gap:7px;white-space:nowrap}
+body.creator-body .platform-bulk-bar>div{display:flex;gap:7px;margin-left:auto}
+body.creator-body .platform-bulk-bar button:disabled{opacity:.45;cursor:not-allowed}
+body.creator-body .creator-table-head,body.creator-body .creator-business-row{grid-template-columns:38px 1.55fr 1.1fr 1fr .75fr .85fr}
+body.creator-body .creator-row-check{display:flex;justify-content:center}.creator-row-check input{width:16px;height:16px}
+body.creator-body .platform-card-actions{display:flex;align-items:center;gap:8px}
+body.creator-body .platform-support-focus{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border:1px solid #5AA9E6;background:#11181b;color:#E7EEEC}
+body.creator-body .platform-support-focus button,body.creator-body .platform-template-group button{border:1px solid #28333A;background:#11181b;color:#E7EEEC;border-radius:6px;padding:6px 8px;cursor:pointer;margin-top:8px}
+body.creator-body .creator-detail-section .creator-empty{padding:8px 0}
+@media(max-width:850px){body.creator-body .platform-bulk-bar{align-items:flex-start;flex-wrap:wrap}body.creator-body .platform-bulk-bar>div{width:100%;margin-left:0}body.creator-body .platform-bulk-bar>div button{flex:1}.creator-business-table{min-width:860px}}
