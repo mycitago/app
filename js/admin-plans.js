@@ -3,6 +3,16 @@ let currentEntitlements = null;
 
 const $ = id => document.getElementById(id);
 
+const FEATURE_MAP = {
+  reports: 'Reportes e ingresos',
+  internal_reviews: 'Reseñas internas',
+  growth_links: 'Enlaces de crecimiento',
+  advanced_audit: 'Auditoría avanzada',
+  priority_support: 'Soporte prioritario',
+  dedicated_onboarding: 'Onboarding dedicado',
+  google_reviews: 'Integración con Google Business'
+};
+
 function humanizeKey(key){
   return String(key || '')
     .replace(/[_-]+/g,' ')
@@ -19,49 +29,63 @@ function formatMoney(value){
   }).format(n);
 }
 
-function featureRows(features){
+function getCommercialFeatures(features){
   if(Array.isArray(features)){
     return features
       .map(item=>{
-        if(typeof item === 'string') return item.trim();
-        if(item && typeof item === 'object'){
-          if(typeof item.label === 'string') return item.label.trim();
-          if(typeof item.name === 'string') return item.name.trim();
-          return Object.entries(item)
-            .filter(([,v])=>v!==false && v!==null && v!=='')
-            .map(([k,v])=>v===true ? humanizeKey(k) : `${humanizeKey(k)}: ${v}`)
-            .join(' · ');
-        }
-        return '';
+        if(typeof item !== 'string') return null;
+        const raw=item.trim();
+        const normalized=raw.toLowerCase().replace(/\s+/g,'_');
+
+        if(!raw || normalized.startsWith('trial_days') || normalized.startsWith('trial_days:')) return null;
+
+        const key=Object.keys(FEATURE_MAP).find(k=>normalized===k || normalized.startsWith(`${k}:`));
+        return key ? FEATURE_MAP[key] : raw;
       })
       .filter(Boolean);
   }
 
-  if(features && typeof features === 'object'){
-    const priority = ['max_staff','max_branches'];
-    const entries = Object.entries(features);
-    entries.sort(([a],[b])=>{
-      const ai=priority.indexOf(a), bi=priority.indexOf(b);
-      if(ai!==-1 || bi!==-1){
-        if(ai===-1) return 1;
-        if(bi===-1) return -1;
-        return ai-bi;
-      }
-      return a.localeCompare(b);
-    });
+  if(!features || typeof features !== 'object') return [];
 
-    return entries.flatMap(([key,value])=>{
-      if(value===false || value===null || value===undefined || value==='') return [];
-      if(key==='max_staff') return [`Hasta ${value} profesional${Number(value)===1?'':'es'}`];
-      if(key==='max_branches') return [`Hasta ${value} sucursal${Number(value)===1?'':'es'}`];
-      if(value===true) return [humanizeKey(key)];
-      if(Array.isArray(value)) return value.length ? [`${humanizeKey(key)}: ${value.join(', ')}`] : [];
-      if(typeof value === 'object') return [];
-      return [`${humanizeKey(key)}: ${value}`];
-    });
+  const items=[];
+
+  if(features.max_staff !== undefined && features.max_staff !== null && features.max_staff !== ''){
+    const n=Number(features.max_staff);
+    if(Number.isFinite(n)){
+      items.push(`Hasta ${n} profesional${n===1?'':'es'}`);
+    }
   }
 
-  return [];
+  if(features.max_branches !== undefined && features.max_branches !== null && features.max_branches !== ''){
+    const n=Number(features.max_branches);
+    if(Number.isFinite(n)){
+      items.push(`Hasta ${n} sucursal${n===1?'':'es'}`);
+    }
+  }
+
+  Object.entries(features).forEach(([key,value])=>{
+    if(key==='max_staff' || key==='max_branches' || key==='trial_days') return;
+    if(value===false || value===null || value===undefined || value==='') return;
+    if(typeof value==='object' && !Array.isArray(value)) return;
+
+    if(value===true){
+      items.push(FEATURE_MAP[key] || humanizeKey(key));
+      return;
+    }
+
+    if(typeof value==='string' && value.trim()){
+      const label=FEATURE_MAP[key] || humanizeKey(key);
+      items.push(`${label}: ${value.trim()}`);
+      return;
+    }
+
+    if(typeof value==='number'){
+      const label=FEATURE_MAP[key] || humanizeKey(key);
+      items.push(`${label}: ${value}`);
+    }
+  });
+
+  return items;
 }
 
 function planCode(plan){
@@ -103,6 +127,27 @@ function renderCurrentPlanStrip(){
   strip.classList.remove('hidden');
 }
 
+function annualPriceText(plan){
+  const monthly=Number(plan.price_monthly);
+  const annual=Number(plan.price_annual);
+
+  if(!Number.isFinite(annual) || annual<=0) return '';
+  const annualFormatted=formatMoney(annual);
+  if(!Number.isFinite(monthly) || monthly<=0){
+    return `${annualFormatted} MXN / año`;
+  }
+
+  const annualIfMonthly=monthly*12;
+  const savings=annualIfMonthly-annual;
+
+  if(savings<=0){
+    return `${annualFormatted} MXN / año`;
+  }
+
+  const percent=Math.round((savings/annualIfMonthly)*100);
+  return `${annualFormatted} MXN / año · ahorra ${percent}%`;
+}
+
 function createPlanCard(plan){
   const article=document.createElement('article');
   const code=String(planCode(plan));
@@ -120,13 +165,6 @@ function createPlanCard(plan){
   title.textContent=plan.name || 'Plan';
   article.appendChild(title);
 
-  if(code){
-    const codeEl=document.createElement('div');
-    codeEl.className='plan-code';
-    codeEl.textContent=code;
-    article.appendChild(codeEl);
-  }
-
   const price=document.createElement('div');
   price.className='plan-price';
   const monthly=formatMoney(plan.price_monthly);
@@ -139,13 +177,12 @@ function createPlanCard(plan){
 
   const annual=document.createElement('div');
   annual.className='plan-annual';
-  const annualPrice=formatMoney(plan.price_annual);
-  annual.textContent=annualPrice ? `${annualPrice} MXN / año` : '';
+  annual.textContent=annualPriceText(plan);
   article.appendChild(annual);
 
   const list=document.createElement('ul');
   list.className='plan-feature-list';
-  const rows=featureRows(plan.features);
+  const rows=getCommercialFeatures(plan.features);
 
   if(rows.length){
     rows.forEach(text=>{
@@ -168,15 +205,15 @@ function createPlanCard(plan){
   button.type='button';
   button.className=`btn ${isCurrent?'btn-ghost':'btn-primary'}`;
   button.disabled=true;
-  button.textContent=isCurrent ? 'Tu plan actual' : 'Cambio de plan próximamente';
+  button.textContent=isCurrent ? 'Plan activo' : 'Próximamente';
   button.title=isCurrent
     ? 'Este es el plan vigente del negocio.'
-    : 'El cambio de plan se habilitará cuando el flujo de cobro y backend quede cerrado.';
+    : 'El cambio de plan todavía no está habilitado.';
 
   const note=document.createElement('small');
   note.className='plan-card-note';
   note.textContent=isCurrent
-    ? 'Consulta tu vigencia desde el dashboard.'
+    ? 'Este es el plan vigente de tu negocio.'
     : 'No se realizará ningún cargo desde esta pantalla.';
 
   footer.append(button,note);

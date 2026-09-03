@@ -1,29 +1,38 @@
-MYCITAGO · FASE 2 · PLANES
-===========================
+MYCITAGO · FASE 2.1 · PULIDO VISUAL DE PLANES
+===============================================
 
-Reemplaza únicamente:
+REEMPLAZA ÚNICAMENTE:
 
 1. admin/planes.html
 2. js/admin-plans.js
 
-No se crea ningún archivo CSS nuevo.
-Los estilos específicos de esta fase están contenidos dentro de planes.html para no tocar admin.css.
+NO TOCAR:
+- Supabase / backend
+- admin-auth.js
+- citago-shell.js
+- navegación
+- CSS global
+- otros módulos
 
-QUÉ CAMBIA
-- Elimina todo texto de "30 días gratis".
-- Usa active_plans como catálogo principal.
-- Si la vista active_plans falla, conserva un fallback seguro a saas_plans active=true.
-- Ya no usa p.id === 'pro'.
-- No marca ningún plan como "Más popular".
-- Lee features tanto si viene como ARRAY como si viene como OBJETO JSON.
-- Consulta get_business_entitlements para identificar el plan actual.
-- Los botones permanecen deshabilitados: todavía no se ejecutan cambios de plan ni cobros.
-- No crea rutas nuevas como contacto-ventas.html.
-- Conserva requireAuth() y getMyBusiness().
+CAMBIOS INCLUIDOS:
+- Oculta plan_code de la interfaz.
+- Excluye trial_days del listado comercial.
+- Traduce claves técnicas conocidas a textos comerciales.
+- Conserva features dinámicos desde Supabase.
+- Botón: "Plan activo" o "Próximamente".
+- Un único mensaje general de cambio de plan.
+- Calcula ahorro anual solo cuando el precio anual realmente es menor que 12 mensualidades.
+- Conserva active_plans como fuente principal.
+- Conserva fallback seguro a saas_plans active=true.
+- Conserva requireAuth(), getMyBusiness() y get_business_entitlements().
+- No habilita cobros ni mutaciones de plan.
 
-DESPUÉS DE SUBIR
+PRUEBAS DESPUÉS DE SUBIR:
 1. Abre admin/planes.html.
-2. Haz Ctrl+F5.
-3. Verifica que aparezcan los planes activos.
-4. El plan vigente debe mostrar "Plan actual".
-5. Revisa consola: no debe haber errores nuevos.
+2. Ctrl + F5.
+3. Comprueba que no aparezcan autonomo_v1 / pro_v2 / premium_v2.
+4. Comprueba que no aparezca "Trial Days".
+5. Verifica textos comerciales de features.
+6. Verifica "Plan activo" / "Próximamente".
+7. Confirma que el aviso de cambio de plan aparezca una sola vez.
+8. Revisa consola: no deben aparecer errores nuevos.

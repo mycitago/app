@@ -13,7 +13,7 @@
   <script src="../js/ui-theme.js"></script>
 
   <style>
-    /* FASE 2 · PLANES DINÁMICOS */
+    /* FASE 2.1 · AJUSTES COMERCIALES DE PLANES */
     .plans-page-hero{display:flex;align-items:flex-end;justify-content:space-between;gap:20px}
     .plans-page-hero .eyebrow{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:var(--ct-primary-soft,#eee8ff);color:var(--ct-primary,#6d36e8);font-size:9px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
     .plans-page-hero p{max-width:720px}
@@ -26,11 +26,10 @@
     .price-card.current{border-color:#9d82eb!important;box-shadow:0 0 0 2px rgba(109,54,232,.09),var(--ct-shadow)!important}
     .price-card .plan-current-label{display:inline-flex;width:max-content;margin-bottom:11px;padding:5px 8px;border-radius:999px;background:var(--ct-primary-soft,#eee8ff);color:var(--ct-primary,#6d36e8);font-size:8px;font-weight:900;text-transform:uppercase}
     .price-card h2{margin:0;font-size:21px;letter-spacing:-.035em}
-    .plan-code{margin-top:4px;color:var(--ct-muted,#727887);font-size:9px}
     .plan-price{display:flex;align-items:flex-end;gap:6px;margin:17px 0 4px}
     .plan-price b{font-size:34px;line-height:1;letter-spacing:-.05em}
     .plan-price span{padding-bottom:3px;color:var(--ct-muted,#727887);font-size:10px}
-    .plan-annual{min-height:18px;color:var(--ct-primary,#6d36e8);font-size:9px;font-weight:750}
+    .plan-annual{min-height:18px;color:var(--ct-primary,#6d36e8);font-size:9px;font-weight:750;line-height:1.45}
     .plan-feature-list{display:grid;gap:0;margin:18px 0 22px;padding:0;list-style:none}
     .plan-feature-list li{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid #eef0f4;color:#454b59;font-size:10px;line-height:1.45}
     .plan-feature-list li:last-child{border-bottom:0}
@@ -42,6 +41,8 @@
     .plan-card-note{display:block;margin-top:8px;color:var(--ct-muted,#727887);font-size:8px;text-align:center;line-height:1.4}
     .plans-loading,.plans-error{grid-column:1/-1;padding:34px;border:1px solid var(--ct-line,#e6e8ee);border-radius:18px;background:#fff;text-align:center;color:var(--ct-muted,#727887)}
     .plans-loading strong,.plans-error strong{display:block;margin-bottom:5px;color:var(--ct-text,#151821)}
+    .plan-change-message{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:18px;padding:16px 18px;border:1px solid var(--ct-line,#e6e8ee);border-radius:16px;background:#fff}
+    .plan-change-message p{margin:0;color:var(--ct-muted,#727887);font-size:10px;line-height:1.5}
     .notice-card{margin-top:18px}
     @media(max-width:980px){.pricing-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
     @media(max-width:680px){
@@ -50,6 +51,8 @@
       .pricing-grid{grid-template-columns:1fr}
       .price-card{padding:20px}
       .plan-price b{font-size:31px}
+      .plan-change-message{display:block}
+      .plan-change-message .btn{width:100%;margin-top:12px;justify-content:center}
     }
   </style>
 </head>
@@ -91,6 +94,11 @@
         <strong>Cargando planes…</strong>
         Consultando el catálogo vigente.
       </div>
+    </section>
+
+    <section class="plan-change-message" aria-label="Disponibilidad de cambio de plan">
+      <p>El cambio de plan estará disponible próximamente. Por ahora puedes contactar a soporte si necesitas un ajuste.</p>
+      <a href="ayuda.html" class="btn btn-ghost">Contactar soporte</a>
     </section>
 
     <div class="notice-card">
