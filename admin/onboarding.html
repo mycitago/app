@@ -1,3 +1,156 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Configura tu negocio · MyCitaGo</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="../css/styles.css"><link rel="stylesheet" href="../css/citago-admin.css"><link rel="stylesheet" href="../css/admin-onboarding.css"><link rel="stylesheet" href="../css/mycitago-themes.css">
-<script src="../js/ui-theme.js"></script>
-</head><body><div id="citago-shell"></div><main class="onboarding-page"><header class="onboarding-head"><img src="../assets/brand/mycitago-logo.png" alt="MyCitaGo"><span>Configuración guiada</span><h1>Tu negocio listo para recibir citas</h1><p>Cuéntanos qué haces y MyCitaGo prepara servicios recomendados para que sólo definas precios y publiques.</p></header><div class="onboarding-progress"><i id="onboarding-progress"></i></div><section class="onboarding-card" id="step-category"><span class="step-label">PASO 1 DE 3</span><h2>¿Qué tipo de negocio tienes?</h2><div id="onboarding-categories" class="onboarding-categories"></div><div id="category-confirm-box" class="category-confirm-box hidden"><span>🔒</span><div><strong id="category-confirm-name">—</strong><p>Este giro configurará tus plantillas y recomendaciones. Después sólo podrás cambiarlo solicitándolo a soporte MyCitaGo.</p></div><button id="confirm-category" class="ct-btn ct-btn-primary" type="button">Confirmar giro</button></div></section><section class="onboarding-card hidden" id="step-services"><span class="step-label">PASO 2 DE 3</span><h2>Elige tus servicios iniciales</h2><p>Selecciona los que ya ofreces. Puedes agregar o borrar servicios después.</p><div id="onboarding-services" class="onboarding-services"></div><div class="onboarding-actions"><button id="back-category" class="ct-btn ct-btn-secondary">Atrás</button><button id="go-prices" class="ct-btn ct-btn-primary">Continuar con precios</button></div></section><section class="onboarding-card hidden" id="step-prices"><span class="step-label">PASO 3 DE 3</span><h2>Define tus precios</h2><p>La duración ya viene recomendada. Ajusta sólo lo que necesites.</p><div id="onboarding-prices" class="onboarding-prices"></div><div class="onboarding-actions"><button id="back-services" class="ct-btn ct-btn-secondary">Atrás</button><button id="finish-onboarding" class="ct-btn ct-btn-primary">Crear servicios y terminar</button></div></section><section id="onboarding-success" class="onboarding-card success hidden"><div class="success-icon">✓</div><h2>Tu base está lista</h2><p>Ya tienes servicios iniciales. Ahora puedes agregar equipo, conectar Google y publicar tu página.</p><div class="onboarding-next"><a href="equipo.html">Agregar equipo</a><a href="resenas.html">Conectar Google</a><a href="mi-pagina.html">Diseñar mi página</a><a href="index.html" class="primary">Ir al panel</a></div></section></main><div id="toast" class="toast hidden"></div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script><script src="../js/config.js"></script><script src="../js/supabase.js"></script><script src="../js/admin-auth.js"></script><script src="../js/admin-onboarding.js"></script><script src="../js/citago-shell.js"></script><script>document.addEventListener('DOMContentLoaded',()=>CitagoShell.mount({mode:'tenant',activePage:'inicio'}));</script></body></html>
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Configura tu negocio · MyCitaGo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/citago-admin.css">
+  <link rel="stylesheet" href="../css/admin-onboarding.css">
+  <link rel="stylesheet" href="../css/mycitago-themes.css">
+  <script src="../js/ui-theme.js"></script>
+</head>
+<body>
+  <div id="citago-shell"></div>
+
+  <main class="onboarding-page">
+    <header class="onboarding-head">
+      <img src="../assets/brand/mycitago-logo.png" alt="MyCitaGo">
+      <span>Configuración guiada</span>
+      <h1>Tu negocio listo para recibir citas</h1>
+      <p>Configura lo esencial en pocos pasos. MyCitaGo conservará tu progreso para que puedas continuar después.</p>
+    </header>
+
+    <nav class="onboarding-steps" aria-label="Progreso de configuración">
+      <button type="button" class="ob-step-pill active" data-step-jump="1"><b>1</b><span>Negocio</span></button>
+      <button type="button" class="ob-step-pill" data-step-jump="2"><b>2</b><span>Horarios</span></button>
+      <button type="button" class="ob-step-pill" data-step-jump="3"><b>3</b><span>Servicios</span></button>
+      <button type="button" class="ob-step-pill" data-step-jump="4"><b>4</b><span>Equipo</span></button>
+    </nav>
+    <div class="onboarding-progress"><i id="onboarding-progress"></i></div>
+
+    <section class="onboarding-card" id="step-business">
+      <span class="step-label">PASO 1 DE 4</span>
+      <h2>Cuéntanos sobre tu negocio</h2>
+      <p>Completa los datos básicos y confirma tu giro. Esto nos ayuda a preparar recomendaciones adecuadas.</p>
+
+      <div class="ob-business-grid">
+        <label>Nombre comercial<input id="business-name" autocomplete="organization" placeholder="Ej. Periquito Barber"></label>
+        <label>Teléfono<input id="business-phone" inputmode="tel" placeholder="229 000 0000"></label>
+        <label class="full">Dirección<input id="business-address" autocomplete="street-address" placeholder="Calle, número, colonia, ciudad"></label>
+      </div>
+
+      <div class="ob-category-title">
+        <div><strong>Tipo de negocio</strong><span>Define las plantillas de servicios recomendadas.</span></div>
+      </div>
+      <div id="onboarding-categories" class="onboarding-categories"></div>
+
+      <div id="category-confirm-box" class="category-confirm-box hidden">
+        <span>🔒</span>
+        <div>
+          <strong id="category-confirm-name">—</strong>
+          <p>Este giro configurará tus recomendaciones. Después solo podrás solicitar el cambio a soporte.</p>
+        </div>
+      </div>
+
+      <div class="onboarding-actions">
+        <button id="save-business-next" class="ct-btn ct-btn-primary" type="button">Guardar y continuar</button>
+      </div>
+    </section>
+
+    <section class="onboarding-card hidden" id="step-hours">
+      <span class="step-label">PASO 2 DE 4</span>
+      <h2>¿Cuándo atiendes?</h2>
+      <p>Elige un horario rápido o personaliza cada día. Este horario alimenta la disponibilidad de tu página pública.</p>
+
+      <div class="hours-presets">
+        <button type="button" data-hours-preset="weekdays">Lun–Vie · 09:00–18:00</button>
+        <button type="button" data-hours-preset="sixdays">Lun–Sáb · 09:00–18:00</button>
+        <button type="button" data-hours-preset="allweek">Todos los días · 09:00–18:00</button>
+      </div>
+
+      <div id="hours-editor" class="hours-editor"></div>
+
+      <div class="onboarding-actions">
+        <button id="back-business" class="ct-btn ct-btn-secondary" type="button">Atrás</button>
+        <button id="save-hours-next" class="ct-btn ct-btn-primary" type="button">Guardar horario y continuar</button>
+      </div>
+    </section>
+
+    <section class="onboarding-card hidden" id="step-services">
+      <span class="step-label">PASO 3 DE 4</span>
+      <h2>Configura tus servicios iniciales</h2>
+      <p>Selecciona lo que ya ofreces y define precio. Si ya tienes servicios guardados, no se eliminarán.</p>
+
+      <div id="onboarding-services" class="onboarding-services"></div>
+      <div id="onboarding-prices" class="onboarding-prices"></div>
+
+      <div class="onboarding-actions">
+        <button id="back-hours" class="ct-btn ct-btn-secondary" type="button">Atrás</button>
+        <button id="save-services-next" class="ct-btn ct-btn-primary" type="button">Guardar servicios y continuar</button>
+      </div>
+    </section>
+
+    <section class="onboarding-card hidden" id="step-team">
+      <span class="step-label">PASO 4 DE 4</span>
+      <h2>¿Trabajas solo o tienes equipo?</h2>
+      <p>Este paso es opcional. Puedes agregar más personas y detalles después desde Equipo.</p>
+
+      <div class="team-choice">
+        <button type="button" class="team-choice-card selected" data-team-mode="solo">
+          <b>Trabajo solo</b>
+          <span>Termina ahora y configura tu equipo después si lo necesitas.</span>
+        </button>
+        <button type="button" class="team-choice-card" data-team-mode="add">
+          <b>Agregar profesional</b>
+          <span>Registra una persona y los servicios que realiza.</span>
+        </button>
+      </div>
+
+      <div id="onboarding-team-form" class="ob-team-form hidden">
+        <label>Nombre del profesional<input id="team-name" placeholder="Nombre completo"></label>
+        <fieldset>
+          <legend>Servicios que realiza</legend>
+          <div id="team-service-options" class="service-check-grid"></div>
+        </fieldset>
+      </div>
+
+      <div class="onboarding-actions">
+        <button id="back-services" class="ct-btn ct-btn-secondary" type="button">Atrás</button>
+        <button id="finish-onboarding" class="ct-btn ct-btn-primary" type="button">Finalizar configuración</button>
+      </div>
+    </section>
+
+    <section id="onboarding-success" class="onboarding-card success hidden">
+      <div class="success-icon">✓</div>
+      <span class="step-label">LISTO PARA COMPARTIR</span>
+      <h2>¡Tu negocio está listo para recibir citas!</h2>
+      <p>Comparte tu enlace para que tus clientes puedan reservar.</p>
+
+      <div class="public-link-card">
+        <span>Tu enlace público</span>
+        <strong id="public-url-display">—</strong>
+      </div>
+
+      <div class="onboarding-next onboarding-next-final">
+        <button id="copy-public-link" type="button">Copiar enlace</button>
+        <a id="share-whatsapp" href="#" target="_blank" rel="noopener">Compartir por WhatsApp</a>
+        <a id="view-public-page" href="#" target="_blank" rel="noopener">Ver mi página</a>
+        <a href="index.html" class="primary">Ir al panel</a>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script>
+  <script src="../js/config.js"></script>
+  <script src="../js/supabase.js"></script>
+  <script src="../js/admin-auth.js"></script>
+  <script src="../js/admin-onboarding.js"></script>
+  <script src="../js/citago-shell.js"></script>
+  <script>document.addEventListener('DOMContentLoaded',()=>CitagoShell.mount({mode:'tenant',activePage:'inicio'}));</script>
+</body>
+</html>

@@ -1,38 +1,45 @@
-MYCITAGO · FASE 2.1 · PULIDO VISUAL DE PLANES
-===============================================
+MYCITAGO · FASE 3 · ONBOARDING
+================================
 
 REEMPLAZA ÚNICAMENTE:
-
-1. admin/planes.html
-2. js/admin-plans.js
+- admin/onboarding.html
+- js/admin-onboarding.js
+- css/admin-onboarding.css
 
 NO TOCAR:
-- Supabase / backend
+- Supabase SQL
 - admin-auth.js
-- citago-shell.js
-- navegación
-- CSS global
-- otros módulos
+- supabase.js
+- appointments.js
+- admin-team.js
+- admin-settings.js
+- navegación global
 
-CAMBIOS INCLUIDOS:
-- Oculta plan_code de la interfaz.
-- Excluye trial_days del listado comercial.
-- Traduce claves técnicas conocidas a textos comerciales.
-- Conserva features dinámicos desde Supabase.
-- Botón: "Plan activo" o "Próximamente".
-- Un único mensaje general de cambio de plan.
-- Calcula ahorro anual solo cuando el precio anual realmente es menor que 12 mensualidades.
-- Conserva active_plans como fuente principal.
-- Conserva fallback seguro a saas_plans active=true.
-- Conserva requireAuth(), getMyBusiness() y get_business_entitlements().
-- No habilita cobros ni mutaciones de plan.
+QUÉ HACE ESTA FASE:
+1. Negocio: nombre, teléfono, dirección y giro.
+2. Horarios: presets + edición diaria.
+   - Guarda obligatoriamente businesses.opening_hours.
+   - Intenta sincronizar business_branches.opening_hours en la sucursal principal.
+   - Si la sincronización de sucursal falla, el onboarding continúa porque la reserva pública actual usa businesses.opening_hours.
+3. Servicios:
+   - Reutiliza service_templates.
+   - NO borra servicios existentes.
+   - Si un servicio ya existe por nombre, lo actualiza.
+   - Si no existe, lo crea.
+4. Equipo opcional:
+   - Trabajo solo, o
+   - Agregar/actualizar un profesional en staff.
+   - Asigna servicios mediante service_staff.
+5. Final:
+   - setup_completed=true
+   - URL con buildPublicBookingUrl()
+   - Copiar enlace / WhatsApp / Ver página / Ir al panel.
 
-PRUEBAS DESPUÉS DE SUBIR:
-1. Abre admin/planes.html.
-2. Ctrl + F5.
-3. Comprueba que no aparezcan autonomo_v1 / pro_v2 / premium_v2.
-4. Comprueba que no aparezca "Trial Days".
-5. Verifica textos comerciales de features.
-6. Verifica "Plan activo" / "Próximamente".
-7. Confirma que el aviso de cambio de plan aparezca una sola vez.
-8. Revisa consola: no deben aparecer errores nuevos.
+PRUEBAS:
+- Nuevo negocio: completar 4 pasos.
+- Recargar a mitad del proceso y confirmar que retoma según datos guardados.
+- Verificar que los servicios existentes NO desaparecen.
+- Verificar horarios en la página pública.
+- Probar "Trabajo solo".
+- Probar agregar profesional.
+- Comprobar enlace público final.
