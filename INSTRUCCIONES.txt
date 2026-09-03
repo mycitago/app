@@ -1,18 +1,29 @@
-MYCITAGO FASE 1 — LISTO PARA GITHUB
+MYCITAGO · FASE 2 · PLANES
+===========================
 
-Reemplaza exactamente estos 3 archivos en tu repositorio:
+Reemplaza únicamente:
 
-1) admin/index.html
-2) js/admin-dashboard-pro.js
-3) css/admin-dashboard-pro.css
+1. admin/planes.html
+2. js/admin-plans.js
 
-No subas la carpeta contenedora como una carpeta nueva dentro del repo.
-Conserva las rutas admin/, js/ y css/.
+No se crea ningún archivo CSS nuevo.
+Los estilos específicos de esta fase están contenidos dentro de planes.html para no tocar admin.css.
 
-No se modifica:
-- admin-auth.js
-- citago-shell.js
-- admin-dashboard.js
-- Supabase
+QUÉ CAMBIA
+- Elimina todo texto de "30 días gratis".
+- Usa active_plans como catálogo principal.
+- Si la vista active_plans falla, conserva un fallback seguro a saas_plans active=true.
+- Ya no usa p.id === 'pro'.
+- No marca ningún plan como "Más popular".
+- Lee features tanto si viene como ARRAY como si viene como OBJETO JSON.
+- Consulta get_business_entitlements para identificar el plan actual.
+- Los botones permanecen deshabilitados: todavía no se ejecutan cambios de plan ni cobros.
+- No crea rutas nuevas como contacto-ventas.html.
+- Conserva requireAuth() y getMyBusiness().
 
-Después de subir, abre el panel y fuerza recarga con Ctrl+F5.
+DESPUÉS DE SUBIR
+1. Abre admin/planes.html.
+2. Haz Ctrl+F5.
+3. Verifica que aparezcan los planes activos.
+4. El plan vigente debe mostrar "Plan actual".
+5. Revisa consola: no debe haber errores nuevos.

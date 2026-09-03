@@ -1,4 +1,110 @@
-<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="../css/styles.css"><link rel="stylesheet" href="../css/admin.css"><title>Planes</title><link rel="stylesheet" href="../css/citago-admin.css"><link rel="stylesheet" href="../css/mycitago-themes.css">
-<script src="../js/ui-theme.js"></script>
-</head><body><div id="citago-shell"></div><header class="adm-topbar"><div><div class="adm-topbar-title" id="biz-name">Cargando…</div><div class="adm-topbar-sub">Crecimiento y automatización</div></div><div class="adm-topbar-actions"><a href="index.html" class="btn btn-ghost">Dashboard</a><a href="servicios.html" class="btn btn-ghost">Servicios</a><a href="configuracion.html" class="btn btn-ghost">Mi negocio</a><a href="equipo.html" class="btn btn-ghost">Equipo</a></div></header><main class="adm-main"><div class="page-hero"><div><span class="eyebrow">30 días gratis</span><h1>Un plan para cada etapa</h1><p>Prueba Pro durante 30 días. Después puedes continuar desde $99 MXN al mes.</p></div></div><div id="plans" class="pricing-grid"></div><div class="notice-card"><b>Modelo de cobro</b><p>La suscripción de la estética se cobra a la plataforma. Los anticipos y pagos de sus clientes van directamente al proveedor de cobro conectado por la estética.</p></div></main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script><script src="../js/config.js"></script>
-<script src="../js/supabase.js"></script><script src="../js/admin-auth.js"></script><script src="../js/admin-plans.js"></script><script src="../js/citago-shell.js"></script><script>document.addEventListener('DOMContentLoaded',()=>CitagoShell.mount({mode:'tenant',activePage:'configuracion'}));</script></body></html>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/admin.css">
+  <title>Planes</title>
+  <link rel="stylesheet" href="../css/citago-admin.css">
+  <link rel="stylesheet" href="../css/mycitago-themes.css">
+  <script src="../js/ui-theme.js"></script>
+
+  <style>
+    /* FASE 2 · PLANES DINÁMICOS */
+    .plans-page-hero{display:flex;align-items:flex-end;justify-content:space-between;gap:20px}
+    .plans-page-hero .eyebrow{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:var(--ct-primary-soft,#eee8ff);color:var(--ct-primary,#6d36e8);font-size:9px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+    .plans-page-hero p{max-width:720px}
+    .plans-current-strip{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:0 0 18px;padding:14px 16px;border:1px solid var(--ct-line,#e6e8ee);border-radius:14px;background:#fff}
+    .plans-current-strip strong{font-size:12px}
+    .plans-current-strip span{display:block;margin-top:3px;color:var(--ct-muted,#727887);font-size:10px}
+    .plans-current-badge{flex:0 0 auto;padding:6px 9px;border-radius:999px;background:#e8f7ef;color:#147c58;font-size:8px;font-weight:900;text-transform:uppercase}
+    .pricing-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:stretch}
+    .price-card{position:relative;display:flex;flex-direction:column;min-height:100%;padding:24px;border-radius:18px!important;overflow:hidden}
+    .price-card.current{border-color:#9d82eb!important;box-shadow:0 0 0 2px rgba(109,54,232,.09),var(--ct-shadow)!important}
+    .price-card .plan-current-label{display:inline-flex;width:max-content;margin-bottom:11px;padding:5px 8px;border-radius:999px;background:var(--ct-primary-soft,#eee8ff);color:var(--ct-primary,#6d36e8);font-size:8px;font-weight:900;text-transform:uppercase}
+    .price-card h2{margin:0;font-size:21px;letter-spacing:-.035em}
+    .plan-code{margin-top:4px;color:var(--ct-muted,#727887);font-size:9px}
+    .plan-price{display:flex;align-items:flex-end;gap:6px;margin:17px 0 4px}
+    .plan-price b{font-size:34px;line-height:1;letter-spacing:-.05em}
+    .plan-price span{padding-bottom:3px;color:var(--ct-muted,#727887);font-size:10px}
+    .plan-annual{min-height:18px;color:var(--ct-primary,#6d36e8);font-size:9px;font-weight:750}
+    .plan-feature-list{display:grid;gap:0;margin:18px 0 22px;padding:0;list-style:none}
+    .plan-feature-list li{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid #eef0f4;color:#454b59;font-size:10px;line-height:1.45}
+    .plan-feature-list li:last-child{border-bottom:0}
+    .plan-feature-list li::before{content:"✓";flex:0 0 auto;color:var(--ct-primary,#6d36e8);font-weight:900}
+    .plan-feature-empty{color:var(--ct-muted,#727887)!important}
+    .plan-feature-empty::before{content:"•"!important;color:#a2a7b1!important}
+    .plan-card-footer{margin-top:auto}
+    .plan-card-footer .btn{width:100%;justify-content:center}
+    .plan-card-note{display:block;margin-top:8px;color:var(--ct-muted,#727887);font-size:8px;text-align:center;line-height:1.4}
+    .plans-loading,.plans-error{grid-column:1/-1;padding:34px;border:1px solid var(--ct-line,#e6e8ee);border-radius:18px;background:#fff;text-align:center;color:var(--ct-muted,#727887)}
+    .plans-loading strong,.plans-error strong{display:block;margin-bottom:5px;color:var(--ct-text,#151821)}
+    .notice-card{margin-top:18px}
+    @media(max-width:980px){.pricing-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:680px){
+      .plans-page-hero{display:block}
+      .plans-current-strip{align-items:flex-start}
+      .pricing-grid{grid-template-columns:1fr}
+      .price-card{padding:20px}
+      .plan-price b{font-size:31px}
+    }
+  </style>
+</head>
+<body>
+  <div id="citago-shell"></div>
+
+  <header class="adm-topbar">
+    <div>
+      <div class="adm-topbar-title" id="biz-name">Cargando…</div>
+      <div class="adm-topbar-sub">Planes y capacidad de tu negocio</div>
+    </div>
+    <div class="adm-topbar-actions">
+      <a href="index.html" class="btn btn-ghost">Dashboard</a>
+      <a href="servicios.html" class="btn btn-ghost">Servicios</a>
+      <a href="configuracion.html" class="btn btn-ghost">Mi negocio</a>
+      <a href="equipo.html" class="btn btn-ghost">Equipo</a>
+    </div>
+  </header>
+
+  <main class="adm-main">
+    <div class="page-hero plans-page-hero">
+      <div>
+        <span class="eyebrow">Planes MyCitaGo</span>
+        <h1>Un plan para cada etapa</h1>
+        <p>Los negocios nuevos comienzan con una prueba Pro de 14 días. Después eliges el plan que mejor se adapte a tu operación.</p>
+      </div>
+    </div>
+
+    <section id="current-plan-strip" class="plans-current-strip hidden" aria-live="polite">
+      <div>
+        <strong id="current-plan-title">Tu plan actual</strong>
+        <span id="current-plan-copy"></span>
+      </div>
+      <span id="current-plan-status" class="plans-current-badge"></span>
+    </section>
+
+    <section id="plans" class="pricing-grid" aria-live="polite">
+      <div class="plans-loading">
+        <strong>Cargando planes…</strong>
+        Consultando el catálogo vigente.
+      </div>
+    </section>
+
+    <div class="notice-card">
+      <b>Modelo de cobro</b>
+      <p>La suscripción del negocio se cobra a la plataforma. Los anticipos y pagos de sus clientes van directamente al proveedor de cobro conectado por el negocio.</p>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script>
+  <script src="../js/config.js"></script>
+  <script src="../js/supabase.js"></script>
+  <script src="../js/admin-auth.js"></script>
+  <script src="../js/admin-plans.js"></script>
+  <script src="../js/citago-shell.js"></script>
+  <script>document.addEventListener('DOMContentLoaded',()=>CitagoShell.mount({mode:'tenant',activePage:'configuracion'}));</script>
+</body>
+</html>
