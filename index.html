@@ -1,25 +1,158 @@
 <!doctype html>
 <html lang="es">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="MyCitaGo: agenda, clientes, servicios, reportes y reservas online para negocios que trabajan con citas.">
-<title>MyCitaGo · Haz crecer tu negocio</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/mycitago-themes.css"><script src="js/ui-theme.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="MyCitaGo: reservas online, agenda, clientes y servicios para negocios que trabajan con citas.">
+<title>MyCitaGo · Haz que reservar contigo sea fácil</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/mycitago-themes.css">
+<script src="js/ui-theme.js"></script>
 <style>
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Manrope,system-ui,sans-serif;background:var(--mk-bg);color:var(--mk-text);transition:background .25s,color .25s}a{text-decoration:none;color:inherit}:root,html[data-theme='light']{--mk-bg:#f7f6fb;--mk-surface:#fff;--mk-text:#12101b;--mk-muted:#6f697c;--mk-line:#e8e4ef;--mk-hero:#100d1c;--mk-hero2:#21103f;--mk-purple:#7c3aed;--mk-purple2:#9b62ff;--mk-shadow:0 24px 70px rgba(29,20,48,.12)}html[data-theme='dark']{--mk-bg:#080611;--mk-surface:#12101d;--mk-text:#f8f6ff;--mk-muted:#aaa3ba;--mk-line:#29213b;--mk-hero:#070611;--mk-hero2:#1d0b3a;--mk-purple:#8b5cf6;--mk-purple2:#a878ff;--mk-shadow:0 28px 80px rgba(0,0,0,.38)}.wrap{width:min(1240px,calc(100% - 32px));margin:auto}.nav{height:78px;display:flex;align-items:center;justify-content:space-between;gap:20px}.brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:22px;letter-spacing:-.04em}.brand img{width:42px;height:42px}.brand em{font-style:normal;color:var(--mk-purple)}.nav-links{display:flex;gap:28px;font-size:11px;font-weight:650;color:var(--mk-muted)}.nav-actions{display:flex;gap:9px;align-items:center}.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:12px 17px;border:1px solid var(--mk-line);border-radius:12px;background:var(--mk-surface);color:var(--mk-text);font:750 11px Manrope;cursor:pointer}.btn-primary{border:0;color:white;background:linear-gradient(100deg,#6d28d9,#8b5cf6);box-shadow:0 12px 28px rgba(124,58,237,.28)}.theme-toggle{width:40px;height:40px}.hero{position:relative;overflow:hidden;border-radius:26px;background:radial-gradient(circle at 78% 12%,rgba(124,58,237,.28),transparent 30%),linear-gradient(125deg,var(--mk-hero),var(--mk-hero2));color:#fff;min-height:590px;box-shadow:var(--mk-shadow)}.hero:after{content:"";position:absolute;right:-160px;bottom:-190px;width:580px;height:580px;border-radius:50%;background:radial-gradient(circle,rgba(128,52,255,.5),transparent 65%);filter:blur(12px)}.hero-grid{position:relative;z-index:2;display:grid;grid-template-columns:.87fr 1.13fr;min-height:590px}.hero-copy{padding:62px 34px;display:flex;flex-direction:column;justify-content:center}.pill{width:max-content;padding:7px 11px;border-radius:999px;background:rgba(124,58,237,.18);border:1px solid rgba(167,123,255,.18);font-size:9px;color:#d7c7ff}.hero h1{font-size:clamp(2.7rem,5.2vw,5.25rem);line-height:1.02;letter-spacing:-.055em;margin:20px 0 18px;max-width:660px}.hero h1 em{font-style:normal;color:#9b62ff}.hero p{max-width:600px;color:#cbc5d4;line-height:1.7;font-size:14px;margin:0}.hero-actions{display:flex;gap:12px;margin-top:28px}.hero-actions .btn:not(.btn-primary){background:transparent;border-color:#4b405e;color:#fff}.benefits{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:42px}.benefit{display:flex;gap:9px;align-items:center}.benefit i{font-style:normal;width:34px;height:34px;border:1px solid rgba(161,111,255,.35);border-radius:10px;display:grid;place-items:center;color:#b995ff}.benefit b{display:block;font-size:9px}.benefit span{display:block;font-size:7px;color:#938b9e;margin-top:2px}.hero-media{position:relative;display:flex;align-items:center;justify-content:center;padding:50px 32px 32px}.hero-media img{position:relative;z-index:2;width:min(100%,720px);border-radius:20px;box-shadow:0 28px 70px rgba(0,0,0,.36);transform:perspective(1200px) rotateY(-2deg)}.float-stat{position:absolute;right:18px;z-index:3;width:132px;padding:15px;background:linear-gradient(145deg,rgba(130,62,242,.88),rgba(92,32,191,.78));border:1px solid rgba(255,255,255,.12);border-radius:14px;backdrop-filter:blur(10px)}.float-stat b{font-size:18px}.float-stat span{display:block;font-size:8px;color:#e9dfff;margin-top:3px}.stat1{top:150px}.stat2{top:250px}.stat3{top:350px}.section{padding:78px 0}.section-head{display:flex;justify-content:space-between;align-items:end;gap:30px;margin-bottom:26px}.eyebrow{font-size:9px;letter-spacing:.14em;font-weight:800;color:var(--mk-purple)}.section h2{font-size:clamp(2rem,4vw,3.6rem);letter-spacing:-.05em;line-height:1.02;margin:7px 0 0}.section-head p{max-width:520px;color:var(--mk-muted);font-size:12px;line-height:1.7;margin:0}.feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.feature{background:var(--mk-surface);border:1px solid var(--mk-line);border-radius:22px;overflow:hidden;box-shadow:0 14px 40px rgba(30,23,45,.06)}.feature img{width:100%;aspect-ratio:16/10;object-fit:cover;display:block}.feature-copy{padding:20px}.feature h3{margin:5px 0 7px;font-size:19px}.feature p{margin:0;color:var(--mk-muted);font-size:10px;line-height:1.6}.metric-band{background:linear-gradient(120deg,#0e0b18,#281345);border-radius:26px;padding:34px;display:grid;grid-template-columns:1.1fr .9fr;align-items:center;color:#fff}.metric-band img{width:100%;border-radius:18px}.metric-band h2{margin:0 0 12px}.metric-band p{color:#bdb4c9;line-height:1.7;max-width:500px}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px}.metrics div{padding:15px;border-radius:14px;background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.18)}.metrics b{display:block;font-size:20px;color:#b58cff}.metrics span{font-size:8px;color:#c4bbcd}.cta{padding:44px;border-radius:28px;background:linear-gradient(115deg,#151020,#32164f 70%,#6d28d9 140%);color:#fff;display:flex;align-items:center;justify-content:space-between;gap:20px}.cta h2{margin:0}.cta p{margin:8px 0 0;color:#c9c0d3;font-size:12px}.footer{padding:34px 0 48px;display:flex;justify-content:space-between;color:var(--mk-muted);font-size:10px}.footer .brand{font-size:17px}.footer .brand img{width:30px;height:30px}.mobile-menu{display:none}
-@media(max-width:980px){.nav-links{display:none}.hero-grid{grid-template-columns:1fr}.hero{min-height:auto}.hero-copy{padding:46px 28px}.hero-media{padding-top:10px}.benefits{grid-template-columns:1fr 1fr}.float-stat{display:none}.feature-grid{grid-template-columns:1fr 1fr}.metric-band{grid-template-columns:1fr}.metric-band>div:last-child{margin-top:24px}}
-@media(max-width:620px){.wrap{width:min(100% - 20px,1240px)}.nav{height:70px}.brand{font-size:19px}.brand img{width:36px;height:36px}.nav-actions .btn:not(.btn-primary),.nav-actions .theme-toggle{display:none}.hero{border-radius:20px}.hero-copy{padding:34px 20px}.hero h1{font-size:2.55rem}.hero p{font-size:12px}.hero-actions{display:grid}.benefits{grid-template-columns:1fr 1fr;gap:18px 10px}.hero-media{padding:8px 18px 24px}.feature-grid{grid-template-columns:1fr}.section{padding:54px 0}.section-head{display:block}.section-head p{margin-top:15px}.metric-band{padding:22px}.metrics{grid-template-columns:1fr 1fr}.cta{padding:28px 22px;display:block}.cta .btn{margin-top:20px;width:100%}.footer{display:block}.footer>span{display:block;margin-top:14px}.mobile-menu{display:block;position:fixed;right:14px;bottom:14px;z-index:20}.mobile-menu .theme-toggle{display:grid;background:#181225;color:#fff;border-color:#3d2b57}}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Manrope,system-ui,sans-serif;background:var(--mk-bg);color:var(--mk-text);transition:background .25s,color .25s}a{text-decoration:none;color:inherit}:root,html[data-theme='light']{--mk-bg:#f7f6fb;--mk-surface:#fff;--mk-text:#12101b;--mk-muted:#6f697c;--mk-line:#e8e4ef;--mk-hero:#100d1c;--mk-hero2:#21103f;--mk-purple:#7c3aed;--mk-purple2:#9b62ff;--mk-shadow:0 24px 70px rgba(29,20,48,.12)}html[data-theme='dark']{--mk-bg:#080611;--mk-surface:#12101d;--mk-text:#f8f6ff;--mk-muted:#aaa3ba;--mk-line:#29213b;--mk-hero:#070611;--mk-hero2:#1d0b3a;--mk-purple:#8b5cf6;--mk-purple2:#a878ff;--mk-shadow:0 28px 80px rgba(0,0,0,.38)}
+.wrap{width:min(1240px,calc(100% - 32px));margin:auto}.nav{height:78px;display:flex;align-items:center;justify-content:space-between;gap:20px}.brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:22px;letter-spacing:-.04em}.brand img{width:42px;height:42px}.brand em{font-style:normal;color:var(--mk-purple)}.nav-links{display:flex;gap:28px;font-size:11px;font-weight:650;color:var(--mk-muted)}.nav-actions{display:flex;gap:9px;align-items:center}.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:12px 17px;border:1px solid var(--mk-line);border-radius:12px;background:var(--mk-surface);color:var(--mk-text);font:750 11px Manrope;cursor:pointer}.btn-primary{border:0;color:white;background:linear-gradient(100deg,#6d28d9,#8b5cf6);box-shadow:0 12px 28px rgba(124,58,237,.28)}.theme-toggle{width:40px;height:40px}
+.hero{position:relative;overflow:hidden;border-radius:26px;background:radial-gradient(circle at 78% 12%,rgba(124,58,237,.28),transparent 30%),linear-gradient(125deg,var(--mk-hero),var(--mk-hero2));color:#fff;min-height:590px;box-shadow:var(--mk-shadow)}.hero:after{content:"";position:absolute;right:-160px;bottom:-190px;width:580px;height:580px;border-radius:50%;background:radial-gradient(circle,rgba(128,52,255,.5),transparent 65%);filter:blur(12px)}.hero-grid{position:relative;z-index:2;display:grid;grid-template-columns:.9fr 1.1fr;min-height:590px}.hero-copy{padding:62px 34px;display:flex;flex-direction:column;justify-content:center}.pill{width:max-content;padding:7px 11px;border-radius:999px;background:rgba(124,58,237,.18);border:1px solid rgba(167,123,255,.18);font-size:9px;color:#d7c7ff}.hero h1{font-size:clamp(2.7rem,5.2vw,5.25rem);line-height:1.02;letter-spacing:-.055em;margin:20px 0 18px;max-width:700px}.hero h1 em{font-style:normal;color:#9b62ff}.hero p{max-width:610px;color:#cbc5d4;line-height:1.7;font-size:14px;margin:0}.hero-actions{display:flex;gap:12px;margin-top:28px}.hero-actions .btn:not(.btn-primary){background:transparent;border-color:#4b405e;color:#fff}.hero-trust{display:flex;gap:18px;flex-wrap:wrap;margin-top:32px;color:#aaa2b6;font-size:9px}.hero-trust span:before{content:"✓";color:#b995ff;margin-right:6px;font-weight:900}.hero-media{position:relative;display:flex;align-items:center;justify-content:center;padding:50px 32px 32px}.hero-media img{position:relative;z-index:2;width:min(100%,720px);border-radius:20px;box-shadow:0 28px 70px rgba(0,0,0,.36);transform:perspective(1200px) rotateY(-2deg)}
+.section{padding:78px 0}.section-head{display:flex;justify-content:space-between;align-items:end;gap:30px;margin-bottom:26px}.eyebrow{font-size:9px;letter-spacing:.14em;font-weight:800;color:var(--mk-purple)}.section h2{font-size:clamp(2rem,4vw,3.6rem);letter-spacing:-.05em;line-height:1.02;margin:7px 0 0}.section-head p{max-width:520px;color:var(--mk-muted);font-size:12px;line-height:1.7;margin:0}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.step{position:relative;background:var(--mk-surface);border:1px solid var(--mk-line);border-radius:20px;padding:22px;min-height:175px}.step-num{width:38px;height:38px;border-radius:12px;background:rgba(124,58,237,.1);color:var(--mk-purple);display:grid;place-items:center;font-weight:800;font-size:12px}.step h3{font-size:16px;margin:20px 0 7px}.step p{font-size:10px;line-height:1.6;color:var(--mk-muted);margin:0}
+.feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.feature{background:var(--mk-surface);border:1px solid var(--mk-line);border-radius:22px;overflow:hidden;box-shadow:0 14px 40px rgba(30,23,45,.06)}.feature img{width:100%;aspect-ratio:16/10;object-fit:cover;display:block}.feature-copy{padding:20px}.feature h3{margin:5px 0 7px;font-size:19px}.feature p{margin:0;color:var(--mk-muted);font-size:10px;line-height:1.6}
+.sector-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}.sector{background:var(--mk-surface);border:1px solid var(--mk-line);border-radius:18px;padding:20px 12px;text-align:center}.sector i{width:42px;height:42px;border-radius:13px;background:rgba(124,58,237,.1);color:var(--mk-purple);display:grid;place-items:center;margin:0 auto 11px;font-style:normal;font-size:18px}.sector b{display:block;font-size:10px}
+.plans-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.plan{background:var(--mk-surface);border:1px solid var(--mk-line);border-radius:22px;padding:24px;display:flex;flex-direction:column;min-height:390px}.plan h3{font-size:20px;margin:0}.plan .price{font-size:34px;letter-spacing:-.05em;font-weight:800;margin:14px 0 4px}.plan .price small{font-size:10px;color:var(--mk-muted);font-weight:600;letter-spacing:0}.plan .desc{font-size:10px;color:var(--mk-muted);line-height:1.6;min-height:34px}.plan ul{list-style:none;padding:0;margin:18px 0 24px;display:grid;gap:9px}.plan li{font-size:10px;color:var(--mk-muted)}.plan li:before{content:"✓";color:var(--mk-purple);font-weight:900;margin-right:7px}.plan .btn{margin-top:auto}.plans-note{text-align:center;color:var(--mk-muted);font-size:9px;margin-top:14px}.plans-loading{grid-column:1/-1;text-align:center;padding:34px;color:var(--mk-muted);font-size:11px}
+.cta{padding:44px;border-radius:28px;background:linear-gradient(115deg,#151020,#32164f 70%,#6d28d9 140%);color:#fff;display:flex;align-items:center;justify-content:space-between;gap:20px}.cta h2{margin:0}.cta p{margin:8px 0 0;color:#c9c0d3;font-size:12px}.footer{padding:34px 0 48px;display:flex;justify-content:space-between;align-items:center;gap:20px;color:var(--mk-muted);font-size:10px}.footer .brand{font-size:17px}.footer .brand img{width:30px;height:30px}.footer-links{display:flex;gap:16px}.mobile-menu{display:none}
+@media(max-width:980px){.nav-links{display:none}.hero-grid{grid-template-columns:1fr}.hero{min-height:auto}.hero-copy{padding:46px 28px}.hero-media{padding-top:10px}.steps{grid-template-columns:1fr 1fr}.feature-grid{grid-template-columns:1fr 1fr}.sector-grid{grid-template-columns:repeat(3,1fr)}.plans-grid{grid-template-columns:1fr 1fr}.plan:last-child{grid-column:1/-1}.footer{flex-wrap:wrap}}
+@media(max-width:620px){.wrap{width:min(100% - 20px,1240px)}.nav{height:70px}.brand{font-size:19px}.brand img{width:36px;height:36px}.nav-actions .btn:not(.btn-primary),.nav-actions .theme-toggle{display:none}.hero{border-radius:20px}.hero-copy{padding:34px 20px}.hero h1{font-size:2.55rem}.hero p{font-size:12px}.hero-actions{display:grid}.hero-media{padding:8px 18px 24px}.steps,.feature-grid,.plans-grid{grid-template-columns:1fr}.plan:last-child{grid-column:auto}.sector-grid{grid-template-columns:1fr 1fr}.section{padding:54px 0}.section-head{display:block}.section-head p{margin-top:15px}.cta{padding:28px 22px;display:block}.cta .btn{margin-top:20px;width:100%}.footer{display:block}.footer-links{margin-top:14px}.mobile-menu{display:block;position:fixed;right:14px;bottom:14px;z-index:20}.mobile-menu .theme-toggle{display:grid;background:#181225;color:#fff;border-color:#3d2b57}}
 </style>
 </head>
 <body>
 <div class="wrap">
-<nav class="nav"><a class="brand" href="./"><img src="assets/brand/mycitago-icon.png" alt=""><span>MyCita<em>Go</em></span></a><div class="nav-links"><a href="#funciones">Funciones</a><a href="#crecimiento">Beneficios</a><a href="admin/planes.html">Precios</a><a href="admin/ayuda.html">Soporte</a></div><div class="nav-actions"><a class="btn" href="admin/login.html">Iniciar sesión</a><a class="btn btn-primary" href="admin/login.html?view=register">Empieza gratis →</a></div></nav>
+<nav class="nav">
+<a class="brand" href="./"><img src="assets/brand/mycitago-icon.png" alt=""><span>MyCita<em>Go</em></span></a>
+<div class="nav-links"><a href="#como-funciona">Cómo funciona</a><a href="#funciones">Funciones</a><a href="#sectores">Para quién es</a><a href="#planes">Planes</a></div>
+<div class="nav-actions"><a class="btn" href="admin/login.html">Iniciar sesión</a><a class="btn btn-primary" href="admin/login.html?view=register">Crear mi negocio gratis →</a></div>
+</nav>
+
 <main>
-<section class="hero"><div class="hero-grid"><div class="hero-copy"><span class="pill">LA PLATAFORMA PARA NEGOCIOS DE SERVICIOS</span><h1>Haz crecer tu negocio mientras <em>MyCitaGo</em> organiza tus citas.</h1><p>Reservas online, clientes, recordatorios, servicios y reportes en una sola plataforma. Menos trabajo administrativo y más tiempo para atender.</p><div class="hero-actions"><a class="btn btn-primary" href="admin/login.html?view=register">Empieza gratis →</a><a class="btn" href="#funciones">Ver demostración ▶</a></div><div class="benefits"><div class="benefit"><i>▣</i><div><b>Reservas 24/7</b><span>Tus clientes reservan cuando quieran</span></div></div><div class="benefit"><i>◉</i><div><b>WhatsApp listo</b><span>Teléfono internacional preparado</span></div></div><div class="benefit"><i>♙</i><div><b>Menos ausencias</b><span>Clientes mejor informados</span></div></div><div class="benefit"><i>↗</i><div><b>Más ingresos</b><span>Mide y mejora tu operación</span></div></div></div></div><div class="hero-media"><img src="assets/marketing/hero-platform.jpg" alt="Dashboard MyCitaGo"><div class="float-stat stat1"><b>+35%</b><span>Más reservas</span></div><div class="float-stat stat2"><b>-40%</b><span>Menos ausencias</span></div><div class="float-stat stat3"><b>+28%</b><span>Más ingresos</span></div></div></div></section>
-<section class="section" id="funciones"><div class="section-head"><div><span class="eyebrow">TODO EN UN SOLO LUGAR</span><h2>Organiza, automatiza y haz crecer tu negocio.</h2></div><p>Una sola experiencia conecta agenda, clientes, servicios, equipo y reportes para trabajar desde computadora o celular.</p></div><div class="feature-grid"><article class="feature"><img src="assets/marketing/agenda.jpg" alt="Agenda"><div class="feature-copy"><span class="eyebrow">AGENDA</span><h3>Todo tu día en orden</h3><p>Visualiza horarios, profesionales, citas y espacios disponibles sin perderte entre pantallas.</p></div></article><article class="feature"><img src="assets/marketing/clientes.jpg" alt="Clientes"><div class="feature-copy"><span class="eyebrow">CLIENTES</span><h3>Conócelos y haz que vuelvan</h3><p>Historial, frecuencia, gasto, próximas citas y notas en un mismo perfil.</p></div></article><article class="feature"><img src="assets/marketing/mobile.jpg" alt="Reservas móviles"><div class="feature-copy"><span class="eyebrow">MÓVIL</span><h3>Reservan fácil y rápido</h3><p>Tu página pública está optimizada para reservar desde cualquier teléfono.</p></div></article></div></section>
-<section class="section" id="crecimiento"><div class="metric-band"><div><span class="eyebrow">CRECIMIENTO</span><h2>Convierte más citas en más ingresos.</h2><p>MyCitaGo reúne la información operativa para que entiendas qué servicios se venden, dónde tienes capacidad y cómo evoluciona tu negocio.</p><div class="metrics"><div><b>+35%</b><span>objetivo de reservas</span></div><div><b>-40%</b><span>menos ausencias</span></div><div><b>+28%</b><span>potencial de ingresos</span></div></div></div><div><img src="assets/marketing/reportes.jpg" alt="Reportes MyCitaGo"></div></div></section>
-<section class="section"><div class="cta"><div><h2>Tus clientes reservan mientras tú trabajas.</h2><p>Empieza con Google o correo. Sin SMS de pago y con configuración guiada.</p></div><a class="btn btn-primary" href="admin/login.html?view=register">Crear mi negocio →</a></div></section>
-</main><footer class="footer"><a class="brand" href="./"><img src="assets/brand/mycitago-icon.png" alt=""><span>MyCita<em>Go</em></span></a><span>© 2026 MyCitaGo · Plataforma para negocios que trabajan con citas.</span></footer>
+<section class="hero">
+<div class="hero-grid">
+<div class="hero-copy">
+<span class="pill">RESERVAS ONLINE PARA NEGOCIOS DE SERVICIOS</span>
+<h1>Haz que reservar contigo <em>sea fácil.</em></h1>
+<p>MyCitaGo organiza tus citas, clientes y servicios en un solo lugar. Configura tu negocio en pocos pasos y comparte tu enlace para empezar a recibir reservaciones.</p>
+<div class="hero-actions"><a class="btn btn-primary" href="admin/login.html?view=register">Crear mi negocio gratis →</a><a class="btn" href="#como-funciona">Ver cómo funciona ↓</a></div>
+<div class="hero-trust"><span>Configuración guiada</span><span>Funciona en celular y computadora</span><span>Tu propio enlace de reservación</span></div>
 </div>
-</body></html>
+<div class="hero-media"><img src="assets/marketing/hero-platform.jpg" alt="Panel de MyCitaGo"></div>
+</div>
+</section>
+
+<section class="section" id="como-funciona">
+<div class="section-head"><div><span class="eyebrow">EMPIEZA SIN COMPLICARTE</span><h2>De tu negocio a tu primera reservación.</h2></div><p>MyCitaGo te guía por lo esencial para que puedas empezar a compartir tu agenda online.</p></div>
+<div class="steps">
+<article class="step"><span class="step-num">01</span><h3>Crea tu negocio</h3><p>Registra la información básica y el tipo de servicio que ofreces.</p></article>
+<article class="step"><span class="step-num">02</span><h3>Configura horarios y servicios</h3><p>Define cuándo atiendes, qué servicios ofreces y sus precios.</p></article>
+<article class="step"><span class="step-num">03</span><h3>Comparte tu enlace</h3><p>Envía tu página pública a tus clientes por el canal que prefieras.</p></article>
+<article class="step"><span class="step-num">04</span><h3>Recibe reservaciones</h3><p>Tus clientes eligen servicio, fecha y horario desde su teléfono.</p></article>
+</div>
+</section>
+
+<section class="section" id="funciones">
+<div class="section-head"><div><span class="eyebrow">TODO EN UN SOLO LUGAR</span><h2>Menos pantallas. Más control de tu día.</h2></div><p>Agenda, clientes y reservaciones conectados en una experiencia diseñada para negocios que trabajan con citas.</p></div>
+<div class="feature-grid">
+<article class="feature"><img src="assets/marketing/agenda.jpg" alt="Agenda MyCitaGo"><div class="feature-copy"><span class="eyebrow">AGENDA</span><h3>Organiza tu día</h3><p>Consulta citas, horarios y espacios disponibles desde una sola vista.</p></div></article>
+<article class="feature"><img src="assets/marketing/clientes.jpg" alt="Clientes MyCitaGo"><div class="feature-copy"><span class="eyebrow">CLIENTES</span><h3>Conoce su historial</h3><p>Mantén la información y actividad de tus clientes organizada en un mismo perfil.</p></div></article>
+<article class="feature"><img src="assets/marketing/mobile.jpg" alt="Reservación móvil MyCitaGo"><div class="feature-copy"><span class="eyebrow">RESERVA MÓVIL</span><h3>Reservan fácil desde su teléfono</h3><p>Comparte tu enlace para que tus clientes consulten servicios y horarios disponibles.</p></div></article>
+</div>
+</section>
+
+<section class="section" id="sectores">
+<div class="section-head"><div><span class="eyebrow">HECHO PARA NEGOCIOS CON CITAS</span><h2>Una agenda que se adapta a lo que haces.</h2></div><p>Si tus clientes necesitan elegir un servicio, un día y una hora, MyCitaGo puede ayudarte a organizarlo.</p></div>
+<div class="sector-grid">
+<div class="sector"><i>✂</i><b>Barberías</b></div>
+<div class="sector"><i>✦</i><b>Salones</b></div>
+<div class="sector"><i>◇</i><b>Clínicas</b></div>
+<div class="sector"><i>♡</i><b>Veterinarias</b></div>
+<div class="sector"><i>▣</i><b>Consultorios</b></div>
+<div class="sector"><i>↗</i><b>Entrenamiento</b></div>
+</div>
+</section>
+
+<section class="section" id="planes">
+<div class="section-head"><div><span class="eyebrow">PLANES</span><h2>Elige el tamaño que necesita tu negocio.</h2></div><p>Consulta las opciones disponibles. Al registrarte podrás comenzar la configuración de tu negocio.</p></div>
+<div class="plans-grid" id="public-plans"><div class="plans-loading">Cargando planes…</div></div>
+<p class="plans-note" id="plans-note">Los precios y características se cargan desde el catálogo activo de MyCitaGo.</p>
+</section>
+
+<section class="section">
+<div class="cta"><div><h2>Tus clientes reservan mientras tú trabajas.</h2><p>Crea tu negocio, configura tu disponibilidad y comparte tu enlace de reservación.</p></div><a class="btn btn-primary" href="admin/login.html?view=register">Crear mi negocio gratis →</a></div>
+</section>
+</main>
+
+<footer class="footer">
+<a class="brand" href="./"><img src="assets/brand/mycitago-icon.png" alt=""><span>MyCita<em>Go</em></span></a>
+<div class="footer-links"><a href="terminos.html">Términos</a><a href="privacidad.html">Privacidad</a><a href="admin/ayuda.html">Contacto</a></div>
+<span>© 2026 MyCitaGo · Plataforma para negocios que trabajan con citas.</span>
+</footer>
+</div>
+
+<div class="mobile-menu"><button class="btn theme-toggle" type="button" aria-label="Cambiar tema" onclick="window.MyCitaGoTheme?.toggle?.()">◐</button></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script>
+<script src="js/config.js"></script>
+<script src="js/supabase.js"></script>
+<script>
+const PUBLIC_FEATURE_LABELS={
+  reports:'Reportes e ingresos',
+  internal_reviews:'Reseñas internas',
+  growth_links:'Enlaces de crecimiento',
+  advanced_audit:'Auditoría avanzada',
+  priority_support:'Soporte prioritario',
+  dedicated_onboarding:'Onboarding dedicado',
+  google_reviews:'Integración con Google Business'
+};
+
+function publicPlanFeatures(features){
+  if(Array.isArray(features)) return features.filter(Boolean).map(String);
+  if(!features||typeof features!=='object') return [];
+  return Object.entries(features)
+    .filter(([key,value])=>key!=='trial_days' && value===true && PUBLIC_FEATURE_LABELS[key])
+    .map(([key])=>PUBLIC_FEATURE_LABELS[key]);
+}
+
+function renderPublicPlans(plans){
+  const root=document.getElementById('public-plans');
+  root.replaceChildren(...plans.slice(0,3).map(plan=>{
+    const article=document.createElement('article'); article.className='plan';
+    const name=document.createElement('h3'); name.textContent=plan.name||'Plan';
+    const price=document.createElement('div'); price.className='price';
+    const amount=Number(plan.price_monthly??plan.monthly_price??0);
+    price.textContent=`$${Number.isFinite(amount)?amount.toLocaleString('es-MX'):0}`;
+    const cadence=document.createElement('small'); cadence.textContent=' MXN / mes'; price.append(cadence);
+    const desc=document.createElement('p'); desc.className='desc'; desc.textContent=plan.description||'Una opción para organizar las citas de tu negocio.';
+    const list=document.createElement('ul');
+    const features=publicPlanFeatures(plan.features);
+    list.replaceChildren(...features.slice(0,6).map(label=>{const li=document.createElement('li');li.textContent=label;return li}));
+    const cta=document.createElement('a'); cta.className='btn btn-primary'; cta.href='admin/login.html?view=register'; cta.textContent='Probar gratis';
+    article.append(name,price,desc,list,cta); return article;
+  }));
+}
+
+async function loadPublicPlans(){
+  const root=document.getElementById('public-plans');
+  try{
+    let result=await supabaseClient.from('active_plans').select('*').order('sort_order');
+    if(result.error||!result.data?.length){
+      result=await supabaseClient.from('saas_plans').select('*').eq('active',true).order('sort_order');
+    }
+    if(result.error) throw result.error;
+    if(!result.data?.length) throw new Error('No hay planes activos disponibles.');
+    renderPublicPlans(result.data);
+  }catch(error){
+    console.warn('[Landing] No se pudo cargar el catálogo público:',error);
+    root.innerHTML='<div class="plans-loading">Consulta nuestros planes al crear tu negocio.</div>';
+    document.getElementById('plans-note').textContent='El catálogo de planes no está disponible en este momento.';
+  }
+}
+document.addEventListener('DOMContentLoaded',loadPublicPlans);
+</script>
+</body>
+</html>

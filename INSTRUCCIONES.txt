@@ -1,45 +1,28 @@
-MYCITAGO · FASE 3 · ONBOARDING
-================================
+MYCITAGO · FASE 4 · LANDING COMERCIAL
+====================================
 
-REEMPLAZA ÚNICAMENTE:
-- admin/onboarding.html
-- js/admin-onboarding.js
-- css/admin-onboarding.css
+REEMPLAZAR ÚNICAMENTE:
+- index.html
 
 NO TOCAR:
-- Supabase SQL
+- backend / Supabase SQL
+- admin/login.html
 - admin-auth.js
-- supabase.js
-- appointments.js
-- admin-team.js
-- admin-settings.js
-- navegación global
+- onboarding
+- panel administrativo
+- assets existentes
 
-QUÉ HACE ESTA FASE:
-1. Negocio: nombre, teléfono, dirección y giro.
-2. Horarios: presets + edición diaria.
-   - Guarda obligatoriamente businesses.opening_hours.
-   - Intenta sincronizar business_branches.opening_hours en la sucursal principal.
-   - Si la sincronización de sucursal falla, el onboarding continúa porque la reserva pública actual usa businesses.opening_hours.
-3. Servicios:
-   - Reutiliza service_templates.
-   - NO borra servicios existentes.
-   - Si un servicio ya existe por nombre, lo actualiza.
-   - Si no existe, lo crea.
-4. Equipo opcional:
-   - Trabajo solo, o
-   - Agregar/actualizar un profesional en staff.
-   - Asigna servicios mediante service_staff.
-5. Final:
-   - setup_completed=true
-   - URL con buildPublicBookingUrl()
-   - Copiar enlace / WhatsApp / Ver página / Ir al panel.
+CAMBIOS:
+- Mensaje principal: "Haz que reservar contigo sea fácil."
+- Elimina métricas comerciales no verificadas.
+- Añade "Cómo funciona" con 4 pasos.
+- Conserva las tarjetas reales de Agenda, Clientes y Reserva móvil.
+- Añade sectores objetivo.
+- Planes públicos cargados desde active_plans; fallback a saas_plans active=true.
+- Los CTA de planes van al registro.
+- No usa "Más popular".
+- Mantiene tema claro/oscuro y responsive.
 
-PRUEBAS:
-- Nuevo negocio: completar 4 pasos.
-- Recargar a mitad del proceso y confirmar que retoma según datos guardados.
-- Verificar que los servicios existentes NO desaparecen.
-- Verificar horarios en la página pública.
-- Probar "Trabajo solo".
-- Probar agregar profesional.
-- Comprobar enlace público final.
+IMPORTANTE:
+La carga pública de planes depende de que las políticas RLS del catálogo permitan lectura pública.
+Si no es posible leer el catálogo, la landing muestra un mensaje neutro y continúa funcionando.
