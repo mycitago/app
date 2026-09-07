@@ -598,15 +598,65 @@ function performSearch(){
   root.classList.remove('hidden');window.lucide?.createIcons();
 }
 
+function dashboardErrorBlock(message){
+  const wrap=document.createElement('div');
+  wrap.className='empty-card dashboard-load-error';
+  const strong=document.createElement('strong');
+  strong.textContent='No pudimos cargar esta información.';
+  const small=document.createElement('small');
+  small.textContent=message || 'Revisa tu conexión y vuelve a intentarlo.';
+  const button=document.createElement('button');
+  button.type='button';
+  button.className='small-btn';
+  button.textContent='Reintentar';
+  button.addEventListener('click',()=>refreshData());
+  wrap.append(strong,small,button);
+  return wrap;
+}
+
+function renderDashboardLoadError(error){
+  console.error('[MyCitaGo dashboard]',error);
+  const message=error?.code==='DATA_TIMEOUT'
+    ? 'La consulta tardó más de 12 segundos.'
+    : (error?.message || 'Error de conexión o permisos.');
+
+  $('today-label').textContent='No pudimos cargar el resumen del negocio.';
+  $('kpi-today').textContent='—';
+  $('kpi-pending').textContent='—';
+  $('kpi-revenue').textContent='—';
+  $('kpi-today-sub').textContent='Error al cargar';
+
+  ['today-timeline','upcoming-list','recent-activity','top-services'].forEach(id=>{
+    const root=$(id);
+    if(!root) return;
+    root.replaceChildren(dashboardErrorBlock(message));
+  });
+  toast('No pudimos actualizar el panel.');
+  window.lucide?.createIcons();
+}
+
 async function refreshData(){
   try{
-    await Promise.all([fetchAppointments(),fetchServices(),fetchCustomers()]);
+    const snap=await DashboardDataLoader.loadBusinessDashboardSnapshot(
+      supabaseClient,
+      dashState.business.id,
+      {timeoutMs:12000}
+    );
+
+    dashState.appointments=snap.appointments;
+    dashState.services=snap.services;
+    dashState.customers=snap.customers;
+
+    setDates();
     await renderBusinessHealth();
-    renderKPIs();renderToday();renderUpcoming();renderActivity();renderTopServices();
+    renderKPIs();
+    renderToday();
+    renderUpcoming();
+    renderActivity();
+    renderTopServices();
     window.lucide?.createIcons();
-  }catch(e){
-    console.error(e);
-    toast('No pudimos actualizar el panel.');
+  }catch(error){
+    renderDashboardLoadError(error);
   }
 }
 

@@ -1,81 +1,91 @@
-MYCITAGO · ADAPTIVE BOOKING PREMIUM — PAQUETE CONSOLIDADO
-===========================================================
+MYCITAGO · PAQUETE MAESTRO ÚNICO
+=================================
 
-ESTADO
-------
-P0 ya fue probado por el usuario y funciona.
-Este ZIP conserva P0 y agrega P1/P2/P3/P4 en la capa pública.
+Este ZIP reúne en una sola entrega:
+A) Dashboard del negocio estabilizado.
+B) Regla de timeout para datos (12 segundos).
+C) RPC business_dashboard_snapshot segura.
+D) Reserva pública adaptativa premium ya preparada.
+E) P0 de reserva conservado mediante RPC seguras.
 
-ARCHIVOS A SUBIR / REEMPLAZAR EN GITHUB
----------------------------------------
-reservar.html
-css/booking-adaptive.css
-js/booking-category-presets.js
-js/adaptive-booking.js
-js/services.js
-js/appointments.js
-js/app.js
+ORDEN OBLIGATORIO
+-----------------
+1. En Supabase SQL Editor ejecuta:
+   sql/BUSINESS_DASHBOARD_SNAPSHOT.sql
 
-IMPORTANTE
-----------
-1. No ejecutes SQL otra vez si las RPC ya existen.
-2. El archivo sql/P0_RPC_PUBLICAS_REFERENCIA.sql queda solo como respaldo.
-3. No toca autenticación, panel admin, onboarding ni Super Admin.
-4. No agrega selección de médico/profesional.
-5. No agrega pagos, recordatorios, correo, reagendar ni cancelar.
+   Resultado esperado:
+   business_dashboard_snapshot | p_business_id uuid | true
 
-FLUJO FINAL
------------
-Servicio → Fecha/Hora → Datos → Confirmación
+2. NO vuelvas a ejecutar P0_RPC_PUBLICAS_REFERENCIA.sql si tus tres RPC
+   públicas ya existen y reservar.html ya funciona. Ese archivo queda
+   solamente como respaldo.
 
-ADAPTACIÓN AUTOMÁTICA
----------------------
-Se resuelve desde business_category_id / business_type.
-Presets incluidos:
-- dental
-- beauty / estética
-- barber / barbería
-- veterinary / veterinaria
-- psychology / psicología
-- spa
-- fallback generic
+3. Sube/reemplaza en GitHub, respetando rutas:
+   admin/index.html
+   reservar.html
+   css/booking-adaptive.css
+   js/data-state.js
+   js/dashboard-data-loader.js
+   js/admin-dashboard-pro.js
+   js/booking-category-presets.js
+   js/adaptive-booking.js
+   js/services.js
+   js/appointments.js
+   js/app.js
 
-PERSONALIZACIÓN
+DASHBOARD — QUÉ CAMBIA
+----------------------
+- Deja de depender de Promise.all de tres consultas separadas para el resumen.
+- Usa una sola RPC: business_dashboard_snapshot.
+- La RPC valida que el usuario pertenezca al business_id (o sea Super Admin).
+- Timeout máximo: 12 segundos.
+- Si falla: KPIs no quedan eternamente en "Cargando"; aparece error + Reintentar.
+- Si no hay datos: los renderizadores existentes muestran estados vacíos.
+- Trial y "Siguiente paso" permanecen en los archivos base, no se eliminan.
+
+PRUEBAS DASHBOARD
+-----------------
+Negocio vacío:
+- Citas hoy = 0.
+- Por confirmar = 0.
+- Ingresos = $0.00.
+- Agenda: "No hay citas programadas para hoy".
+- Próximas: "No hay próximas citas".
+- Actividad: estado vacío.
+- Nunca "Cargando..." infinito.
+
+Negocio con datos:
+- KPIs deben coincidir con citas reales.
+- Agenda, próximas citas y servicios deben aparecer.
+- El banner de trial sigue funcionando.
+
+RESERVA PÚBLICA
 ---------------
-El negocio conserva logo, portada y tema/color cuando ya existen.
-MyCitaGo controla estructura, contraste, tipografía, espaciado y controles.
+Flujo:
+Servicio → Fecha/Hora → Datos → Confirmación.
 
-PRUEBA DESPUÉS DE SUBIR
------------------------
-1. Espera a GitHub Pages.
-2. Abre en incógnito:
-   https://mycitago.github.io/app/reservar.html?n=clinica
-3. Ctrl+F5.
-4. Confirma:
-   - diseño dental;
-   - servicios;
-   - fecha;
-   - horarios;
-   - nombre + WhatsApp;
-   - confirmación;
-   - WhatsApp si el negocio lo tiene.
-5. Probar teclado: Tab debe recorrer servicios, fechas y horarios.
-6. Probar móvil desde DevTools.
+El diseño se adapta por business_category_id:
+- dental
+- estética / beauty
+- barbería
+- veterinaria
+- psicología
+- spa
+- fallback genérico
 
-P4 / CONFIANZA
+P5 NO INCLUIDO
 --------------
-No se inventan opiniones ni certificaciones.
-Las reseñas se muestran sólo si la vista pública devuelve reseñas reales.
-WhatsApp se muestra sólo si existe.
-Dirección se deja vacía si no está configurada.
+No agrega pagos online, recordatorios, correo, reagendar ni cancelar.
 
-P5 — NO INCLUIDO
-----------------
-Pagos online, correo, recordatorios, reagendar y cancelar quedan fuera.
-Requieren backend real.
+ROLLBACK
+--------
+Si el Dashboard falla después de ejecutar la RPC, no borres la función.
+Restaura únicamente admin/index.html y js/admin-dashboard-pro.js desde GitHub
+y envía el error exacto de Console/Network.
 
-LIGHTHOUSE
-----------
-Este paquete NO afirma un puntaje Lighthouse porque el número sólo es válido
-después de desplegar y medir la URL real. Meta: Accessibility >=95,
-Performance >=90. Máximo Lighthouse: 100.
+VERIFICACIÓN TÉCNICA INCLUIDA
+-----------------------------
+tests/data-state.test.js
+tests/dashboard-data-loader.test.js
+tests/dashboard-static.test.js
+tests/booking-presets.test.js
