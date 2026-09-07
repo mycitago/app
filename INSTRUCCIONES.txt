@@ -1,36 +1,81 @@
-MYCITAGO · P0 SERVICIOS POR RPC
-================================
+MYCITAGO · ADAPTIVE BOOKING PREMIUM — PAQUETE CONSOLIDADO
+===========================================================
 
-Ya creaste correctamente:
-- get_public_business
-- get_public_blocked_times
-- get_public_services
+ESTADO
+------
+P0 ya fue probado por el usuario y funciona.
+Este ZIP conserva P0 y agrega P1/P2/P3/P4 en la capa pública.
 
-Este paquete reemplaza SOLO:
+ARCHIVOS A SUBIR / REEMPLAZAR EN GITHUB
+---------------------------------------
+reservar.html
+css/booking-adaptive.css
+js/booking-category-presets.js
+js/adaptive-booking.js
 js/services.js
+js/appointments.js
+js/app.js
 
-PASOS
------
-1. En GitHub abre:
-   mycitago/app/js/services.js
+IMPORTANTE
+----------
+1. No ejecutes SQL otra vez si las RPC ya existen.
+2. El archivo sql/P0_RPC_PUBLICAS_REFERENCIA.sql queda solo como respaldo.
+3. No toca autenticación, panel admin, onboarding ni Super Admin.
+4. No agrega selección de médico/profesional.
+5. No agrega pagos, recordatorios, correo, reagendar ni cancelar.
 
-2. Reemplaza el archivo completo por:
-   js/services.js de este ZIP.
+FLUJO FINAL
+-----------
+Servicio → Fecha/Hora → Datos → Confirmación
 
-3. Guarda el cambio.
+ADAPTACIÓN AUTOMÁTICA
+---------------------
+Se resuelve desde business_category_id / business_type.
+Presets incluidos:
+- dental
+- beauty / estética
+- barber / barbería
+- veterinary / veterinaria
+- psychology / psicología
+- spa
+- fallback generic
 
-4. Espera a que GitHub Pages publique.
+PERSONALIZACIÓN
+---------------
+El negocio conserva logo, portada y tema/color cuando ya existen.
+MyCitaGo controla estructura, contraste, tipografía, espaciado y controles.
 
-5. Abre en incógnito:
+PRUEBA DESPUÉS DE SUBIR
+-----------------------
+1. Espera a GitHub Pages.
+2. Abre en incógnito:
    https://mycitago.github.io/app/reservar.html?n=clinica
+3. Ctrl+F5.
+4. Confirma:
+   - diseño dental;
+   - servicios;
+   - fecha;
+   - horarios;
+   - nombre + WhatsApp;
+   - confirmación;
+   - WhatsApp si el negocio lo tiene.
+5. Probar teclado: Tab debe recorrer servicios, fechas y horarios.
+6. Probar móvil desde DevTools.
 
-6. Haz Ctrl+F5.
+P4 / CONFIANZA
+--------------
+No se inventan opiniones ni certificaciones.
+Las reseñas se muestran sólo si la vista pública devuelve reseñas reales.
+WhatsApp se muestra sólo si existe.
+Dirección se deja vacía si no está configurada.
 
-RESULTADO ESPERADO
-------------------
-- Debe cargar CLINICA EL DIENTE.
-- Deben aparecer sus servicios activos.
-- No debe haber consulta directa a public.services desde el navegador.
+P5 — NO INCLUIDO
+----------------
+Pagos online, correo, recordatorios, reagendar y cancelar quedan fuera.
+Requieren backend real.
 
-NO CAMBIES NADA MÁS TODAVÍA.
-Cuando esto funcione, P0 queda listo para la prueba de fecha/hora y reserva.
+LIGHTHOUSE
+----------
+Este paquete NO afirma un puntaje Lighthouse porque el número sólo es válido
+después de desplegar y medir la URL real. Meta: Accessibility >=95,
+Performance >=90. Máximo Lighthouse: 100.
