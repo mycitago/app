@@ -20,7 +20,11 @@
       return {
         appointments:Array.isArray(snap.appointments)?snap.appointments:[],
         services:Array.isArray(snap.services)?snap.services:[],
-        customers:Array.isArray(snap.customers)?snap.customers:[]
+        customers:Array.isArray(snap.customers)?snap.customers:[],
+        dashboardTimezone:snap.dashboard_timezone || null,
+        primaryBranchId:snap.primary_branch_id || null,
+        primaryBranchName:snap.primary_branch_name || null,
+        branchCount:Number(snap.branch_count || 0)
       };
     },{timeoutMs});
   }

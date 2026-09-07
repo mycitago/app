@@ -1,0 +1,27 @@
+
+.business-clock-wrap{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;margin-top:8px}
+.business-clock-label{font-size:8px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#7b8497}
+.business-clock-wrap strong{font-size:18px;letter-spacing:-.03em;color:#182036}
+.business-clock-wrap small{width:100%;font-size:8px;color:#80899b}
+.timezone-warning{margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;max-width:680px;border:1px solid #f2d49a;background:#fff8e7;color:#7e5710;border-radius:11px;padding:9px 11px;font-size:8.5px}
+.timezone-warning svg{width:15px;height:15px;flex:none}
+.timezone-warning a{color:#6b48d9;font-weight:800;text-decoration:none;margin-left:auto}
+.agenda-punctuality-summary{display:inline-flex;align-items:center;margin:-4px 0 12px;padding:7px 10px;border-radius:999px;background:#f3f5f9;color:#4f596c;font-size:8px;font-weight:800}
+.appointment-status-stack{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.punctuality-pill{display:inline-flex;align-items:center;gap:4px;padding:5px 8px;border-radius:999px;font-size:7.5px;font-weight:900;white-space:nowrap}
+.punctuality-pill svg{width:11px;height:11px}
+.punctuality-upcoming{background:#e9f3ff;color:#216bb4}
+.punctuality-starting{background:#fff4d7;color:#956000}
+.punctuality-in-progress{background:#e5f7ed;color:#137a4e}
+.punctuality-late{background:#fff0f1;color:#b13748}
+.punctuality-completed{background:#eef1f4;color:#707887}
+.punctuality-other-branch{background:#f2efff;color:#6a4ec0}
+.dashboard-load-error{display:grid;gap:7px;justify-items:center}
+.dashboard-load-error strong{color:#333c50}
+.dashboard-load-error small{display:block;color:#8992a3}
+@media(max-width:700px){
+  .timezone-warning a{margin-left:0;width:100%}
+  .appointment-status-stack{align-items:flex-start}
+  .upcoming-row{grid-template-columns:48px minmax(0,1fr)}
+  .upcoming-row .appointment-status-stack{grid-column:2}
+}

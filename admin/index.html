@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/styles.css">
   <link rel="stylesheet" href="../css/admin-dashboard-pro.css">
+  <link rel="stylesheet" href="../css/dashboard-clock.css">
   <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
 <link rel="stylesheet" href="../css/citago-admin.css"><link rel="stylesheet" href="../css/mycitago-themes.css">
 <script src="../js/ui-theme.js"></script>
@@ -108,6 +109,16 @@
         <div>
           <h1 id="welcome-title">Tu negocio, en un vistazo</h1>
           <p id="today-label">Cargando resumen…</p>
+          <div id="business-clock-wrap" class="business-clock-wrap hidden" aria-live="polite">
+            <span class="business-clock-label">Hora de la sucursal principal</span>
+            <strong id="business-live-clock">--:--</strong>
+            <small id="business-clock-branch"></small>
+          </div>
+          <div id="business-timezone-warning" class="timezone-warning hidden" role="status">
+            <i data-lucide="clock-alert" aria-hidden="true"></i>
+            <span>Configura la zona horaria de tu sucursal para ver la hora correcta y el estado de puntualidad.</span>
+            <a href="configuracion.html">Configurar zona horaria</a>
+          </div>
         </div>
         <button id="hero-new-appointment" class="btn-new hero" type="button"><i data-lucide="plus"></i> Nueva cita</button>
       </section>
@@ -157,6 +168,7 @@
                 <button type="button" class="small-btn"><i data-lucide="calendar"></i> Hoy</button>
               </div>
             </div>
+            <div id="agenda-punctuality-summary" class="agenda-punctuality-summary hidden" aria-live="polite"></div>
             <div id="today-timeline" class="today-timeline"></div>
             <div class="card-footer-link"><a href="#upcoming">Ver próximas citas <i data-lucide="arrow-right"></i></a></div>
           </article>
@@ -228,6 +240,7 @@
 <script src="../js/admin-auth.js"></script>
 <script src="../js/data-state.js"></script>
 <script src="../js/dashboard-data-loader.js"></script>
+<script src="../js/dashboard-punctuality.js"></script>
 <script src="../js/admin-dashboard-pro.js"></script>
 <script>document.addEventListener("DOMContentLoaded",()=>window.lucide?.createIcons());</script>
 <script src="../js/citago-shell.js"></script><script>document.addEventListener('DOMContentLoaded',()=>CitagoShell.mount({mode:'tenant',activePage:'inicio'}));</script></body>

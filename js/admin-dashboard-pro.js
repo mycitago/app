@@ -6,7 +6,12 @@ const dashState = {
   appointments:[],
   services:[],
   customers:[],
-  selectedAppointment:null
+  selectedAppointment:null,
+  dashboardTimezone:null,
+  primaryBranchId:null,
+  primaryBranchName:null,
+  branchCount:0,
+  clockTimer:null
 };
 
 const $ = id => document.getElementById(id);
@@ -65,10 +70,16 @@ function setUserIdentity(){
 
 function setDates(){
   const now=new Date();
-  const long=now.toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const timezone=dashState.dashboardTimezone;
+  const long=timezone
+    ? DashboardPunctuality.formatBusinessDate(now,timezone)
+    : now.toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   $('today-label').textContent=`Aquí tienes el resumen de tu negocio para ${long}.`;
   $('agenda-date').textContent=long.charAt(0).toUpperCase()+long.slice(1);
-  $('month-label').textContent=now.toLocaleDateString('es-MX',{month:'long',year:'numeric'});
+  $('month-label').textContent=new Intl.DateTimeFormat('es-MX',{
+    timeZone:timezone || undefined,
+    month:'long',year:'numeric'
+  }).format(now);
 }
 
 async function fetchAppointments(){
@@ -174,6 +185,114 @@ async function renderBusinessHealth(){
   const missing=[];if(!activeServices)missing.push('agrega un servicio');if(!teamCount)missing.push('agrega equipo');if(!brandingPublished)missing.push('publica tu página');if($('health-note'))$('health-note').textContent=missing.length?`Siguiente recomendado: ${missing[0]}.`:'Todo lo esencial está configurado. Revisa reportes y reseñas para seguir creciendo.';
 }
 
+
+function setTimezoneUi(){
+  const timezone=dashState.dashboardTimezone;
+  const clockWrap=$('business-clock-wrap');
+  const warning=$('business-timezone-warning');
+  const branchLabel=$('business-clock-branch');
+
+  if(!timezone){
+    clockWrap?.classList.add('hidden');
+    warning?.classList.remove('hidden');
+    $('agenda-punctuality-summary')?.classList.add('hidden');
+    return false;
+  }
+
+  warning?.classList.add('hidden');
+  clockWrap?.classList.remove('hidden');
+
+  const branchName=dashState.primaryBranchName || 'Sucursal principal';
+  if(branchLabel){
+    branchLabel.textContent=dashState.branchCount>1
+      ? `${branchName} · Dashboard consolidado: la puntualidad usa esta sucursal`
+      : `${branchName} · ${timezone}`;
+  }
+  return true;
+}
+
+function businessNow(){
+  return DashboardPunctuality.businessNowParts(new Date(),dashState.dashboardTimezone);
+}
+
+function updateBusinessClock(){
+  if(!setTimezoneUi()) return;
+  const node=$('business-live-clock');
+  if(node){
+    node.textContent=DashboardPunctuality.formatBusinessTime(
+      new Date(),
+      dashState.dashboardTimezone,
+      false
+    );
+  }
+  refreshPunctualityUi();
+}
+
+function punctualityFor(a){
+  if(!dashState.dashboardTimezone) return null;
+  return DashboardPunctuality.getPunctualityState(
+    a,
+    businessNow(),
+    {primaryBranchId:dashState.primaryBranchId}
+  );
+}
+
+function buildPunctualityBadge(a){
+  const state=punctualityFor(a);
+  if(!state) return null;
+  const badge=document.createElement('span');
+  badge.className=`punctuality-pill ${state.className}`;
+  badge.dataset.punctualityFor=a.id;
+  const icon=document.createElement('i');
+  icon.setAttribute('data-lucide',state.icon);
+  icon.setAttribute('aria-hidden','true');
+  const text=document.createElement('span');
+  text.textContent=state.label;
+  badge.append(icon,text);
+  return badge;
+}
+
+function refreshPunctualityUi(){
+  if(!dashState.dashboardTimezone) return;
+
+  document.querySelectorAll('[data-punctuality-for]').forEach(node=>{
+    const a=dashState.appointments.find(x=>String(x.id)===String(node.dataset.punctualityFor));
+    if(!a) return;
+    const state=punctualityFor(a);
+    if(!state) return;
+    node.className=`punctuality-pill ${state.className}`;
+    const icon=node.querySelector('i');
+    if(icon) icon.setAttribute('data-lucide',state.icon);
+    const text=node.querySelector('span');
+    if(text) text.textContent=state.label;
+  });
+
+  const todayKey=businessNow()?.dateKey;
+  const todayAppointments=dashState.appointments.filter(a=>
+    a.appointment_date===todayKey &&
+    !['cancelada','cancelled','no_asistio','no_show'].includes(String(a.status||'').toLowerCase())
+  );
+  const states=todayAppointments.map(punctualityFor);
+  const summary=DashboardPunctuality.summarizeTodayPunctuality(states);
+  const node=$('agenda-punctuality-summary');
+  if(node){
+    node.textContent=summary;
+    node.classList.toggle('hidden',!summary);
+  }
+  window.lucide?.createIcons();
+}
+
+function startBusinessClock(){
+  if(dashState.clockTimer){
+    clearInterval(dashState.clockTimer);
+    dashState.clockTimer=null;
+  }
+  updateBusinessClock();
+  if(dashState.dashboardTimezone){
+    dashState.clockTimer=setInterval(updateBusinessClock,60000);
+  }
+}
+
 function renderKPIs(){
   const today=dateKey();
   const next7=addDaysKey(7);
@@ -226,7 +345,12 @@ function appointmentCard(a){
   meta.append(m1,m2);
   left.append(h,p,meta);
 
-  card.append(left,statusPill(a.status));
+  const statusWrap=document.createElement('div');
+  statusWrap.className='appointment-status-stack';
+  const punctuality=buildPunctualityBadge(a);
+  if(punctuality) statusWrap.appendChild(punctuality);
+  statusWrap.appendChild(statusPill(a.status));
+  card.append(left,statusWrap);
   return card;
 }
 
@@ -291,7 +415,12 @@ function renderUpcoming(){
     meta.textContent=`${dur} min  ·  ${hour(a.start_time)}`;
     info.append(h,p,meta);
 
-    row.append(tile,info,statusPill(a.status));
+    const statusWrap=document.createElement('div');
+    statusWrap.className='appointment-status-stack';
+    const punctuality=buildPunctualityBadge(a);
+    if(punctuality) statusWrap.appendChild(punctuality);
+    statusWrap.appendChild(statusPill(a.status));
+    row.append(tile,info,statusWrap);
     root.appendChild(row);
   });
 }
@@ -403,6 +532,12 @@ function actionButton(label,status,cls){
     btn.disabled=true;
     const {error}=await supabaseClient.from('appointments').update({status}).eq('id',dashState.selectedAppointment.id);
     if(error){toast(error.message);btn.disabled=false;return}
+    if(dashState.selectedAppointment){
+      dashState.selectedAppointment.status=status;
+      const local=dashState.appointments.find(x=>x.id===dashState.selectedAppointment.id);
+      if(local) local.status=status;
+    }
+    refreshPunctualityUi();
     $('appointment-drawer').classList.add('hidden');
     toast('Cita actualizada');
     await refreshData();
@@ -646,6 +781,10 @@ async function refreshData(){
     dashState.appointments=snap.appointments;
     dashState.services=snap.services;
     dashState.customers=snap.customers;
+    dashState.dashboardTimezone=snap.dashboardTimezone;
+    dashState.primaryBranchId=snap.primaryBranchId;
+    dashState.primaryBranchName=snap.primaryBranchName;
+    dashState.branchCount=snap.branchCount;
 
     setDates();
     await renderBusinessHealth();
@@ -654,6 +793,7 @@ async function refreshData(){
     renderUpcoming();
     renderActivity();
     renderTopServices();
+    startBusinessClock();
     window.lucide?.createIcons();
   }catch(error){
     renderDashboardLoadError(error);

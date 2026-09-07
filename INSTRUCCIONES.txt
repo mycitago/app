@@ -1,91 +1,101 @@
-MYCITAGO · PAQUETE MAESTRO ÚNICO
-=================================
+MYCITAGO · DASHBOARD ESTABLE + RELOJ + PUNTUALIDAD
+=================================================
 
-Este ZIP reúne en una sola entrega:
-A) Dashboard del negocio estabilizado.
-B) Regla de timeout para datos (12 segundos).
-C) RPC business_dashboard_snapshot segura.
-D) Reserva pública adaptativa premium ya preparada.
-E) P0 de reserva conservado mediante RPC seguras.
+ALCANCE
+------
+Este ZIP toca SOLAMENTE:
+- admin/index.html
+- js/admin-dashboard-pro.js
+- js/data-state.js
+- js/dashboard-data-loader.js
+- js/dashboard-punctuality.js
+- css/dashboard-clock.css
+- sql/DASHBOARD_SNAPSHOT_TIMEZONE.sql
 
-ORDEN OBLIGATORIO
+NO toca reservar.html ni admin/servicios.html.
+
+1) SUPABASE PRIMERO
+-------------------
+Ejecuta:
+sql/DASHBOARD_SNAPSHOT_TIMEZONE.sql
+
+Resultado esperado:
+business_dashboard_snapshot | p_business_id uuid | true
+
+2) GITHUB DESPUÉS
 -----------------
-1. En Supabase SQL Editor ejecuta:
-   sql/BUSINESS_DASHBOARD_SNAPSHOT.sql
+Sube/reemplaza respetando rutas:
+admin/index.html
+js/admin-dashboard-pro.js
+js/data-state.js
+js/dashboard-data-loader.js
+js/dashboard-punctuality.js
+css/dashboard-clock.css
 
-   Resultado esperado:
-   business_dashboard_snapshot | p_business_id uuid | true
+3) REGLA DE ZONA HORARIA
+------------------------
+- El reloj NO usa la zona horaria del navegador.
+- Lee business_branches.timezone de la sucursal principal.
+- Si no existe timezone:
+  NO muestra reloj,
+  NO calcula atrasos,
+  muestra un aviso visible con enlace a configuracion.html.
+- No hay fallback silencioso a una zona por defecto.
 
-2. NO vuelvas a ejecutar P0_RPC_PUBLICAS_REFERENCIA.sql si tus tres RPC
-   públicas ya existen y reservar.html ya funciona. Ese archivo queda
-   solamente como respaldo.
-
-3. Sube/reemplaza en GitHub, respetando rutas:
-   admin/index.html
-   reservar.html
-   css/booking-adaptive.css
-   js/data-state.js
-   js/dashboard-data-loader.js
-   js/admin-dashboard-pro.js
-   js/booking-category-presets.js
-   js/adaptive-booking.js
-   js/services.js
-   js/appointments.js
-   js/app.js
-
-DASHBOARD — QUÉ CAMBIA
-----------------------
-- Deja de depender de Promise.all de tres consultas separadas para el resumen.
-- Usa una sola RPC: business_dashboard_snapshot.
-- La RPC valida que el usuario pertenezca al business_id (o sea Super Admin).
-- Timeout máximo: 12 segundos.
-- Si falla: KPIs no quedan eternamente en "Cargando"; aparece error + Reintentar.
-- Si no hay datos: los renderizadores existentes muestran estados vacíos.
-- Trial y "Siguiente paso" permanecen en los archivos base, no se eliminan.
-
-PRUEBAS DASHBOARD
------------------
-Negocio vacío:
-- Citas hoy = 0.
-- Por confirmar = 0.
-- Ingresos = $0.00.
-- Agenda: "No hay citas programadas para hoy".
-- Próximas: "No hay próximas citas".
-- Actividad: estado vacío.
-- Nunca "Cargando..." infinito.
-
-Negocio con datos:
-- KPIs deben coincidir con citas reales.
-- Agenda, próximas citas y servicios deben aparecer.
-- El banner de trial sigue funcionando.
-
-RESERVA PÚBLICA
----------------
-Flujo:
-Servicio → Fecha/Hora → Datos → Confirmación.
-
-El diseño se adapta por business_category_id:
-- dental
-- estética / beauty
-- barbería
-- veterinaria
-- psicología
-- spa
-- fallback genérico
-
-P5 NO INCLUIDO
+MULTI-SUCURSAL
 --------------
-No agrega pagos online, recordatorios, correo, reagendar ni cancelar.
+El Resumen sigue siendo consolidado.
+El reloj representa la sucursal principal.
+Si hay más de una sucursal, el texto lo indica explícitamente.
 
-ROLLBACK
---------
-Si el Dashboard falla después de ejecutar la RPC, no borres la función.
-Restaura únicamente admin/index.html y js/admin-dashboard-pro.js desde GitHub
-y envía el error exacto de Console/Network.
+Para evitar marcar falsamente como atrasada una cita que sí trae branch_id de
+otra sucursal, esa cita muestra "Otra sucursal" en vez de calcular puntualidad
+con la zona principal. Las citas sin branch_id siguen el contexto de la
+sucursal principal, por compatibilidad con registros históricos.
 
-VERIFICACIÓN TÉCNICA INCLUIDA
------------------------------
-tests/data-state.test.js
-tests/dashboard-data-loader.test.js
-tests/dashboard-static.test.js
-tests/booking-presets.test.js
+4) ESTADOS
+----------
+Próxima: >15 min antes.
+Por comenzar: exactamente 15 min o menos antes.
+En curso: dentro inicio-fin, o estado guardado en_curso.
+Atrasada: ya pasó end_time y no completada.
+Completada: gana siempre sobre la hora.
+Cancelada/no-show: neutro.
+
+5) ACTUALIZACIÓN
+----------------
+El reloj y etiquetas se recalculan cada 60 segundos sin nuevas llamadas a
+Supabase. Las llamadas al servidor siguen ocurriendo sólo en refreshData o al
+cambiar una cita.
+
+6) PRUEBA MANUAL
+----------------
+Prueba citas:
+- +16 min => Próxima
+- +15 min exactos => Por comenzar
+- dentro del intervalo => En curso
+- después de end_time => Atrasada
+- status completada => Completada
+
+Marca una atrasada como completada:
+la alerta debe cambiar inmediatamente y luego refrescar datos.
+
+7) ZONA HORARIA FALTANTE
+------------------------
+Temporalmente deja timezone vacía en una sucursal de prueba:
+debe aparecer:
+"Configura la zona horaria de tu sucursal para ver la hora correcta..."
+No debe aparecer una hora calculada con la computadora.
+
+8) NEGOCIO MULTI-SUCURSAL
+-------------------------
+Con 2+ sucursales debe decir que el reloj/puntualidad corresponden a la
+sucursal principal. Las citas que indiquen branch_id diferente reciben
+etiqueta "Otra sucursal".
+
+IMPORTANTE
+----------
+La zona horaria debe ser un identificador IANA válido, por ejemplo:
+America/Mexico_City
+America/Cancun
+America/Tijuana
