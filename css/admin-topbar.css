@@ -1,0 +1,192 @@
+.dash-topbar{
+  height:76px;
+  padding:0 30px;
+  gap:24px;
+}
+
+.dash-search-wrap{
+  width:min(460px,42vw);
+  height:44px;
+  gap:10px;
+  padding:0 13px;
+  border-radius:12px;
+}
+
+.dash-search-wrap>svg{
+  width:18px;
+  height:18px;
+}
+
+.dash-search-wrap input{
+  font-size:14px;
+  line-height:1.4;
+}
+
+.dash-search-wrap input::placeholder{
+  color:#8a93a5;
+}
+
+.dash-search-wrap kbd{
+  font-size:11px;
+  line-height:1;
+  padding:5px 7px;
+}
+
+.dash-top-actions{
+  gap:12px;
+}
+
+.btn-new{
+  min-height:42px;
+  padding:0 16px;
+  font-size:13px;
+  line-height:1;
+}
+
+.btn-new svg{
+  width:16px;
+  height:16px;
+}
+
+.top-icon-btn{
+  width:42px;
+  height:42px;
+  border-radius:11px;
+}
+
+.dash-user{
+  position:relative;
+  display:block;
+}
+
+.dash-user-trigger{
+  min-height:46px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  border:1px solid transparent;
+  border-radius:12px;
+  background:transparent;
+  padding:4px 8px 4px 5px;
+  color:var(--text);
+  cursor:pointer;
+  text-align:left;
+  transition:background .16s ease,border-color .16s ease,box-shadow .16s ease;
+}
+
+.dash-user-trigger:hover,
+.dash-user-trigger.is-open{
+  background:#f8f7fc;
+  border-color:#e7e3f2;
+}
+
+.dash-user-trigger:focus-visible{
+  outline:3px solid rgba(105,49,232,.2);
+  outline-offset:2px;
+}
+
+.user-avatar{
+  width:38px;
+  height:38px;
+  flex:0 0 38px;
+  font-size:12px;
+}
+
+.dash-user-copy{
+  display:flex;
+  min-width:104px;
+  max-width:180px;
+  flex-direction:column;
+  gap:2px;
+}
+
+.dash-user-name{
+  display:block;
+  overflow:hidden;
+  font-size:13px;
+  font-weight:800;
+  line-height:1.25;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.dash-user-role{
+  display:block;
+  overflow:hidden;
+  font-size:11px;
+  font-weight:600;
+  line-height:1.25;
+  color:#7d8798;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.dash-user-chevron{
+  width:16px;
+  height:16px;
+  flex:0 0 16px;
+  color:#8790a2;
+  transition:transform .16s ease;
+}
+
+.dash-user-trigger.is-open .dash-user-chevron{
+  transform:rotate(180deg);
+}
+
+.user-menu{
+  position:absolute;
+  top:calc(100% + 8px);
+  right:0;
+  z-index:80;
+  width:210px;
+  padding:7px;
+  border:1px solid #e4e7ef;
+  border-radius:13px;
+  background:#fff;
+  box-shadow:0 18px 45px rgba(20,28,60,.14);
+}
+
+.user-menu a,
+.user-menu button{
+  width:100%;
+  min-height:40px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  border:0;
+  border-radius:9px;
+  background:transparent;
+  padding:9px 10px;
+  color:#2a3248;
+  font-size:13px;
+  font-weight:700;
+  text-align:left;
+  text-decoration:none;
+  cursor:pointer;
+}
+
+.user-menu a:hover,
+.user-menu button:hover,
+.user-menu a:focus-visible,
+.user-menu button:focus-visible{
+  background:#f6f3ff;
+  color:#6231e5;
+  outline:none;
+}
+
+.user-menu svg{
+  width:16px;
+  height:16px;
+}
+
+.user-logout{
+  position:static;
+  display:flex;
+  box-shadow:none;
+}
+
+@media (max-width:820px){
+  /* Este archivo no rediseña .dash-mobile-top. Solo evita forzar
+     reglas del topbar desktop cuando deja de ser visible. */
+  .dash-topbar{display:none}
+}

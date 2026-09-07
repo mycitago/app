@@ -57,12 +57,31 @@ function setBusinessIdentity(){
   });
 }
 
+const ROLE_LABELS = {
+  OWNER:'Dueño',
+  MANAGER:'Gerente',
+  RECEPTIONIST:'Recepción',
+  PROFESSIONAL:'Profesional'
+};
+
+function humanizeRole(role){
+  const raw=String(role||'').trim();
+  if(!raw) return 'Miembro del negocio';
+  const normalized=raw.toUpperCase();
+  if(ROLE_LABELS[normalized]) return ROLE_LABELS[normalized];
+  return raw
+    .toLowerCase()
+    .replace(/[_-]+/g,' ')
+    .replace(/\b\w/g,c=>c.toUpperCase());
+}
+
 function setUserIdentity(){
   const user=dashState.session?.user;
   const rawName=user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Administrador';
   const display=rawName.split(/[._-]/).map(x=>x?x[0].toUpperCase()+x.slice(1):'').join(' ').trim();
   $('user-name').textContent=display || 'Administrador';
   $('user-avatar').textContent=(display || 'A').slice(0,2).toUpperCase();
+  if($('user-role')) $('user-role').textContent=humanizeRole(dashState.business?.memberRole);
 
   const first=(display || 'Administrador').split(' ')[0];
   $('welcome-title').textContent=`¡Hola, ${first}! 👋`;
@@ -800,7 +819,43 @@ async function refreshData(){
   }
 }
 
+function setUserMenuOpen(open){
+  const trigger=$('user-menu-trigger');
+  const menu=$('user-menu');
+  if(!trigger || !menu) return;
+  trigger.setAttribute('aria-expanded',open?'true':'false');
+  menu.classList.toggle('hidden',!open);
+  trigger.classList.toggle('is-open',open);
+  if(open){
+    const first=menu.querySelector('[role="menuitem"]');
+    first?.focus();
+  }
+}
+
+function setupUserMenu(){
+  const trigger=$('user-menu-trigger');
+  const menu=$('user-menu');
+  if(!trigger || !menu) return;
+
+  trigger.addEventListener('click',event=>{
+    event.stopPropagation();
+    const open=trigger.getAttribute('aria-expanded')==='true';
+    setUserMenuOpen(!open);
+  });
+
+  menu.addEventListener('click',event=>event.stopPropagation());
+
+  document.addEventListener('click',()=>setUserMenuOpen(false));
+  document.addEventListener('keydown',event=>{
+    if(event.key==='Escape' && trigger.getAttribute('aria-expanded')==='true'){
+      setUserMenuOpen(false);
+      trigger.focus();
+    }
+  });
+}
+
 function bind(){
+  setupUserMenu();
   $('btn-logout').addEventListener('click',logout);
   ['new-appointment','hero-new-appointment','quick-new','mobile-new','mobile-bottom-new']
     .forEach(id=>$(id)?.addEventListener('click',publicBooking));

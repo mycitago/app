@@ -1,101 +1,57 @@
-MYCITAGO · DASHBOARD ESTABLE + RELOJ + PUNTUALIDAD
-=================================================
+MYCITAGO · TOPBAR ADMIN PROFESIONAL
+===================================
 
 ALCANCE
-------
-Este ZIP toca SOLAMENTE:
+-------
+Solo topbar desktop de admin/index.html.
+No toca sidebar, contenido del Dashboard, reloj/puntualidad ni .dash-mobile-top.
+
+ARCHIVOS
+--------
+Reemplazar:
 - admin/index.html
 - js/admin-dashboard-pro.js
-- js/data-state.js
-- js/dashboard-data-loader.js
-- js/dashboard-punctuality.js
-- css/dashboard-clock.css
-- sql/DASHBOARD_SNAPSHOT_TIMEZONE.sql
 
-NO toca reservar.html ni admin/servicios.html.
+Agregar:
+- css/admin-topbar.css
 
-1) SUPABASE PRIMERO
--------------------
-Ejecuta:
-sql/DASHBOARD_SNAPSHOT_TIMEZONE.sql
+NOTA DE IMPLEMENTACIÓN
+----------------------
+Los estilos del topbar se aislaron en css/admin-topbar.css y se cargan
+después de admin-dashboard-pro.css. Esto evita reemplazar o alterar estilos
+del resto del Dashboard y mantiene el cambio estrictamente acotado.
 
-Resultado esperado:
-business_dashboard_snapshot | p_business_id uuid | true
+ROL REAL
+--------
+No hace una llamada nueva a Supabase.
+Usa business.memberRole, que getMyBusiness() ya obtiene de business_members.
 
-2) GITHUB DESPUÉS
------------------
-Sube/reemplaza respetando rutas:
-admin/index.html
-js/admin-dashboard-pro.js
-js/data-state.js
-js/dashboard-data-loader.js
-js/dashboard-punctuality.js
-css/dashboard-clock.css
+Mapeo:
+OWNER -> Dueño
+MANAGER -> Gerente
+RECEPTIONIST -> Recepción
+PROFESSIONAL -> Profesional
+Rol desconocido -> se humaniza; no se inventa "Administrador".
 
-3) REGLA DE ZONA HORARIA
-------------------------
-- El reloj NO usa la zona horaria del navegador.
-- Lee business_branches.timezone de la sucursal principal.
-- Si no existe timezone:
-  NO muestra reloj,
-  NO calcula atrasos,
-  muestra un aviso visible con enlace a configuracion.html.
-- No hay fallback silencioso a una zona por defecto.
+MENÚ
+----
+Se dejó únicamente:
+- Configuración
+- Salir
 
-MULTI-SUCURSAL
---------------
-El Resumen sigue siendo consolidado.
-El reloj representa la sucursal principal.
-Si hay más de una sucursal, el texto lo indica explícitamente.
+No se agregó "Mi perfil" porque hoy no existe una página de perfil separada
+y duplicar configuracion.html con dos nombres sería confuso.
 
-Para evitar marcar falsamente como atrasada una cita que sí trae branch_id de
-otra sucursal, esa cita muestra "Otra sucursal" en vez de calcular puntualidad
-con la zona principal. Las citas sin branch_id siguen el contexto de la
-sucursal principal, por compatibilidad con registros históricos.
-
-4) ESTADOS
-----------
-Próxima: >15 min antes.
-Por comenzar: exactamente 15 min o menos antes.
-En curso: dentro inicio-fin, o estado guardado en_curso.
-Atrasada: ya pasó end_time y no completada.
-Completada: gana siempre sobre la hora.
-Cancelada/no-show: neutro.
-
-5) ACTUALIZACIÓN
-----------------
-El reloj y etiquetas se recalculan cada 60 segundos sin nuevas llamadas a
-Supabase. Las llamadas al servidor siguen ocurriendo sólo en refreshData o al
-cambiar una cita.
-
-6) PRUEBA MANUAL
-----------------
-Prueba citas:
-- +16 min => Próxima
-- +15 min exactos => Por comenzar
-- dentro del intervalo => En curso
-- después de end_time => Atrasada
-- status completada => Completada
-
-Marca una atrasada como completada:
-la alerta debe cambiar inmediatamente y luego refrescar datos.
-
-7) ZONA HORARIA FALTANTE
-------------------------
-Temporalmente deja timezone vacía en una sucursal de prueba:
-debe aparecer:
-"Configura la zona horaria de tu sucursal para ver la hora correcta..."
-No debe aparecer una hora calculada con la computadora.
-
-8) NEGOCIO MULTI-SUCURSAL
--------------------------
-Con 2+ sucursales debe decir que el reloj/puntualidad corresponden a la
-sucursal principal. Las citas que indiquen branch_id diferente reciben
-etiqueta "Otra sucursal".
-
-IMPORTANTE
-----------
-La zona horaria debe ser un identificador IANA válido, por ejemplo:
-America/Mexico_City
-America/Cancun
-America/Tijuana
+PRUEBA MANUAL
+-------------
+1. Nombre real visible.
+2. Segunda línea muestra rol real.
+3. Click en usuario abre/cierra menú.
+4. Click fuera cierra menú.
+5. Escape cierra menú y devuelve foco al disparador.
+6. Configuración abre configuracion.html.
+7. Salir conserva logout() existente.
+8. Buscador sigue funcionando.
+9. Campana/conteo sigue funcionando.
+10. Nueva cita conserva el degradado morado.
+11. Mobile no cambia.
