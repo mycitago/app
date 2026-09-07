@@ -1,54 +1,36 @@
-MYCITAGO · FASE 5 SEGURIDAD HARDENING V2
-==========================================
+MYCITAGO · P0 SERVICIOS POR RPC
+================================
 
-CAUSA CONFIRMADA EN FRONTEND
-----------------------------
-GitHub sí está usando businesses_public.
-La captura muestra que esa consulta REST devuelve 404.
-Por eso NO vamos a reabrir public.businesses.
-
-V2 elimina la dependencia de vistas públicas REST y usa RPCs de salida limitada:
+Ya creaste correctamente:
 - get_public_business
 - get_public_blocked_times
+- get_public_services
 
-ORDEN EXACTO
-------------
-1. Sube a GitHub:
-   js/services.js
-   js/appointments.js
+Este paquete reemplaza SOLO:
+js/services.js
 
-2. Espera publicación de GitHub Pages.
+PASOS
+-----
+1. En GitHub abre:
+   mycitago/app/js/services.js
 
-3. En Supabase SQL Editor ejecuta:
-   sql/FASE5_SEGURIDAD_V2.sql
+2. Reemplaza el archivo completo por:
+   js/services.js de este ZIP.
 
-4. Debe salir una tabla con 2 funciones y security_definer = true.
+3. Guarda el cambio.
+
+4. Espera a que GitHub Pages publique.
 
 5. Abre en incógnito:
    https://mycitago.github.io/app/reservar.html?n=clinica
 
-6. Ctrl+F5.
+6. Haz Ctrl+F5.
 
 RESULTADO ESPERADO
 ------------------
-- Carga el negocio.
-- Carga servicios.
-- Permite elegir fecha.
-- Respeta bloqueos.
-- No hay SELECT anónimo directo sobre businesses/staff/blocked_times.
+- Debe cargar CLINICA EL DIENTE.
+- Deben aparecer sus servicios activos.
+- No debe haber consulta directa a public.services desde el navegador.
 
-NO HAGAS
---------
-- No ejecutes el rollback anterior.
-- No vuelvas a crear businesses_public_read.
-- No vuelvas a crear staff_public_read.
-- No vuelvas a crear blocked_times_public_read.
-
-SEGURIDAD
----------
-Las RPC son SECURITY DEFINER, pero:
-- devuelven sólo columnas explícitas;
-- no aceptan SQL dinámico;
-- get_public_business sólo filtra por slug;
-- get_public_blocked_times sólo devuelve horas de bloqueo;
-- no exponen owner_id, email, teléfono de staff ni comisión.
+NO CAMBIES NADA MÁS TODAVÍA.
+Cuando esto funcione, P0 queda listo para la prueba de fecha/hora y reserva.

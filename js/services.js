@@ -1,12 +1,8 @@
 // =========================================================
-// services.js — Carga de negocio (por slug) y servicios activos
-// SEGURIDAD FASE 5: la página pública ya no consulta public.businesses directamente.
+// services.js — Carga pública segura de negocio y servicios
+// FASE 5 P0: negocio y servicios se consultan mediante RPC públicas limitadas.
 // =========================================================
 
-/**
- * Carga el negocio a partir del slug presente en la URL (?n=slug).
- * La vista businesses_public expone únicamente columnas aptas para la página pública.
- */
 async function loadBusiness() {
   const slug = getBusinessSlugFromUrl();
 
@@ -30,18 +26,16 @@ async function loadBusiness() {
 }
 
 async function loadActiveServices(businessId) {
-  const { data, error } = await supabaseClient
-    .from('services')
-    .select('*')
-    .eq('business_id', businessId)
-    .eq('active', true)
-    .order('name', { ascending: true });
+  const { data, error } = await supabaseClient.rpc('get_public_services', {
+    p_business_id: businessId,
+  });
 
   if (error) {
     console.error('Error cargando servicios:', error);
     return [];
   }
-  return data;
+
+  return Array.isArray(data) ? data : [];
 }
 
 function formatPrice(price) {
