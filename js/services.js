@@ -1,14 +1,11 @@
 // =========================================================
 // services.js — Carga de negocio (por slug) y servicios activos
+// SEGURIDAD FASE 5: la página pública ya no consulta public.businesses directamente.
 // =========================================================
 
 /**
  * Carga el negocio a partir del slug presente en la URL (?n=slug).
- * Devuelve:
- *   - el negocio si se encontró
- *   - null si no hay slug en la URL, o no existe un negocio con ese slug
- * En ambos casos de null, el llamador debe mostrar un mensaje adecuado
- * (ver app.js) en vez de asumir que hubo un error de configuración.
+ * La vista businesses_public expone únicamente columnas aptas para la página pública.
  */
 async function loadBusiness() {
   const slug = getBusinessSlugFromUrl();
@@ -16,7 +13,7 @@ async function loadBusiness() {
   if (!slug) {
     if (typeof LOCAL_NO_LOGIN !== 'undefined' && LOCAL_NO_LOGIN) {
       const { data, error } = await supabaseClient
-        .from('businesses')
+        .from('businesses_public')
         .select('*')
         .order('created_at', { ascending: true })
         .limit(1)
@@ -29,7 +26,7 @@ async function loadBusiness() {
   }
 
   const { data, error } = await supabaseClient
-    .from('businesses')
+    .from('businesses_public')
     .select('*')
     .eq('slug', slug)
     .maybeSingle();
@@ -72,9 +69,6 @@ function formatDuration(minutes) {
   return m === 0 ? `${h} h` : `${h} h ${m} min`;
 }
 
-// Categoría por defecto usada cuando un servicio no trae una asignada
-// (debe coincidir con el default de la columna en sql/09_saas_pro.sql
-// y con el placeholder del admin en admin-services.js).
 const DEFAULT_CATEGORY = 'Servicios';
 
 function serviceFallbackImage(service){
@@ -95,11 +89,6 @@ function serviceFallbackImage(service){
   return new URL(`assets/service-presets/${file}`,location.href).href;
 }
 
-/**
- * Devuelve las categorías presentes en `services`, en el orden en que
- * aparece cada una por primera vez (no alfabético, para respetar el
- * orden en que el negocio los fue cargando).
- */
 function getServiceCategories(services) {
   const seen = [];
   services.forEach((s) => {
@@ -109,15 +98,10 @@ function getServiceCategories(services) {
   return seen;
 }
 
-/**
- * Renderiza los chips de categoría ("Todos" + una por categoría).
- * onSelectCategory(categoryOrNull) se llama con null para "Todos".
- */
 function renderCategoryTabs(services, container, onSelectCategory) {
   const categories = getServiceCategories(services);
   container.innerHTML = '';
 
-  // Con una sola categoría (o ninguna) no aporta nada mostrar tabs.
   if (categories.length < 2) {
     container.classList.add('hidden');
     return;
@@ -162,7 +146,6 @@ function renderServices(services, container, onSelect, activeCategory, searchTer
     return;
   }
 
-  // Destacados primero dentro del grupo visible, sin alterar el resto del orden.
   const sorted = [...visible].sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
 
   sorted.forEach((service) => {

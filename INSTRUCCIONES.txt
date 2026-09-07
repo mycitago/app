@@ -1,61 +1,84 @@
-MYCITAGO · SERVICIOS HOTFIX V2
-==============================
-
-CAUSA CONFIRMADA
-----------------
-El negocio CLINICA EL DIENTE tiene:
-- business_category_id = dental
-- business_category_locked = true
-- category_name = Dentista
-
-El Hotfix V1 no consideraba business_category_id como código directo.
-Por eso no detectó correctamente "dental" y el selector de Servicios
-siguió permitiendo mezclar Barbería/Uñas.
-
-QUÉ CORRIGE V2
---------------
-1. Lee business_category_id = "dental" directamente.
-2. Si business_category_locked = true:
-   - fuerza el selector a Dentista;
-   - bloquea el selector;
-   - fuerza renderServiceTemplates("dental");
-   - bloquea cualquier intento de aplicar una plantilla ajena al giro;
-   - bloquea también creación por lote de otro giro.
-3. Evita duplicados:
-   - activo => Editar;
-   - inactivo => Reactivar el mismo ID;
-   - nuevo => Crear.
-4. Hace una consulta final a services antes de cada INSERT.
-
-SUBIDA A GITHUB
----------------
-Reemplaza el archivo:
-js/admin-services-template-guard.js
-
-por el archivo V2 incluido en este ZIP.
-
-NO cambies admin-services.js.
-NO ejecutes SQL para instalar este hotfix.
-NO borres filas todavía.
-
-VERIFICA QUE admin/servicios.html YA CONTENGA:
-<script src="../js/admin-services.js"></script>
-<script src="../js/admin-services-template-guard.js"></script>
-
-Si ya agregaste esa línea con V1, NO debes volver a agregarla.
-
-PRUEBA
-------
-1. Recarga fuerte: Ctrl+F5.
-2. Entra a Servicios.
-3. "Tipo de negocio" debe mostrar Dentista y quedar bloqueado.
-4. No deben aparecer plantillas Barbería ni Uñas.
-5. Valoración dental y Limpieza dental deben mostrar Editar si están activas.
-6. Desactiva una dental y confirma que la plantilla cambie a Reactivar.
-7. Reactívala y verifica en Supabase que conserve el mismo ID.
+MYCITAGO · FASE 5 SEGURIDAD / HARDENING
+=========================================
 
 IMPORTANTE
 ----------
-Las filas contaminadas ya existentes no se borran con este hotfix.
-Primero validamos que ya no puedan volver a crearse.
-Después limpiamos los registros incorrectos una sola vez.
+Este paquete corrige exposición pública excesiva detectada en:
+- businesses
+- staff
+- blocked_times
+- business_branches
+
+No modifica clientes, citas, autenticación ni pagos.
+
+ORDEN CORRECTO
+--------------
+1) SUBE PRIMERO A GITHUB estos archivos:
+   js/services.js
+   js/appointments.js
+
+2) Espera a que GitHub Pages publique.
+3) Haz Ctrl+F5 en la página pública.
+
+4) DESPUÉS ejecuta en Supabase:
+   sql/FASE5_SEGURIDAD_HARDENING.sql
+
+¿Por qué en ese orden?
+Porque el SQL elimina acceso anónimo directo a businesses y blocked_times.
+Los JS nuevos ya consultan:
+- businesses_public
+- blocked_times_public
+
+PRUEBAS OBLIGATORIAS DESPUÉS
+-----------------------------
+A. Abre reservar.html?n=<slug> en incógnito.
+   Debe cargar nombre, portada, dirección, horarios y servicios.
+
+B. Elige una fecha.
+   Debe respetar bloqueos de día y de horario.
+
+C. Crea una reserva.
+   Debe terminar correctamente.
+
+D. En el panel autenticado:
+   - Servicios debe cargar.
+   - Equipo debe cargar.
+   - Sucursales debe cargar.
+
+E. Seguridad:
+   Ya no debe existir SELECT anónimo directo sobre:
+   public.businesses
+   public.staff
+   public.blocked_times
+
+QUÉ SE OCULTA DEL PÚBLICO
+-------------------------
+businesses:
+- owner_id
+- email
+- setup_completed
+- business_category_locked
+y cualquier otra columna no incluida en businesses_public.
+
+staff:
+- se elimina lectura anónima directa de toda la tabla.
+Por tanto email, phone, role y commission_rate dejan de ser públicos.
+
+blocked_times:
+- público sólo recibe business_id, date, start_time, end_time.
+
+business_branches:
+- se elimina la política member_all que permitía escritura demasiado amplia.
+Las políticas específicas OWNER/MANAGER permanecen.
+
+ROLLBACK
+--------
+Si algo crítico falla:
+sql/FASE5_SEGURIDAD_ROLLBACK.sql
+
+Usa rollback sólo temporalmente y avísame del error exacto.
+
+NOTA TÉCNICA
+------------
+Las vistas públicas son deliberadamente de columnas explícitas.
+La tabla base conserva RLS para usuarios autenticados y Super Admin.
