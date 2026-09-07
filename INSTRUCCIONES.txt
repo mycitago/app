@@ -1,32 +1,78 @@
-CORRECCIÓN TOPBAR REAL ct-* — MyCitaGo
+MYCITAGO — SIDEBAR V2 DEL SHELL REAL
+====================================
 
-Archivos de producción afectados:
-1) js/citago-shell.js
-2) css/citago-admin.css
+OBJETIVO
+--------
+Normalizar de una sola vez el sidebar real ct-*:
+- altura uniforme de filas;
+- Servicios / Equipo / Sucursales con el mismo ritmo vertical;
+- grupos con espaciado consistente;
+- texto desktop de 13px;
+- iconos Lucide homogéneos;
+- active / hover / focus profesionales;
+- mobile sin cambios.
 
-IMPORTANTE:
-- js/citago-shell.js del ZIP sí es reemplazo completo.
-- Para CSS, ejecuta APLICAR_CSS.py desde la raíz de tu repo. El script modifica
-  el citago-admin.css ACTUAL y únicamente cambia 12->13, 11->13 y 9->11
-  en las tres reglas del topbar. Esto evita sobrescribir accidentalmente
-  otros estilos actuales del archivo.
-- Después sube a GitHub únicamente:
-  js/citago-shell.js
-  css/citago-admin.css
+ARCHIVOS DE PRODUCCIÓN AFECTADOS
+--------------------------------
+js/citago-shell.js
+css/citago-admin.css
 
-NO TOCA:
-admin/index.html
-admin-dashboard-pro.css
-admin-dashboard-pro.js
-hideLegacy()
-sidebar ct-*
-navegación mobile ct-mobile
+NO TOCA
+-------
+- ct-mobile
+- topbar
+- Dashboard
+- rutas
+- permisos
+- backend
+- hideLegacy()
+- contenido de páginas
 
-ROL:
-Usa b.memberRole devuelto por getMyBusiness(); no hace otra consulta a Supabase.
-OWNER=Dueño; MANAGER=Gerente; RECEPTIONIST=Recepción; PROFESSIONAL=Profesional.
-Roles desconocidos se humanizan. Platform conserva MyCitaGo Platform.
+INSTALACIÓN
+-----------
+1. Descomprime este ZIP en la raíz del repositorio.
+2. Ejecuta:
 
-DROPDOWN:
-No duplica el toggle tenant que ya vive en admin-actions.js.
-Añade semántica ARIA, sincronización aria-expanded, Escape y foco de retorno.
+   python APLICAR_SIDEBAR_V2.py
+
+3. Revisa git diff.
+4. Deben cambiar únicamente:
+   js/citago-shell.js
+   css/citago-admin.css
+
+5. Sube esos dos archivos a GitHub.
+
+POR QUÉ SE USA UN APLICADOR
+---------------------------
+El script parchea la versión ACTUAL de tus dos archivos en vez de entregarte
+copias completas potencialmente desactualizadas. Así conserva el topbar real,
+dropdown, acciones y cualquier cambio reciente ya existente.
+
+CAMBIO DE ICONOS
+----------------
+Desktop usa Lucide mediante data-lucide y la llamada createIcons() que el shell
+ya ejecuta. Mobile conserva los símbolos actuales; no se rediseña.
+
+CHECKLIST VISUAL
+----------------
+- MI NEGOCIO:
+  Servicios, Equipo y Sucursales deben tener exactamente la misma altura y
+  separación.
+- CRECIMIENTO y ADMINISTRACIÓN deben repetir el mismo patrón.
+- El activo debe verse claramente sin aumentar la altura de su fila.
+- Tab debe mostrar foco visible.
+- Ninguna ruta debe cambiar.
+- Mobile debe verse igual que antes.
+
+PRUEBAS AUTOMÁTICAS INCLUIDAS
+-----------------------------
+tests/sidebar-v2.test.js
+
+La prueba valida:
+- rama Lucide solo para desktop;
+- rama mobile conservada;
+- altura 44px;
+- texto 13px;
+- espaciado de grupos;
+- foco visible;
+- caja de icono fija.
