@@ -10,37 +10,23 @@
 async function loadBusiness() {
   const slug = getBusinessSlugFromUrl();
 
-  if (!slug) {
-    if (typeof LOCAL_NO_LOGIN !== 'undefined' && LOCAL_NO_LOGIN) {
-      const { data, error } = await supabaseClient
-        .from('businesses_public')
-        .select('*')
-        .order('created_at', { ascending: true })
-        .limit(1)
-        .maybeSingle();
-      if (error) return { error: 'query_failed' };
-      if (!data) return { error: 'not_found' };
-      return { business: data };
-    }
+  if (!slug && !(typeof LOCAL_NO_LOGIN !== 'undefined' && LOCAL_NO_LOGIN)) {
     return { error: 'missing_slug' };
   }
 
-  const { data, error } = await supabaseClient
-    .from('businesses_public')
-    .select('*')
-    .eq('slug', slug)
-    .maybeSingle();
+  const { data, error } = await supabaseClient.rpc('get_public_business', {
+    p_slug: slug || null,
+  });
 
   if (error) {
     console.error('Error cargando negocio:', error);
     return { error: 'query_failed' };
   }
 
-  if (!data) {
-    return { error: 'not_found' };
-  }
+  const row = Array.isArray(data) ? data[0] : data;
+  if (!row) return { error: 'not_found' };
 
-  return { business: data };
+  return { business: row };
 }
 
 async function loadActiveServices(businessId) {

@@ -55,11 +55,10 @@ function buildUpcomingDays(business, count = 21) {
 async function fetchBusyRanges(businessId, dateKey) {
   const [{ data: busySlots, error: busyError }, { data: blocked, error: blockedError }] = await Promise.all([
     supabaseClient.rpc('get_busy_slots', { p_business_id: businessId, p_date: dateKey }),
-    supabaseClient
-      .from('blocked_times_public')
-      .select('start_time, end_time')
-      .eq('business_id', businessId)
-      .eq('date', dateKey),
+    supabaseClient.rpc('get_public_blocked_times', {
+      p_business_id: businessId,
+      p_date: dateKey,
+    }),
   ]);
 
   if (busyError) console.error('Error obteniendo horarios ocupados:', busyError);
@@ -80,20 +79,17 @@ async function fetchBusyRanges(businessId, dateKey) {
 }
 
 async function isDateFullyBlocked(businessId, dateKey) {
-  const { data, error } = await supabaseClient
-    .from('blocked_times_public')
-    .select('business_id')
-    .eq('business_id', businessId)
-    .eq('date', dateKey)
-    .is('start_time', null)
-    .is('end_time', null)
-    .limit(1);
+  const { data, error } = await supabaseClient.rpc('get_public_blocked_times', {
+    p_business_id: businessId,
+    p_date: dateKey,
+  });
 
   if (error) {
     console.error('Error verificando bloqueo de día completo:', error);
     return false;
   }
-  return (data || []).length > 0;
+
+  return (data || []).some((row) => !row.start_time && !row.end_time);
 }
 
 function rangesOverlap(aStart, aEnd, bStart, bEnd) {
