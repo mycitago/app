@@ -1,57 +1,32 @@
-MYCITAGO · TOPBAR ADMIN PROFESIONAL
-===================================
+CORRECCIÓN TOPBAR REAL ct-* — MyCitaGo
 
-ALCANCE
--------
-Solo topbar desktop de admin/index.html.
-No toca sidebar, contenido del Dashboard, reloj/puntualidad ni .dash-mobile-top.
+Archivos de producción afectados:
+1) js/citago-shell.js
+2) css/citago-admin.css
 
-ARCHIVOS
---------
-Reemplazar:
-- admin/index.html
-- js/admin-dashboard-pro.js
+IMPORTANTE:
+- js/citago-shell.js del ZIP sí es reemplazo completo.
+- Para CSS, ejecuta APLICAR_CSS.py desde la raíz de tu repo. El script modifica
+  el citago-admin.css ACTUAL y únicamente cambia 12->13, 11->13 y 9->11
+  en las tres reglas del topbar. Esto evita sobrescribir accidentalmente
+  otros estilos actuales del archivo.
+- Después sube a GitHub únicamente:
+  js/citago-shell.js
+  css/citago-admin.css
 
-Agregar:
-- css/admin-topbar.css
+NO TOCA:
+admin/index.html
+admin-dashboard-pro.css
+admin-dashboard-pro.js
+hideLegacy()
+sidebar ct-*
+navegación mobile ct-mobile
 
-NOTA DE IMPLEMENTACIÓN
-----------------------
-Los estilos del topbar se aislaron en css/admin-topbar.css y se cargan
-después de admin-dashboard-pro.css. Esto evita reemplazar o alterar estilos
-del resto del Dashboard y mantiene el cambio estrictamente acotado.
+ROL:
+Usa b.memberRole devuelto por getMyBusiness(); no hace otra consulta a Supabase.
+OWNER=Dueño; MANAGER=Gerente; RECEPTIONIST=Recepción; PROFESSIONAL=Profesional.
+Roles desconocidos se humanizan. Platform conserva MyCitaGo Platform.
 
-ROL REAL
---------
-No hace una llamada nueva a Supabase.
-Usa business.memberRole, que getMyBusiness() ya obtiene de business_members.
-
-Mapeo:
-OWNER -> Dueño
-MANAGER -> Gerente
-RECEPTIONIST -> Recepción
-PROFESSIONAL -> Profesional
-Rol desconocido -> se humaniza; no se inventa "Administrador".
-
-MENÚ
-----
-Se dejó únicamente:
-- Configuración
-- Salir
-
-No se agregó "Mi perfil" porque hoy no existe una página de perfil separada
-y duplicar configuracion.html con dos nombres sería confuso.
-
-PRUEBA MANUAL
--------------
-1. Nombre real visible.
-2. Segunda línea muestra rol real.
-3. Click en usuario abre/cierra menú.
-4. Click fuera cierra menú.
-5. Escape cierra menú y devuelve foco al disparador.
-6. Configuración abre configuracion.html.
-7. Salir conserva logout() existente.
-8. Buscador sigue funcionando.
-9. Campana/conteo sigue funcionando.
-10. Nueva cita conserva el degradado morado.
-11. Mobile no cambia.
+DROPDOWN:
+No duplica el toggle tenant que ya vive en admin-actions.js.
+Añade semántica ARIA, sincronización aria-expanded, Escape y foco de retorno.
