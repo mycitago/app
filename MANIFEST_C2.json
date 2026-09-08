@@ -1,0 +1,10 @@
+{
+  "block": "C2",
+  "rpc": [
+    "platform_bulk_suspend(uuid[])",
+    "platform_bulk_reactivate(uuid[],integer)"
+  ],
+  "audit": "per-business",
+  "partial_success": true,
+  "frontend_changes": false
+}

@@ -1,0 +1,6 @@
+-- Sustituye UUID_NEGOCIO_PRUEBA por un negocio desechable.
+-- select public.platform_bulk_suspend(array['UUID_NEGOCIO_PRUEBA']::uuid[]);
+-- select public.platform_bulk_reactivate(array['UUID_NEGOCIO_PRUEBA']::uuid[],30);
+-- Verifica audit_logs: una fila business_suspended/business_reactivated por negocio.
+-- Prueba seguridad desde usuario NO platform admin: debe devolver forbidden (42501).
+-- Prueba parcial: un UUID válido + uno inexistente => processed=1, failed=1.
