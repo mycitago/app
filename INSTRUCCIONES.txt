@@ -1,78 +1,83 @@
-MYCITAGO — SIDEBAR V2 DEL SHELL REAL
-====================================
+MYCITAGO — TEMA CLARO / OSCURO / SISTEMA + SIDEBAR V3
+=====================================================
 
-OBJETIVO
---------
-Normalizar de una sola vez el sidebar real ct-*:
-- altura uniforme de filas;
-- Servicios / Equipo / Sucursales con el mismo ritmo vertical;
-- grupos con espaciado consistente;
-- texto desktop de 13px;
-- iconos Lucide homogéneos;
-- active / hover / focus profesionales;
-- mobile sin cambios.
-
-ARCHIVOS DE PRODUCCIÓN AFECTADOS
---------------------------------
-js/citago-shell.js
-css/citago-admin.css
-
-NO TOCA
+ALCANCE
 -------
-- ct-mobile
-- topbar
-- Dashboard
+Este paquete modifica únicamente el shell real compartido:
+- js/citago-shell.js
+- css/citago-admin.css
+
+NO modifica:
+- Supabase
+- RLS
+- gating de planes
+- búsqueda
+- notificaciones
+- lógica de Nueva cita
+- admin-dashboard-pro.js
+- servicios
 - rutas
-- permisos
-- backend
-- hideLegacy()
-- contenido de páginas
+- ct-mobile
+
+MEJORAS
+-------
+1. Apariencia:
+   - Claro
+   - Oscuro
+   - Sistema
+   La preferencia se guarda en localStorage.
+   "Sistema" sigue prefers-color-scheme y se actualiza si cambia.
+
+2. Sidebar desktop:
+   - Iconos Lucide uniformes.
+   - Filas de 44 px.
+   - Botón contraer/expandir.
+   - Estado persistente tras recargar.
+   - Expandido: icono + texto.
+   - Compacto: solo iconos.
+   - Tooltip nativo por módulo.
+   - El área de trabajo recupera espacio al contraer.
+
+3. Accesibilidad:
+   - aria-current en página activa.
+   - aria-expanded en botón del sidebar.
+   - foco visible.
+   - modo mobile sin alteraciones.
 
 INSTALACIÓN
 -----------
-1. Descomprime este ZIP en la raíz del repositorio.
+1. Descomprime este ZIP en la raíz del repo mycitago/app.
 2. Ejecuta:
 
-   python APLICAR_SIDEBAR_V2.py
+   python APLICAR_TEMA_SIDEBAR_V3.py
 
-3. Revisa git diff.
-4. Deben cambiar únicamente:
+3. Revisa el diff de Git.
+4. Deben cambiar solamente:
    js/citago-shell.js
    css/citago-admin.css
 
 5. Sube esos dos archivos a GitHub.
 
-POR QUÉ SE USA UN APLICADOR
----------------------------
-El script parchea la versión ACTUAL de tus dos archivos en vez de entregarte
-copias completas potencialmente desactualizadas. Así conserva el topbar real,
-dropdown, acciones y cualquier cambio reciente ya existente.
+PRUEBA MANUAL
+-------------
+A) Tema
+1. Abrir admin/index.html en desktop.
+2. Abrir menú de usuario.
+3. Apariencia → Oscuro.
+4. Confirmar topbar, fondo, menú de usuario y tarjetas comunes en oscuro.
+5. Elegir Claro.
+6. Elegir Sistema y cambiar el tema del sistema operativo/navegador.
+7. Recargar y confirmar persistencia.
 
-CAMBIO DE ICONOS
-----------------
-Desktop usa Lucide mediante data-lucide y la llamada createIcons() que el shell
-ya ejecuta. Mobile conserva los símbolos actuales; no se rediseña.
+B) Sidebar
+1. Pulsar el botón de contraer.
+2. Confirmar barra de ~76 px con solo iconos.
+3. Confirmar que el contenido usa el espacio liberado.
+4. Recargar y confirmar que permanece contraído.
+5. Expandir y confirmar que vuelven nombres/grupos.
+6. Navegar entre módulos y revisar aria-current/estado activo.
+7. Verificar Servicios / Equipo / Sucursales con ritmo uniforme.
 
-CHECKLIST VISUAL
-----------------
-- MI NEGOCIO:
-  Servicios, Equipo y Sucursales deben tener exactamente la misma altura y
-  separación.
-- CRECIMIENTO y ADMINISTRACIÓN deben repetir el mismo patrón.
-- El activo debe verse claramente sin aumentar la altura de su fila.
-- Tab debe mostrar foco visible.
-- Ninguna ruta debe cambiar.
-- Mobile debe verse igual que antes.
-
-PRUEBAS AUTOMÁTICAS INCLUIDAS
------------------------------
-tests/sidebar-v2.test.js
-
-La prueba valida:
-- rama Lucide solo para desktop;
-- rama mobile conservada;
-- altura 44px;
-- texto 13px;
-- espaciado de grupos;
-- foco visible;
-- caja de icono fija.
+C) Mobile
+1. Activar viewport <=900 px.
+2. Confirmar que ct-mobile se conserva y que no aparece el botón de contraer.

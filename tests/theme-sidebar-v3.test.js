@@ -1,0 +1,22 @@
+
+const fs=require('fs'),assert=require('assert');
+const js=fs.readFileSync('../fixtures/citago-shell.js','utf8');
+const css=fs.readFileSync('../fixtures/citago-admin.css','utf8');
+assert.ok(js.includes('CT_THEME_KEY'));
+assert.ok(js.includes('system'));
+assert.ok(js.includes('matchMedia'));
+assert.ok(js.includes('ct-theme-option'));
+assert.ok(js.includes('ct-sidebar-toggle'));
+assert.ok(js.includes('CT_SIDEBAR_KEY'));
+assert.ok(js.includes('sidebar-collapsed'));
+assert.ok(js.includes('NAV_ICON_MAP'));
+assert.ok(js.includes('nav(items,activePage,false)'));
+assert.ok(js.includes('activePage,true'));
+assert.ok(css.includes('[data-ct-theme="dark"]'));
+assert.ok(css.includes('--ct-sidebar-w-collapsed'));
+assert.ok(css.includes('.sidebar-collapsed .ct-sidebar'));
+assert.ok(css.includes('.sidebar-collapsed .ct-main'));
+assert.ok(css.includes('.ct-sidebar-toggle'));
+assert.ok(css.includes('.ct-theme-switcher'));
+assert.ok(css.includes('@media(min-width:901px)'));
+console.log('PASS theme + sidebar V3');
