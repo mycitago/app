@@ -1,0 +1,13 @@
+{
+  "repo": "mycitago/app",
+  "block": "A1",
+  "root_cause": "ROOT-01",
+  "files_modified": [
+    "js/admin-auth.js"
+  ],
+  "other_blocks_included": [],
+  "sql_modified": false,
+  "rls_modified": false,
+  "visual_changes": false,
+  "guarded_replacements": true
+}

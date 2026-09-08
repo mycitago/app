@@ -1,29 +1,28 @@
-# MyCitaGo — Paquete consolidado de estabilización
+# MyCitaGo — A1 / ROOT-01 solamente
 
-Este paquete se preparó contra el estado actual de `mycitago/app` en la rama `main`.
+Este paquete corrige exclusivamente el fallo crítico de suscripción detectado en `js/admin-auth.js`.
 
-## Incluye
+## Problema corregido
 
-- **A1 / ROOT-01:** un error técnico consultando `subscriptions` ya no se convierte en “Suscripción vencida”.
-- **A2 / ROOT-04/05:** Agenda, Clientes, Equipo y Sucursales distinguen mejor error técnico de estado vacío.
-- **A3 / ROOT-08:** mutaciones sensibles de Servicios agregan `business_id` además del `id`.
-- **D / ROOT-09:** elimina importes hardcodeados presentados como precios sugeridos.
-- **G / ROOT-11:** elimina tipografía funcional de 8–9 px en Reportes.
-- **C1 seguro:** mejora legibilidad del shell base sin crear V4.
+Antes, `getMySubscription()` ignoraba el error de Supabase y devolvía `null`. Luego `subscriptionExpired(null)` lo interpretaba como suscripción vencida y mostraba el paywall aunque el problema real fuera de red/backend.
 
-## Lo que deliberadamente NO hace automáticamente
+## Qué cambia
 
-No elimina `citago-shell-v3.js` ni `citago-v3.css`: hoy contienen tema claro/oscuro y sidebar contraíble. Quitarlos de golpe rompería funciones visibles. La consolidación física definitiva de V3 debe hacerse después de una prueba visual autenticada.
+1. `getMySubscription()` devuelve `null` solo cuando la consulta fue válida y no existe suscripción.
+2. Si Supabase devuelve error, se lanza una excepción técnica con `code = subscription_lookup_failed`.
+3. `getMyBusiness()` captura ese error y muestra un estado de carga fallida con botón `Reintentar`.
+4. `showPaywall()` solo se ejecuta si la consulta de suscripción terminó correctamente y la suscripción realmente está vencida/inválida.
 
-No toca RLS, SQL, Edge Functions, cobros ni tablas.
+## Alcance
 
-## Cómo aplicar
+- Modifica: `js/admin-auth.js`
+- NO modifica: A2, A3, C1, D, G
+- NO modifica: SQL, RLS, tablas, Edge Functions, CSS ni otros JS
+- Crea un backup independiente: `_backup_A1_ROOT01_FECHA_HORA/js/admin-auth.js`
 
-1. Descomprime este paquete dentro de la carpeta raíz de tu repo `app`.
-2. Ejecuta:
-   `python APLICAR_ESTABILIZACION.py`
-3. Revisa la carpeta `_backup_pre_estabilizacion_FECHA_HORA`.
-4. Ejecuta las pruebas de `VERIFICACION.md`.
-5. Solo después sube los archivos modificados a GitHub.
+## Aplicación
 
-El instalador se detiene si no reconoce un bloque crítico del código actual, para evitar aplicar un parche sobre una versión distinta.
+1. Coloca `APLICAR_A1_SUSCRIPCION.py` en la raíz del repo.
+2. Ejecuta: `python APLICAR_A1_SUSCRIPCION.py`
+3. Ejecuta únicamente las 3 pruebas de `VERIFICACION_A1.md`.
+4. Si pasan, sube `js/admin-auth.js` a GitHub.
