@@ -1,0 +1,75 @@
+MYCITAGO — DASHBOARD V3 COMPLETO
+================================
+
+ESTE ZIP YA CONTIENE LOS ARCHIVOS REALES LISTOS PARA SUBIR.
+NO HAY QUE EJECUTAR PYTHON.
+
+SUBE A GITHUB RESPETANDO EXACTAMENTE ESTAS RUTAS:
+
+js/citago-shell.js              REEMPLAZAR
+js/citago-shell-v3.js           NUEVO
+js/dashboard-v3.js              NUEVO
+css/citago-v3.css               NUEVO
+
+IMPORTANTE
+----------
+1. No subas solo la carpeta o el ZIP.
+2. En GitHub debes ver físicamente:
+   /js/citago-shell.js
+   /js/citago-shell-v3.js
+   /js/dashboard-v3.js
+   /css/citago-v3.css
+
+3. citago-shell.js ya quedó preparado para cargar automáticamente:
+   - citago-v3.css en todas las páginas del panel tenant;
+   - citago-shell-v3.js en todas las páginas tenant;
+   - dashboard-v3.js solamente cuando activePage='inicio'.
+
+NO TOCA
+-------
+Supabase
+RLS
+gating de planes
+cobros
+reservas públicas
+servicios
+admin-dashboard-pro.js
+admin/index.html
+búsqueda
+notificaciones
+Nueva cita
+
+MEJORAS VISIBLES
+----------------
+- Tema Claro / Oscuro / Sistema desde el menú de usuario.
+- Sidebar contraíble y persistente.
+- Iconos Lucide uniformes.
+- Sidebar reorganizado: Operación / Mi negocio / Crecimiento / Análisis / Sistema.
+- Dashboard con 4 KPI: Citas hoy / Por confirmar / Atrasadas / Ingresos.
+- KPI Atrasadas usa los datos ya cargados y la zona horaria existente.
+- Si falta timezone, muestra acción para configurarla.
+- Panel “Requiere tu atención”.
+- Accesos rápidos duplicados ocultos.
+- Agenda con mayor jerarquía.
+- Colores semánticos, sin minigráficos decorativos.
+- Dark mode para shell y superficies principales.
+
+DESPUÉS DE SUBIR
+----------------
+1. Espera a que GitHub Pages termine el deployment.
+2. Abre:
+   https://mycitago.github.io/app/admin/index.html?v=dashboard-v3
+3. Pulsa Ctrl+Shift+R.
+4. Debe aparecer el KPI Atrasadas.
+5. Debe aparecer “Requiere tu atención”.
+6. En el menú del usuario debe aparecer APARIENCIA.
+7. Debe aparecer un botón para contraer el sidebar.
+
+SI SE VE IGUAL
+---------------
+Abre F12 > Network y confirma STATUS 200 para:
+citago-shell-v3.js
+dashboard-v3.js
+citago-v3.css
+
+Si alguno da 404, el archivo no quedó en la ruta correcta de GitHub.

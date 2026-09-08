@@ -24,12 +24,31 @@
     if(isPlatform){
       trigger.onclick=()=>{menu.classList.toggle('open');syncMenuAria(trigger,menu)};
     }else{
-      /* admin-actions.js conserva el toggle funcional del tenant.
-         Sin duplicar ese listener, sincronizamos ARIA después de que termine. */
       trigger.addEventListener('click',()=>setTimeout(()=>syncMenuAria(trigger,menu),0));
     }
     document.addEventListener('click',e=>{if(!e.target.closest('.ct-user-wrap')){menu.classList.remove('open');syncMenuAria(trigger,menu)}});
     document.addEventListener('keydown',e=>{if(e.key==='Escape'&&menu.classList.contains('open')){menu.classList.remove('open');syncMenuAria(trigger,menu);trigger.focus()}});
+  }
+  function loadV3Assets(activePage,isPlatform){
+    if(!document.querySelector('link[data-citago-v3]')){
+      const link=document.createElement('link');
+      link.rel='stylesheet';link.href='../css/citago-v3.css';link.dataset.citagoV3='1';
+      document.head.appendChild(link);
+    }
+    if(!isPlatform&&!document.querySelector('script[data-citago-shell-v3]')){
+      const script=document.createElement('script');
+      script.src='../js/citago-shell-v3.js';script.defer=true;script.dataset.citagoShellV3='1';
+      script.onload=()=>{
+        global.CitagoShellV3?.mount({activePage});
+        if(activePage==='inicio'&&!document.querySelector('script[data-dashboard-v3]')){
+          const d=document.createElement('script');
+          d.src='../js/dashboard-v3.js';d.defer=true;d.dataset.dashboardV3='1';
+          d.onload=()=>global.MyCitaGoDashboardV3?.mount();
+          document.body.appendChild(d);
+        }
+      };
+      document.body.appendChild(script);
+    }
   }
   function mount({mode='tenant',activePage='inicio'}={}){
     const host=document.getElementById('citago-shell');if(!host||host.dataset.mounted)return;
@@ -46,6 +65,7 @@
       const themeBtn=document.getElementById('ct-platform-theme');if(themeBtn)themeBtn.onclick=()=>{const dark=!document.body.classList.contains('platform-theme-dark');document.body.classList.toggle('platform-theme-dark',dark);localStorage.setItem('mycitago:platform-theme',dark?'dark':'light')};
       const lo=document.getElementById('ct-logout');if(lo)lo.onclick=async()=>{try{await global.supabaseClient?.auth?.signOut()}finally{location.replace('login.html')}};
     }
+    loadV3Assets(activePage,isPlatform);
     if(global.lucide?.createIcons)global.lucide.createIcons()
   }
   global.CitagoShell={mount};
