@@ -1,0 +1,10 @@
+{
+  "block": "C2-frontend-close",
+  "file": "js/admin-platform.js",
+  "rpc_recreated": false,
+  "sql_modified": false,
+  "rls_modified": false,
+  "partial_success_ui": true,
+  "failed_rows_reselected": true,
+  "atomic_prevalidation": true
+}

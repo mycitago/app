@@ -1,5 +1,22 @@
-# C2 — Acciones en lote
-Instala exclusivamente las RPC bulk del Super Admin. Corrige la firma que produjo el error de schema cache: `platform_bulk_suspend(p_business_ids uuid[])`.
-Incluye suspensión/reactivación, autorización `is_platform_admin()`, auditoría por negocio, deduplicación de UUID y resultado por fila con éxito parcial. No cambia planes en lote, frontend, C1 ni RLS tenant.
+# MyCitaGo — C2 cierre frontend
 
-Ejecuta primero `01_C2_ACCIONES_LOTE.sql` en Supabase SQL Editor y después usa `02_VERIFICACION_C2.sql` con negocios de prueba.
+Este paquete NO vuelve a crear las RPC. Se aplica después de haber instalado:
+- `platform_bulk_suspend(uuid[])`
+- `platform_bulk_reactivate(uuid[],integer)`
+
+## Qué corrige
+El frontend actual solo mostraba `X negocios procesados`, aunque el backend ya devuelve:
+- `processed`
+- `failed`
+- `results[]`
+
+Ahora:
+- informa éxitos y fallos parciales;
+- conserva seleccionados los negocios que fallaron para poder reintentar;
+- limpia la selección de los que sí terminaron;
+- mantiene el manejo de error total existente.
+
+## Archivo modificado
+- `js/admin-platform.js`
+
+No toca SQL, RLS, C1 ni otros bloques.
