@@ -1,0 +1,16 @@
+{
+  "block": "C1",
+  "roots": [
+    "ROOT-02",
+    "ROOT-03",
+    "ROOT-06",
+    "ROOT-10"
+  ],
+  "canonical": [
+    "js/citago-shell.js",
+    "css/citago-admin.css"
+  ],
+  "creates_v4": false,
+  "deletes_v3": false,
+  "atomic_prevalidation": true
+}
