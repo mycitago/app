@@ -1,0 +1,19 @@
+{
+  "block": "A2",
+  "scope": [
+    "agenda loading/error/empty",
+    "customers loading/error/empty",
+    "team error state",
+    "branches error/empty state"
+  ],
+  "files": [
+    "js/admin-agenda.js",
+    "js/admin-customers.js",
+    "js/admin-team.js",
+    "js/admin-branches.js"
+  ],
+  "touches_A1": false,
+  "touches_SQL": false,
+  "touches_RLS": false,
+  "atomic_prevalidation": true
+}
