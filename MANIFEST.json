@@ -1,0 +1,17 @@
+{
+  "base_repo": "mycitago/app",
+  "base_branch": "main",
+  "base_tree_sha": "b5c7483678a9f2628e279ade59a455e79d336e09",
+  "generated": "2026-09-08",
+  "blocks": [
+    "A1",
+    "A2",
+    "A3",
+    "C1-safe",
+    "D",
+    "G"
+  ],
+  "sql_modified": false,
+  "rls_modified": false,
+  "creates_v4": false
+}
