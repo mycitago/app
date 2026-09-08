@@ -1,0 +1,14 @@
+{
+  "block": "A3",
+  "root_cause": "ROOT-08",
+  "file": "js/admin-services.js",
+  "mutations_hardened": [
+    "toggleService",
+    "saveService update",
+    "deleteBlock"
+  ],
+  "sql_modified": false,
+  "rls_modified": false,
+  "visual_changes": false,
+  "atomic_prevalidation": true
+}
