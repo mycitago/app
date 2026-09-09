@@ -1,14 +1,23 @@
-# MyCitaGo — Ventas + control fiscal
+MyCitaGo — Fix carga de Reportes
 
-Archivos incluidos:
-1. `sql/SQL_SALES_FISCAL.sql` — ejecutar primero en Supabase SQL Editor.
-2. `admin/contabilidad.html` — reemplazar el archivo actual.
-3. `js/admin-accounting.js` — reemplazar el archivo actual.
-4. `css/admin-reports.css` — reemplazar el archivo actual.
+CAUSA PROBABLE AISLADA
+La versión nueva de admin-accounting.js agregó esta relación embebida a appointments:
+customers(name,full_name)
 
-Importante:
-- El módulo registra control administrativo y datos relacionados con facturación.
-- NO genera, timbra ni valida CFDI ante SAT.
-- El estado "Facturada" exige capturar UUID en la interfaz, pero el UUID no se valida contra SAT.
-- Se mantiene separación por `business_id` mediante RLS.
-- Antes de ejecutar el SQL, confirma que tu tabla de membresías se llama `business_members` y usa columnas `business_id` y `user_id`. Si tu esquema usa otro nombre, adapta las políticas RLS.
+La versión anterior de Reportes no dependía de esa relación. Si PostgREST no reconoce
+esa FK/relación o la columna full_name no existe, falla TODA la consulta de appointments
+y el dashboard queda en $0 con "No se pudieron cargar los reportes".
+
+CORRECCIÓN
+- Se elimina únicamente el embed customers(name,full_name).
+- Se conserva services(id,name).
+- No se toca Supabase ni los cálculos existentes.
+- El nombre del cliente queda temporalmente como "Cliente" dentro de la tabla fiscal.
+- Si otra fuente falla, el toast indicará ahora: citas / gastos / reseñas.
+
+SUBIR A GITHUB
+Reemplazar solamente:
+js/admin-accounting.js
+
+Después abrir:
+https://mycitago.github.io/app/admin/contabilidad.html?v=20260909-reportfix1

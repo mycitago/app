@@ -24,12 +24,19 @@ async function init(){
 async function loadData(){
  const from=`${lastMonthKeys(6)[0]}-01`;
  const [apptsRes,expRes,reviewsRes,fiscalRes]=await Promise.all([
-  supabaseClient.from('appointments').select('id,appointment_date,status,price_charged,booking_source,customer_id,services(id,name),customers(name,full_name)').eq('business_id',state.business.id).gte('appointment_date',from),
+  supabaseClient.from('appointments').select('id,appointment_date,status,price_charged,booking_source,customer_id,services(id,name)').eq('business_id',state.business.id).gte('appointment_date',from),
   supabaseClient.from('expenses').select('*').eq('business_id',state.business.id).gte('expense_date',from).order('expense_date',{ascending:false}),
   supabaseClient.from('reviews').select('rating,created_at,status').eq('business_id',state.business.id).eq('status','published').gte('created_at',from),
   supabaseClient.from('sale_fiscal_records').select('*').eq('business_id',state.business.id)
  ]);
- if(apptsRes.error||expRes.error||reviewsRes.error){console.error(apptsRes.error||expRes.error||reviewsRes.error);showToast('No se pudieron cargar los reportes.');return}
+ if(apptsRes.error||expRes.error||reviewsRes.error){
+  console.error('[reportes] appointments:',apptsRes.error);
+  console.error('[reportes] expenses:',expRes.error);
+  console.error('[reportes] reviews:',reviewsRes.error);
+  const source=apptsRes.error?'citas':expRes.error?'gastos':'reseñas';
+  showToast(`No se pudieron cargar los reportes (${source}).`);
+  return
+}
  if(fiscalRes.error){console.warn('Control fiscal no disponible. Ejecuta SQL_SALES_FISCAL.sql',fiscalRes.error)}
  state.appointments=apptsRes.data||[];state.expenses=expRes.data||[];state.reviews=reviewsRes.data||[];state.fiscal=fiscalRes.error?[]:(fiscalRes.data||[]);renderAll();
 }
@@ -40,7 +47,7 @@ async function addExpense(){
  document.getElementById('exp-concept').value='';document.getElementById('exp-amount').value='';document.getElementById('expense-panel').classList.add('hidden');showToast('Gasto guardado.');await loadData();
 }
 function expenseRow(x){return `<div class="adm-row"><div class="adm-row-time">${formatMoney(x.amount)}</div><div class="adm-row-info"><div class="adm-row-name">${esc(x.concept)}</div><div class="adm-row-sub">${CATEGORY_LABELS[x.category]||esc(x.category)} · ${esc(x.expense_date)}</div></div><button class="adm-exp-del" data-id="${x.id}">Eliminar</button></div>`}
-function customerName(a){return a.customers?.full_name||a.customers?.name||'Cliente'}
+function customerName(a){return 'Cliente'}
 function renderSales(){
  const rows=state.appointments.filter(a=>a.status==='completada'&&(a.appointment_date||'').startsWith(state.month));
  let total=0,invoiced=0,pending=0,vat=0;
