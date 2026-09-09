@@ -1,22 +1,18 @@
-# MyCitaGo — C2 cierre frontend
+# Corrección de Solicitar reseña
 
-Este paquete NO vuelve a crear las RPC. Se aplica después de haber instalado:
-- `platform_bulk_suspend(uuid[])`
-- `platform_bulk_reactivate(uuid[],integer)`
+El error de la captura proviene de Supabase, no de Agenda.
 
-## Qué corrige
-El frontend actual solo mostraba `X negocios procesados`, aunque el backend ya devuelve:
-- `processed`
-- `failed`
-- `results[]`
+La Agenda ya llama correctamente:
+`create_review_request({p_appointment_id:id})`
 
-Ahora:
-- informa éxitos y fallos parciales;
-- conserva seleccionados los negocios que fallaron para poder reintentar;
-- limpia la selección de los que sí terminaron;
-- mantiene el manejo de error total existente.
+Instalación:
+1. Supabase → SQL Editor.
+2. Ejecutar completo `sql/FIX_SOLICITAR_RESENA.sql`.
+3. Ejecutar `sql/VERIFY_SOLICITAR_RESENA.sql`.
+4. Volver a Agenda y pulsar Solicitar reseña en una cita completada.
 
-## Archivo modificado
-- `js/admin-platform.js`
-
-No toca SQL, RLS, C1 ni otros bloques.
+No subas nada a GitHub para este error.
+No modifica Google Reviews.
+Mantiene:
+- `internal` = MyCitaGo / cliente verificado.
+- `google` = Google Business Profile.
