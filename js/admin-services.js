@@ -222,7 +222,38 @@ function renderServiceTemplates(category=currentTemplateCategory){
   root.querySelector('#add-selected-templates')?.addEventListener('click',openBatchTemplateReview);
 }
 function applyServiceTemplate(t){if(!templateBelongsToBusiness(t)){toast('Esta plantilla no pertenece al giro de tu negocio');return;}clearForm();$('sname').value=t.name;$('category').value=t.category;$('duration').value=t.duration;$('sdesc').value=t.description||'';const price=suggestedPriceForTemplate(t);$('price').value=price||'';selectedPresetImage=platformAssetForTemplate(t)||assetUrl(t.image);$('preset-image-url').value=selectedPresetImage;updateSummary();calculateServiceIntelligence();saveLocalDraft();$('price').focus();toast(`${t.name}: revisa y confirma el precio sugerido`)}
-function openBatchTemplateReview(){const list=(SERVICE_TEMPLATE_LIBRARY[currentTemplateCategory]||[]).filter(t=>selectedTemplateNames.has(t.name));if(!list.length)return toast('Selecciona al menos una plantilla');let box=$('template-batch-review');if(!box){box=document.createElement('section');box.id='template-batch-review';box.className='svc-card svc-batch-review';$('service-template-library').after(box)}box.innerHTML=`<div class="svc-card-title"><div><h2>Revisa antes de crear</h2><p>Los precios son sugerencias y no se guardan hasta confirmar.</p></div></div>${list.map((t,i)=>`<label>${t.name}<span>${t.duration} min</span><input data-batch-price="${i}" type="number" min="0" step="0.01" value="${suggestedPriceForTemplate(t)}"></label>`).join('')}<button id="confirm-batch-services" class="svc-btn svc-btn-primary" type="button">Confirmar y crear ${list.length} servicios</button>`;$('confirm-batch-services').onclick=()=>createBatchServices(list,box)}
+function openBatchTemplateReview(){
+  const list=(SERVICE_TEMPLATE_LIBRARY[currentTemplateCategory]||[]).filter(t=>selectedTemplateNames.has(t.name));
+  if(!list.length)return toast('Selecciona al menos una plantilla');
+
+  let box=$('template-batch-review');
+  if(!box){
+    box=document.createElement('section');
+    box.id='template-batch-review';
+    box.className='svc-card svc-batch-review';
+    $('service-template-library').after(box);
+  }
+
+  box.innerHTML=`
+    <div class="svc-card-title svc-batch-head">
+      <div>
+        <h2>Revisa antes de crear</h2>
+        <p class="svc-batch-helper">Los precios son sugerencias y no se guardan hasta confirmar.</p>
+      </div>
+    </div>
+    <div class="svc-batch-review-list">
+      ${list.map((t,i)=>`
+        <label class="svc-batch-review-row">
+          <span class="svc-batch-service-name">${t.name}</span>
+          <span class="svc-batch-duration">${t.duration} min</span>
+          <input data-batch-price="${i}" type="number" min="0" step="0.01" value="${suggestedPriceForTemplate(t)}" aria-label="Precio sugerido de ${t.name}">
+        </label>
+      `).join('')}
+    </div>
+    <button id="confirm-batch-services" class="svc-btn svc-btn-primary" type="button">Confirmar y crear ${list.length} servicios</button>
+  `;
+  $('confirm-batch-services').onclick=()=>createBatchServices(list,box);
+}
 async function createBatchServices(list,box){const btn=$('confirm-batch-services');btn.disabled=true;try{if(list.some(t=>!templateBelongsToBusiness(t)))throw new Error('Hay plantillas que no pertenecen al giro de tu negocio');for(let i=0;i<list.length;i++){const t=list[i],price=Number(box.querySelector(`[data-batch-price="${i}"]`).value)||0;const generic=platformAssetForTemplate(t)||assetUrl(t.image);let image_url=generic;if(platformAssetForTemplate(t)&&window.CitagoMedia){image_url=(await CitagoMedia.adoptPublicImage(generic,{businessId:biz.id,kind:'services'})).url}const {error}=await supabaseClient.from('services').insert({business_id:biz.id,name:t.name,category:t.category,price,duration_minutes:t.duration,description:t.description||'',image_url,active:true});if(error)throw error}toast(`${list.length} servicios creados`);box.remove();await loadServices()}catch(e){toast('No se pudieron crear: '+e.message)}finally{btn.disabled=false}}
 function openBulkPriceAdjust(){const pct=Number(prompt('Ajustar precios por lote. Escribe el porcentaje (ej. 10 o -5):','10'));if(!Number.isFinite(pct)||pct===0)return;const category=prompt('Categoría exacta a ajustar. Déjalo vacío para todos:','')||'';const targets=items.filter(x=>!category||String(x.category||'').toLowerCase()===category.toLowerCase());if(!targets.length)return toast('No hay servicios para ese filtro');const preview=targets.slice(0,5).map(x=>`${x.name}: ${money(x.price)} → ${money(Number(x.price)*(1+pct/100))}`).join('\n');if(!confirm(`Ajustar ${targets.length} servicios ${pct>0?'+':''}${pct}%?\n\n${preview}`))return;Promise.all(targets.map(x=>supabaseClient.from('services').update({price:Math.round(Number(x.price)*(1+pct/100)*100)/100}).eq('id',x.id).eq('business_id',biz.id))).then(async results=>{const bad=results.find(r=>r.error);if(bad)return toast('No se pudo actualizar: '+bad.error.message);toast('Precios actualizados');await loadServices()})}
 

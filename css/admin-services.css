@@ -18,3 +18,50 @@
 .svc-compatibility{display:inline-flex;margin:7px 0 2px;padding:5px 8px;border-radius:999px;background:#fef3c7;color:#92400e;font-size:8px;font-weight:800}
 #bulk-hide-incompatible{border-color:#f59e0b!important;color:#92400e!important;background:#fffaf0!important}
 #bulk-hide-incompatible:hover{background:#fef3c7!important}
+
+
+/* =========================================================
+   Servicios · Contraste definitivo en "Revisa antes de crear"
+   ========================================================= */
+.svc-quick-start .svc-batch-review{
+  background:#fff!important;
+  color:#17151f!important;
+  border-color:#e6e1ed!important;
+}
+.svc-quick-start .svc-batch-review .svc-batch-head h2{
+  color:#5630ed!important;
+}
+.svc-quick-start .svc-batch-review .svc-batch-helper{
+  color:#716b79!important;
+  opacity:1!important;
+}
+.svc-quick-start .svc-batch-review .svc-batch-review-list{
+  display:grid;
+}
+.svc-quick-start .svc-batch-review .svc-batch-review-row{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 90px 130px;
+  gap:10px;
+  align-items:center;
+  padding:9px 0;
+  border-bottom:1px solid #eee;
+  color:#17151f!important;
+}
+.svc-quick-start .svc-batch-review .svc-batch-service-name{color:#17151f!important;font-weight:700}
+.svc-quick-start .svc-batch-review .svc-batch-duration{color:#56627c!important;font-weight:600}
+.svc-quick-start .svc-batch-review input{
+  background:#fff!important;
+  color:#17151f!important;
+  border:1px solid #dfe4ee!important;
+  opacity:1!important;
+}
+.svc-quick-start .svc-batch-review input::placeholder{color:#75809a!important}
+.svc-quick-start .svc-batch-review #confirm-batch-services{color:#fff!important}
+@media(max-width:700px){
+  .svc-quick-start .svc-batch-review .svc-batch-review-row{
+    grid-template-columns:1fr 70px;
+  }
+  .svc-quick-start .svc-batch-review .svc-batch-review-row input{
+    grid-column:1/-1;
+  }
+}
