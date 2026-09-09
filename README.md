@@ -1,18 +1,29 @@
-# Corrección de Solicitar reseña
+# MyCitaGo — Fix de guardado de reseña
 
-El error de la captura proviene de Supabase, no de Agenda.
+La captura demuestra que el enlace ya funciona:
+- token válido
+- negocio identificado
+- servicio identificado
+- cita identificada como completada
 
-La Agenda ya llama correctamente:
-`create_review_request({p_appointment_id:id})`
+El fallo ocurre al guardar la reseña.
 
-Instalación:
-1. Supabase → SQL Editor.
-2. Ejecutar completo `sql/FIX_SOLICITAR_RESENA.sql`.
-3. Ejecutar `sql/VERIFY_SOLICITAR_RESENA.sql`.
-4. Volver a Agenda y pulsar Solicitar reseña en una cita completada.
+## 1. Supabase
+Ejecuta:
+`sql/FIX_GUARDAR_RESENA.sql`
 
-No subas nada a GitHub para este error.
-No modifica Google Reviews.
-Mantiene:
-- `internal` = MyCitaGo / cliente verificado.
-- `google` = Google Business Profile.
+Luego:
+`sql/VERIFY_GUARDAR_RESENA.sql`
+
+## 2. GitHub
+Reemplaza:
+`js/public-review.js`
+
+Con este JS, si aún existe un error del backend, la página mostrará el mensaje real de Supabase en lugar del texto genérico.
+
+## 3. Probar
+Genera un NUEVO enlace desde Agenda y prueba una reseña.
+
+Se mantienen separados:
+- internal = MyCitaGo / Cliente verificado
+- google = Google Business Profile

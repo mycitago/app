@@ -1,12 +1,34 @@
-
 const q=id=>document.getElementById(id);
 let token='',rating=0,context=null;
 
-function showError(message){
+function showError(message,hideForm=true){
   q('review-error').textContent=message;
   q('review-error').classList.remove('hidden');
-  q('review-form').classList.add('hidden');
+  if(hideForm)q('review-form')?.classList.add('hidden');
 }
+
+function backendMessage(error){
+  const raw=String(error?.message||'');
+  if(raw.includes('request_already_used')||raw.includes('review_already_submitted')){
+    return 'Esta cita ya tiene una reseña registrada.';
+  }
+  if(raw.includes('appointment_not_completed')){
+    return 'La cita ya no aparece como completada.';
+  }
+  if(raw.includes('request_expired')){
+    return 'Este enlace de reseña venció.';
+  }
+  if(raw.includes('invalid_rating')){
+    return 'Selecciona una calificación de 1 a 5 estrellas.';
+  }
+  if(raw.includes('comment_too_long')){
+    return 'El comentario es demasiado largo.';
+  }
+  return raw
+    ? `No se pudo guardar la reseña: ${raw}`
+    : 'No se pudo guardar la reseña.';
+}
+
 function paint(){
   document.querySelectorAll('[data-rating]').forEach(b=>{
     const active=Number(b.dataset.rating)<=rating;
@@ -15,11 +37,13 @@ function paint(){
   });
   q('rating-help').textContent=rating?`${rating} de 5 estrellas`:'Selecciona de 1 a 5 estrellas.';
 }
+
 function dateLabel(value){
   if(!value)return'';
   const [y,m,d]=String(value).slice(0,10).split('-').map(Number);
   return new Date(y,m-1,d,12).toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'});
 }
+
 async function init(){
   token=new URLSearchParams(location.search).get('t')||'';
   if(!token)return showError('Este enlace de reseña no es válido.');
@@ -44,13 +68,22 @@ async function init(){
     b.setAttribute('aria-pressed','false');
     b.onclick=()=>{rating=Number(b.dataset.rating);paint();};
   });
-  q('review-comment').addEventListener('input',()=>q('review-count').textContent=q('review-comment').value.length);
+
+  q('review-comment').addEventListener('input',()=>{
+    q('review-count').textContent=q('review-comment').value.length;
+  });
+
   q('review-form').onsubmit=submit;
 }
+
 async function submit(e){
   e.preventDefault();
   q('review-error').classList.add('hidden');
-  if(!rating)return showError('Selecciona de 1 a 5 estrellas.');
+
+  if(!rating){
+    showError('Selecciona de 1 a 5 estrellas.',false);
+    return;
+  }
 
   const btn=q('review-submit');
   btn.disabled=true;
@@ -64,13 +97,16 @@ async function submit(e){
   });
 
   if(error||!data?.ok){
+    console.error('[MyCitaGo review submit]',error,data);
     btn.disabled=false;
     btn.textContent='Publicar mi reseña';
-    return showError('No se pudo guardar la reseña. El enlace puede haber sido utilizado o la cita ya no es elegible.');
+    showError(backendMessage(error),false);
+    return;
   }
 
   q('review-form').classList.add('hidden');
   q('review-error').classList.add('hidden');
   q('review-success').classList.remove('hidden');
 }
+
 document.addEventListener('DOMContentLoaded',init);

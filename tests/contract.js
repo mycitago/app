@@ -1,12 +1,15 @@
 
 const fs=require('fs');
 const sql=fs.readFileSync(process.argv[2],'utf8');
+const js=fs.readFileSync(process.argv[3],'utf8');
 let bad=false;
 function ok(c,m){if(!c){console.error('FAIL:',m);bad=true}}
-ok(sql.includes('alter extension pgcrypto set schema extensions'),'no fuerza pgcrypto al schema extensions');
-ok(sql.includes('extensions.gen_random_bytes(24)'),'gen_random_bytes no esta calificado');
-ok(sql.includes('extensions.digest('),'digest no esta calificado');
-ok(sql.includes('create or replace function public.create_review_request'),'falta RPC create_review_request');
-ok(sql.includes('grant execute on function public.create_review_request(uuid) to authenticated'),'falta grant autenticado');
-ok(sql.includes('notify pgrst'), 'falta recarga de schema');
+ok(sql.includes('add column if not exists verified boolean'),'falta verified');
+ok(sql.includes('add column if not exists verified_at timestamptz'),'falta verified_at');
+ok(sql.includes('add column if not exists appointment_id uuid'),'falta appointment_id');
+ok(sql.includes('add column if not exists customer_id uuid'),'falta customer_id');
+ok(sql.includes('create or replace function public.submit_internal_review'),'falta RPC submit');
+ok(sql.includes("md5(coalesce(p_token,''))"),'submit no usa hash actual');
+ok(js.includes("error?.message"),'frontend no muestra error real');
+ok(js.includes("request_already_used"),'frontend no traduce enlace usado');
 process.exit(bad?1:0);
