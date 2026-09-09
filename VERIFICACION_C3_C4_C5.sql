@@ -1,0 +1,3 @@
+select to_regclass('public.platform_notification_outbox') outbox,to_regclass('public.platform_operational_alerts') alerts,to_regprocedure('public.platform_collect_operational_alerts()') collect_alerts,to_regprocedure('public.platform_queue_daily_alert_digest(date)') digest,to_regprocedure('public.platform_read_support_v2()') support_v2,to_regprocedure('public.platform_update_support_ticket(uuid,text,uuid,boolean,text)') support_update,to_regprocedure('public.platform_queue_billing_reminders(date)') billing_reminders;
+select * from public.platform_notification_settings;
+select dedupe_key,count(*) from public.platform_notification_outbox group by dedupe_key having count(*)>1;
