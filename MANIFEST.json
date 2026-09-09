@@ -1,17 +1,19 @@
 {
-  "base_repo": "mycitago/app",
-  "base_branch": "main",
-  "base_tree_sha": "b5c7483678a9f2628e279ade59a455e79d336e09",
-  "generated": "2026-09-08",
-  "blocks": [
-    "A1",
-    "A2",
-    "A3",
-    "C1-safe",
-    "D",
-    "G"
+  "scope": "Dashboard only: operational business date + timezone completeness + KPI icon semantics",
+  "files_modified": [
+    "js/admin-dashboard-pro.js",
+    "js/dashboard-v3.js",
+    "admin/index.html",
+    "css/citago-v3.css"
   ],
-  "sql_modified": false,
-  "rls_modified": false,
-  "creates_v4": false
+  "not_modified": [
+    "RLS",
+    "Supabase schema",
+    "citago-shell.js",
+    "citago-shell-v3.js",
+    "other admin pages"
+  ],
+  "origin_late_card": "js/dashboard-v3.js::ensureLateKpi/renderLateKpi",
+  "reversible": true,
+  "installer_fails_closed": true
 }

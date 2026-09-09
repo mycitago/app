@@ -1,0 +1,4 @@
+.dashboard-v3 .v3-kpi-3 .kpi-icon{background:var(--v3-card-soft)!important;color:var(--v3-muted)!important}
+.dashboard-v3 .v3-kpi-late.v3-kpi-late-config .kpi-icon{background:var(--v3-card-soft)!important;color:var(--v3-muted)!important}
+.dashboard-v3 .v3-kpi-late.v3-kpi-late-clear .kpi-icon{background:var(--v3-info-soft)!important;color:var(--v3-info)!important}
+.dashboard-v3 .v3-kpi-late.v3-kpi-late-danger .kpi-icon{background:var(--v3-danger-soft)!important;color:var(--v3-danger)!important}
