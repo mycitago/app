@@ -9,7 +9,7 @@ ESTE PAQUETE:
 - Si falla una fuente, las demás sí se muestran.
 - El estado superior indica qué fuente falló.
 - Elimina relaciones embebidas de appointments.
-- Fuerza carga del JS nuevo con ?v=20260909-reportfix2.
+- Fuerza carga del JS nuevo con ?v=20260909-reportfix3.
 - IVA activado por defecto al 16%.
 - Puede desactivarse por venta.
 - Con IVA activo, el precio de la cita se trata como TOTAL IVA INCLUIDO; subtotal = total / 1.16.
@@ -21,6 +21,8 @@ ORDEN:
 3. Reemplazar js/admin-accounting.js
 4. Reemplazar css/admin-reports.css
 5. Abrir:
-https://mycitago.github.io/app/admin/contabilidad.html?v=20260909-reportfix2
+https://mycitago.github.io/app/admin/contabilidad.html?v=20260909-reportfix3
 
 Si sale "Datos cargados parcialmente", el mismo mensaje indicará la fuente exacta que no tiene acceso.
+
+IMPORTANTE: El repo main que revisé todavía carga admin-accounting.js sin versión y conserva la carga anterior. Debes reemplazar los 3 archivos completos para que el navegador use esta versión.
