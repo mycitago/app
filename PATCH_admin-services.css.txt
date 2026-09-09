@@ -1,0 +1,94 @@
+/* REDISEÑO CONFIGURACIÓN RÁPIDA — bloque visual aprobado
+   Aplicar sobre las reglas existentes; no crear archivo CSS paralelo. */
+
+/* Paso 1: selección única */
+.svc-business-type{
+  margin:18px 0 12px;
+  max-width:360px;
+}
+.svc-business-type label{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  font-size:10px;
+  font-weight:800;
+  color:#d8d3e2;
+}
+.svc-business-type label::before{
+  content:"1 · ELIGE TU TIPO DE NEGOCIO";
+  color:#b79cff;
+  font-size:9px;
+  font-weight:800;
+}
+.svc-business-type label::after{
+  content:"Una sola opción";
+  color:#cbc5d8;
+  font-size:9px;
+  font-weight:600;
+}
+.svc-business-type select{
+  border:1px solid #514565;
+  background:#211b30;
+  color:#fff;
+  border-radius:11px;
+  padding:11px 12px;
+  font:600 12px Manrope,sans-serif;
+}
+
+/* Paso 2: selección múltiple */
+.svc-template-batch-tools{
+  grid-column:1/-1;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:12px;
+  border:1px solid #e8e2ef;
+  border-radius:14px;
+  background:#faf8ff;
+  color:#17151f;
+}
+.svc-template-step-copy{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  min-width:0;
+}
+.svc-template-step-copy b{
+  color:#17151f;
+  font-size:11px;
+}
+.svc-template-step-copy span{
+  color:#716b79;
+  font-size:9px;
+}
+.svc-template-step-copy .svc-template-step-number{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:18px;
+  height:18px;
+  margin-right:4px;
+  border-radius:999px;
+  background:#6d35ee;
+  color:#fff;
+  font-size:9px;
+}
+.svc-template-batch-tools button{
+  border:0;
+  border-radius:9px;
+  padding:7px 10px;
+  background:#6d35ee;
+  color:#fff;
+  font-weight:800;
+}
+
+@media(max-width:700px){
+  .svc-template-batch-tools{
+    flex-direction:column;
+    align-items:stretch;
+  }
+  .svc-template-batch-tools button{
+    width:100%;
+  }
+}

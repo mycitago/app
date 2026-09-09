@@ -1,0 +1,5 @@
+/* REEMPLAZO ÚNICO dentro de renderServiceTemplates()
+   Sustituir SOLO el tools.innerHTML actual por esta línea.
+   No cambia comportamiento: mantiene el mismo id del botón.
+*/
+tools.innerHTML='<div class="svc-template-step-copy"><b><span class="svc-template-step-number">2</span> Elige servicios para agregar</b><span>Selecciona una o varias plantillas.</span></div><button id="add-selected-templates" type="button">Agregar seleccionados</button>';
