@@ -53,10 +53,7 @@ async function selectDate(day){
   announce(el.availabilityLive,'Buscando horarios disponibles.');
   const slots=await getAvailableSlots(state.business,day.date,state.selectedService.duration_minutes);renderSlots(slots);
 }
-function slotGroup(title,slots){
-  if(!slots.length)return'';
-  return `<section class="slot-period"><h3>${title}</h3><div class="slot-period-grid"></div></section>`;
-}
+function slotGroup(title,slots){if(!slots.length)return'';return `<section class="slot-period"><h3>${title}</h3><div class="slot-period-grid"></div></section>`;}
 function renderSlots(slots){
   el.slotGrid.replaceChildren();
   const available=(slots||[]).filter(s=>s.available);
@@ -81,9 +78,17 @@ function renderSlots(slots){
   });
   announce(el.availabilityLive,`${available.length} horarios disponibles.`);
 }
+function syncFlowChrome(stepEl){
+  const onServices=stepEl?.id==='step-services';
+  document.body.classList.toggle('booking-flow-active',!onServices);
+  const hero=$('hero');
+  if(hero)hero.hidden=!onServices;
+}
 function goToStep(stepEl){
   [$('step-services'),el.bookingStep,el.formStep,el.successStep].forEach(s=>s?.classList.add('hidden'));
-  stepEl.classList.remove('hidden');scrollToNode(stepEl);stepEl.querySelector('h2')?.focus?.();
+  stepEl.classList.remove('hidden');
+  syncFlowChrome(stepEl);
+  scrollToNode(stepEl);stepEl.querySelector('h2')?.focus?.();
 }
 function setProgress(step){
   document.querySelectorAll('[data-progress-step]').forEach(node=>{
@@ -126,6 +131,7 @@ async function init(){
   $('services-count').textContent=state.services.length?`${state.services.length} opciones`:'';
   el.serviceSearch?.addEventListener('input',()=>{state.serviceSearch=el.serviceSearch.value.trim();renderServices(state.services,el.servicesList,selectService,state.activeCategory,state.serviceSearch);});
   renderDateScroller();loadPublicReviews(state.business.id);
+  syncFlowChrome($('step-services'));
   el.btnAgendar.addEventListener('click',()=>{if(!state.selectedService)return;setProgress(2);goToStep(el.bookingStep);});
   el.btnGoToForm.addEventListener('click',()=>{if(!state.selectedSlot)return;setProgress(3);goToStep(el.formStep);});
   el.btnConfirmBooking.addEventListener('click',handleConfirmBooking);

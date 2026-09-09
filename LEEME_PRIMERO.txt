@@ -1,0 +1,35 @@
+MYCITAGO — CORRECCIÓN BANNER EN RESERVACIÓN
+
+SUBIR A GITHUB reemplazando los archivos completos:
+
+1) /reservar.html
+2) /js/app.js
+
+NO cambies nombres ni rutas.
+
+QUÉ CORRIGE
+- El banner/portada grande se muestra en el Paso 1: elegir servicio.
+- Al avanzar a Fecha/Hora, Datos o Confirmación, el banner se oculta.
+- Así el banner ya no tapa servicios, fechas ni horarios.
+- Al volver al Paso 1, la portada reaparece.
+- No modifica Supabase, creación de citas ni cálculo de disponibilidad.
+
+DESPUÉS DEL DEPLOY
+Abrir:
+https://mycitago.github.io/app/reservar.html?n=clinica&v=20260909-banner-fix1
+
+PRUEBA
+1. Seleccionar un servicio.
+2. Pulsar continuar/agendar.
+3. Confirmar que desaparece la portada grande.
+4. Seleccionar fecha.
+5. Seleccionar hora.
+6. Continuar a datos.
+7. Confirmar la cita.
+8. Volver a Servicios y confirmar que la portada reaparece.
+
+VERIFICACIÓN LOCAL DEL PAQUETE
+- Control de estado del hero: OK
+- Protección CSS de [hidden]: OK
+- Cache busting de app.js: OK
+- Sintaxis JavaScript: OK
