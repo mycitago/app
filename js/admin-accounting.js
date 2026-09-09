@@ -1,89 +1,108 @@
-// admin-accounting.js — Reportes, ventas, control fiscal e indicadores
-function currentMonthKey(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`}
-const state={business:null,month:currentMonthKey(),appointments:[],expenses:[],reviews:[],fiscal:[]};let financeChart=null;
-const el={monthPicker:document.getElementById('month-picker'),kpiIncome:document.getElementById('kpi-income'),kpiExpenses:document.getElementById('kpi-expenses'),kpiDone:document.getElementById('kpi-done'),kpiProjected:document.getElementById('kpi-projected'),kpiProfit:document.getElementById('kpi-profit'),kpiNote:document.getElementById('kpi-note'),listExpenses:document.getElementById('list-expenses'),summary6m:document.getElementById('summary-6m'),toast:document.getElementById('toast')};
-const CATEGORY_LABELS={insumos:'Insumos',renta:'Renta',sueldos:'Sueldos',servicios:'Servicios',marketing:'Marketing',mantenimiento:'Mantenimiento',otros:'Otros'};
-function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function showToast(msg){el.toast.textContent=msg;el.toast.classList.remove('hidden');setTimeout(()=>el.toast.classList.add('hidden'),3000)}
-function pad(n){return String(n).padStart(2,'0')} function todayKey(){const d=new Date();return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`}
-function formatMoney(n){return '$'+Number(n||0).toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2})}
-function lastMonthKeys(count=6){const keys=[],d=new Date();d.setDate(1);for(let i=0;i<count;i++){keys.unshift(`${d.getFullYear()}-${pad(d.getMonth()+1)}`);d.setMonth(d.getMonth()-1)}return keys}
-function monthLabel(key){const[y,m]=key.split('-').map(Number);return new Date(y,m-1,1).toLocaleDateString('es-MX',{month:'short',year:'2-digit'})}
-function fiscalByAppointment(id){return state.fiscal.find(x=>x.appointment_id===id)||null}
+function monthKeyNow(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`}
+const state={business:null,month:monthKeyNow(),appointments:[],expenses:[],reviews:[],fiscal:[],services:new Map()};
+let financeChart=null;
+const $=id=>document.getElementById(id);
+const money=n=>'$'+Number(n||0).toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2});
+const pad=n=>String(n).padStart(2,'0');
+const todayKey=()=>{const d=new Date();return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`};
+function lastMonths(n=6){const a=[],d=new Date();d.setDate(1);for(let i=0;i<n;i++){a.unshift(`${d.getFullYear()}-${pad(d.getMonth()+1)}`);d.setMonth(d.getMonth()-1)}return a}
+function monthLabel(k){const[y,m]=k.split('-').map(Number);return new Date(y,m-1,1).toLocaleDateString('es-MX',{month:'short',year:'2-digit'})}
+function toast(m){const e=$('toast');if(!e)return;e.textContent=m;e.classList.remove('hidden');setTimeout(()=>e.classList.add('hidden'),3200)}
+function setLoadStatus(text,type='ok'){const e=$('report-load-status');if(!e)return;e.textContent=text;e.dataset.type=type}
+function fiscal(id){return state.fiscal.find(x=>x.appointment_id===id)||null}
+function svcName(a){return state.services.get(a.service_id)||'Servicio'}
+function computeVatFromTotal(total,applies=true,rate=0.16){total=Number(total||0);if(!applies)return{subtotal:total,vat:0};const subtotal=total/(1+rate);return{subtotal:Number(subtotal.toFixed(2)),vat:Number((total-subtotal).toFixed(2))}}
+
 async function init(){
- const session=await requireAuth();if(!session)return;const business=await getMyBusiness(session.user);if(!business){showToast('No tienes un negocio asignado.');return}state.business=business;
- el.monthPicker.value=state.month;el.monthPicker.addEventListener('change',()=>{if(el.monthPicker.value){state.month=el.monthPicker.value;renderAll()}});
- document.getElementById('btn-add-expense').addEventListener('click',addExpense);
- document.getElementById('open-expense')?.addEventListener('click',()=>document.getElementById('expense-panel').classList.remove('hidden'));
- document.querySelectorAll('[data-close-expense]').forEach(x=>x.addEventListener('click',()=>document.getElementById('expense-panel').classList.add('hidden')));
- document.querySelectorAll('[data-close-sale]').forEach(x=>x.addEventListener('click',()=>document.getElementById('sale-panel').classList.add('hidden')));
- document.getElementById('save-sale-fiscal')?.addEventListener('click',saveSaleFiscal);
- document.getElementById('export-sales')?.addEventListener('click',exportSalesCSV);
- document.getElementById('exp-date').value=todayKey();await loadData();
+ const session=await requireAuth();if(!session)return;
+ state.business=await getMyBusiness(session.user);if(!state.business){toast('No tienes un negocio asignado.');return}
+ $('month-picker').value=state.month;$('month-picker').onchange=()=>{state.month=$('month-picker').value||state.month;renderAll()};
+ $('open-expense').onclick=()=>$('expense-panel').classList.remove('hidden');
+ document.querySelectorAll('[data-close-expense]').forEach(x=>x.onclick=()=>$('expense-panel').classList.add('hidden'));
+ document.querySelectorAll('[data-close-sale]').forEach(x=>x.onclick=()=>$('sale-panel').classList.add('hidden'));
+ $('btn-add-expense').onclick=addExpense;$('save-sale-fiscal').onclick=saveFiscal;$('export-sales').onclick=exportCSV;
+ $('exp-date').value=todayKey();
+ $('sale-vat-applies').onchange=recalcOpenSaleVat;
+ await loadData();
 }
+
 async function loadData(){
- const from=`${lastMonthKeys(6)[0]}-01`;
- const [apptsRes,expRes,reviewsRes,fiscalRes]=await Promise.all([
-  supabaseClient.from('appointments').select('id,appointment_date,status,price_charged,booking_source,customer_id,services(id,name)').eq('business_id',state.business.id).gte('appointment_date',from),
-  supabaseClient.from('expenses').select('*').eq('business_id',state.business.id).gte('expense_date',from).order('expense_date',{ascending:false}),
-  supabaseClient.from('reviews').select('rating,created_at,status').eq('business_id',state.business.id).eq('status','published').gte('created_at',from),
-  supabaseClient.from('sale_fiscal_records').select('*').eq('business_id',state.business.id)
- ]);
- if(apptsRes.error||expRes.error||reviewsRes.error){
-  console.error('[reportes] appointments:',apptsRes.error);
-  console.error('[reportes] expenses:',expRes.error);
-  console.error('[reportes] reviews:',reviewsRes.error);
-  const source=apptsRes.error?'citas':expRes.error?'gastos':'reseñas';
-  showToast(`No se pudieron cargar los reportes (${source}).`);
-  return
+ setLoadStatus('Cargando información…','loading');
+ const from=`${lastMonths(6)[0]}-01`;
+ const tasks={
+  appointments:supabaseClient.from('appointments').select('id,appointment_date,status,price_charged,booking_source,customer_id,service_id').eq('business_id',state.business.id).gte('appointment_date',from),
+  expenses:supabaseClient.from('expenses').select('*').eq('business_id',state.business.id).gte('expense_date',from),
+  reviews:supabaseClient.from('reviews').select('rating,created_at,status').eq('business_id',state.business.id).eq('status','published').gte('created_at',from),
+  fiscal:supabaseClient.from('sale_fiscal_records').select('*').eq('business_id',state.business.id),
+  services:supabaseClient.from('services').select('id,name').eq('business_id',state.business.id)
+ };
+ const keys=Object.keys(tasks), results=await Promise.allSettled(Object.values(tasks));
+ const errors=[];
+ results.forEach((r,i)=>{
+   const key=keys[i];
+   if(r.status==='rejected'||r.value?.error){errors.push(key);console.error(`[reportes:${key}]`,r.reason||r.value?.error);return}
+   const data=r.value?.data||[];
+   if(key==='appointments')state.appointments=data;
+   if(key==='expenses')state.expenses=data;
+   if(key==='reviews')state.reviews=data;
+   if(key==='fiscal')state.fiscal=data;
+   if(key==='services')state.services=new Map(data.map(s=>[s.id,s.name]));
+ });
+ renderAll();
+ if(errors.length) setLoadStatus(`Datos cargados parcialmente. Sin acceso a: ${errors.join(', ')}.`,'warn');
+ else setLoadStatus('Datos actualizados.','ok');
 }
- if(fiscalRes.error){console.warn('Control fiscal no disponible. Ejecuta SQL_SALES_FISCAL.sql',fiscalRes.error)}
- state.appointments=apptsRes.data||[];state.expenses=expRes.data||[];state.reviews=reviewsRes.data||[];state.fiscal=fiscalRes.error?[]:(fiscalRes.data||[]);renderAll();
-}
+
 async function addExpense(){
- const concept=document.getElementById('exp-concept').value.trim(),category=document.getElementById('exp-category').value,amount=parseFloat(document.getElementById('exp-amount').value),date=document.getElementById('exp-date').value||todayKey();
- if(!concept||!amount||amount<=0){showToast('Escribe un concepto y un monto mayor a 0.');return}
- const{error}=await supabaseClient.from('expenses').insert({business_id:state.business.id,concept,category,amount,expense_date:date});if(error){showToast('No se pudo guardar el gasto.');return}
- document.getElementById('exp-concept').value='';document.getElementById('exp-amount').value='';document.getElementById('expense-panel').classList.add('hidden');showToast('Gasto guardado.');await loadData();
+ const concept=$('exp-concept').value.trim(),amount=Number($('exp-amount').value||0);
+ if(!concept||amount<=0)return toast('Captura concepto y monto mayor a 0.');
+ const{error}=await supabaseClient.from('expenses').insert({business_id:state.business.id,concept,category:$('exp-category').value,amount,expense_date:$('exp-date').value||todayKey()});
+ if(error){console.error(error);return toast('No se pudo guardar el gasto.')}
+ $('expense-panel').classList.add('hidden');toast('Gasto guardado.');await loadData();
 }
-function expenseRow(x){return `<div class="adm-row"><div class="adm-row-time">${formatMoney(x.amount)}</div><div class="adm-row-info"><div class="adm-row-name">${esc(x.concept)}</div><div class="adm-row-sub">${CATEGORY_LABELS[x.category]||esc(x.category)} · ${esc(x.expense_date)}</div></div><button class="adm-exp-del" data-id="${x.id}">Eliminar</button></div>`}
-function customerName(a){return 'Cliente'}
+
+function openSale(id){
+ const a=state.appointments.find(x=>x.id===id);if(!a)return;
+ const f=fiscal(id), total=Number(a.price_charged||0), applies=f?f.vat_applies!==false:true, rate=Number(f?.vat_rate??0.16), calc=computeVatFromTotal(total,applies,rate);
+ $('sale-appointment-id').value=id;$('sale-vat-applies').checked=applies;
+ $('sale-payment-status').value=f?.payment_status||'paid';$('sale-cfdi-status').value=f?.cfdi_status||'not_required';
+ $('sale-subtotal').value=Number(f?.subtotal??calc.subtotal).toFixed(2);$('sale-vat').value=Number(f?.vat_amount??calc.vat).toFixed(2);
+ $('sale-uuid').value=f?.cfdi_uuid||'';$('sale-payment-form').value=f?.payment_form||'';$('sale-payment-method').value=f?.payment_method||'';
+ $('sale-rfc').value=f?.receiver_rfc||'';$('sale-fiscal-name').value=f?.receiver_fiscal_name||'';$('sale-tax-regime').value=f?.receiver_tax_regime||'';$('sale-zip').value=f?.receiver_zip||'';$('sale-cfdi-use').value=f?.cfdi_use||'';$('sale-stamped-at').value=f?.stamped_at?String(f.stamped_at).slice(0,16):'';
+ $('sale-panel').dataset.total=String(total);$('sale-panel').classList.remove('hidden');
+}
+function recalcOpenSaleVat(){
+ const total=Number($('sale-panel').dataset.total||0), applies=$('sale-vat-applies').checked, calc=computeVatFromTotal(total,applies,0.16);
+ $('sale-subtotal').value=calc.subtotal.toFixed(2);$('sale-vat').value=calc.vat.toFixed(2);
+}
+async function saveFiscal(){
+ const id=$('sale-appointment-id').value;if(!id)return;
+ const payload={business_id:state.business.id,appointment_id:id,payment_status:$('sale-payment-status').value,cfdi_status:$('sale-cfdi-status').value,vat_applies:$('sale-vat-applies').checked,vat_rate:$('sale-vat-applies').checked?0.16:0,subtotal:Number($('sale-subtotal').value||0),vat_amount:Number($('sale-vat').value||0),cfdi_uuid:$('sale-uuid').value.trim()||null,payment_form:$('sale-payment-form').value.trim()||null,payment_method:$('sale-payment-method').value||null,receiver_rfc:$('sale-rfc').value.trim().toUpperCase()||null,receiver_fiscal_name:$('sale-fiscal-name').value.trim()||null,receiver_tax_regime:$('sale-tax-regime').value.trim()||null,receiver_zip:$('sale-zip').value.trim()||null,cfdi_use:$('sale-cfdi-use').value.trim().toUpperCase()||null,stamped_at:$('sale-stamped-at').value||null,updated_at:new Date().toISOString()};
+ if(payload.cfdi_status==='invoiced'&&!payload.cfdi_uuid)return toast('Para marcar como facturada captura el UUID.');
+ const{error}=await supabaseClient.from('sale_fiscal_records').upsert(payload,{onConflict:'business_id,appointment_id'});if(error){console.error(error);return toast('No se pudo guardar el control fiscal.')}
+ $('sale-panel').classList.add('hidden');toast('Control fiscal guardado.');await loadData();
+}
+
+function renderAll(){
+ const ms=lastMonths(6), per=ms.map(key=>{const a=state.appointments.filter(x=>(x.appointment_date||'').startsWith(key)),income=a.filter(x=>x.status==='completada').reduce((s,x)=>s+Number(x.price_charged||0),0),projected=a.filter(x=>x.status==='confirmada').reduce((s,x)=>s+Number(x.price_charged||0),0),expenses=state.expenses.filter(x=>(x.expense_date||'').startsWith(key)).reduce((s,x)=>s+Number(x.amount||0),0);return{key,income,projected,expenses,profit:income-expenses,done:a.filter(x=>x.status==='completada').length}});
+ const cur=per.find(x=>x.key===state.month)||{income:0,projected:0,expenses:0,profit:0,done:0};
+ $('kpi-income').textContent=money(cur.income);$('kpi-done').textContent=cur.done;$('kpi-projected').textContent=money(cur.projected);$('kpi-expenses').textContent=money(cur.expenses);$('kpi-profit').textContent=money(cur.profit);$('kpi-note').textContent=`${cur.done} citas completadas.`;
+ const rev=state.reviews.filter(r=>String(r.created_at||'').startsWith(state.month));$('kpi-new-reviews').textContent=rev.length;$('kpi-review-rating').textContent=rev.length?(rev.reduce((s,r)=>s+Number(r.rating||0),0)/rev.length).toFixed(1)+' ★':'—';$('kpi-shared-bookings').textContent=state.appointments.filter(a=>(a.appointment_date||'').startsWith(state.month)&&a.booking_source).length;
+ renderSales();renderExpenses();renderPopular();renderHistory(per);renderChart(per);
+}
+
 function renderSales(){
  const rows=state.appointments.filter(a=>a.status==='completada'&&(a.appointment_date||'').startsWith(state.month));
- let total=0,invoiced=0,pending=0,vat=0;
- rows.forEach(a=>{const amount=Number(a.price_charged||0),f=fiscalByAppointment(a.id);total+=amount;if(f?.cfdi_status==='invoiced')invoiced+=amount;else pending+=amount;vat+=Number(f?.vat_amount||0)});
- document.getElementById('fiscal-sales').textContent=formatMoney(total);document.getElementById('fiscal-invoiced').textContent=formatMoney(invoiced);document.getElementById('fiscal-pending').textContent=formatMoney(pending);document.getElementById('fiscal-vat').textContent=formatMoney(vat);
- const root=document.getElementById('sales-list');if(!rows.length){root.innerHTML='<tr><td colspan="7" class="ct-empty">No hay servicios completados en este periodo.</td></tr>';return}
- root.innerHTML=rows.sort((a,b)=>String(b.appointment_date).localeCompare(String(a.appointment_date))).map(a=>{const f=fiscalByAppointment(a.id),cfdi=f?.cfdi_status||'not_required',pay=f?.payment_status||'paid';return `<tr><td>${esc(a.appointment_date)}</td><td><b>${esc(customerName(a))}</b><small>${esc(a.services?.name||'Servicio')}</small></td><td><b>${formatMoney(a.price_charged)}</b></td><td><span class="fiscal-badge ${pay==='paid'?'ok':'warn'}">${pay==='paid'?'Pagado':'Pendiente'}</span></td><td><span class="fiscal-badge ${cfdi==='invoiced'?'ok':cfdi==='pending'?'warn':''}">${cfdi==='invoiced'?'Facturada':cfdi==='pending'?'Pendiente':cfdi==='cancelled'?'Cancelada':'Sin factura'}</span></td><td>${esc(f?.cfdi_uuid||'—')}</td><td><button class="sale-edit" data-sale-id="${a.id}">Detalle</button></td></tr>`}).join('');
- root.querySelectorAll('.sale-edit').forEach(b=>b.addEventListener('click',()=>openSale(b.dataset.saleId)));
+ let total=0,inv=0,pend=0,vat=0;
+ rows.forEach(a=>{const amount=Number(a.price_charged||0),f=fiscal(a.id),calc=computeVatFromTotal(amount,f?f.vat_applies!==false:true,Number(f?.vat_rate??0.16));total+=amount;vat+=Number(f?.vat_amount??calc.vat);if(f?.cfdi_status==='invoiced')inv+=amount;else pend+=amount});
+ $('fiscal-sales').textContent=money(total);$('fiscal-invoiced').textContent=money(inv);$('fiscal-pending').textContent=money(pend);$('fiscal-vat').textContent=money(vat);
+ $('sales-list').innerHTML=rows.length?rows.map(a=>{const f=fiscal(a.id),calc=computeVatFromTotal(Number(a.price_charged||0),f?f.vat_applies!==false:true,Number(f?.vat_rate??0.16));return `<tr><td>${a.appointment_date||''}</td><td><b>${svcName(a)}</b></td><td>${money(a.price_charged)}</td><td>${money(f?.vat_amount??calc.vat)}</td><td>${f?.payment_status==='pending'?'Pendiente':'Pagado'}</td><td>${f?.cfdi_status==='invoiced'?'Facturada':f?.cfdi_status==='pending'?'Pendiente':'Sin factura'}</td><td>${f?.cfdi_uuid||'—'}</td><td><button class="sale-edit" data-id="${a.id}">Detalle</button></td></tr>`}).join(''):'<tr><td colspan="8">No hay servicios completados en este periodo.</td></tr>';
+ document.querySelectorAll('.sale-edit').forEach(b=>b.onclick=()=>openSale(b.dataset.id));
 }
-function openSale(id){
- const a=state.appointments.find(x=>x.id===id),f=fiscalByAppointment(id)||{};if(!a)return;
- document.getElementById('sale-appointment-id').value=id;document.getElementById('sale-payment-status').value=f.payment_status||'paid';document.getElementById('sale-cfdi-status').value=f.cfdi_status||'not_required';
- const total=Number(a.price_charged||0);document.getElementById('sale-subtotal').value=f.subtotal??total;document.getElementById('sale-vat').value=f.vat_amount??0;document.getElementById('sale-uuid').value=f.cfdi_uuid||'';document.getElementById('sale-payment-form').value=f.payment_form||'';document.getElementById('sale-payment-method').value=f.payment_method||'';document.getElementById('sale-rfc').value=f.receiver_rfc||'';document.getElementById('sale-fiscal-name').value=f.receiver_fiscal_name||'';document.getElementById('sale-tax-regime').value=f.receiver_tax_regime||'';document.getElementById('sale-zip').value=f.receiver_zip||'';document.getElementById('sale-cfdi-use').value=f.cfdi_use||'';document.getElementById('sale-stamped-at').value=f.stamped_at?String(f.stamped_at).slice(0,16):'';document.getElementById('sale-panel').classList.remove('hidden');
-}
-async function saveSaleFiscal(){
- const appointment_id=document.getElementById('sale-appointment-id').value;if(!appointment_id)return;
- const payload={business_id:state.business.id,appointment_id,payment_status:document.getElementById('sale-payment-status').value,cfdi_status:document.getElementById('sale-cfdi-status').value,subtotal:Number(document.getElementById('sale-subtotal').value||0),vat_amount:Number(document.getElementById('sale-vat').value||0),cfdi_uuid:document.getElementById('sale-uuid').value.trim()||null,payment_form:document.getElementById('sale-payment-form').value.trim()||null,payment_method:document.getElementById('sale-payment-method').value||null,receiver_rfc:document.getElementById('sale-rfc').value.trim().toUpperCase()||null,receiver_fiscal_name:document.getElementById('sale-fiscal-name').value.trim()||null,receiver_tax_regime:document.getElementById('sale-tax-regime').value.trim()||null,receiver_zip:document.getElementById('sale-zip').value.trim()||null,cfdi_use:document.getElementById('sale-cfdi-use').value.trim().toUpperCase()||null,stamped_at:document.getElementById('sale-stamped-at').value||null,updated_at:new Date().toISOString()};
- if(payload.cfdi_status==='invoiced'&&!payload.cfdi_uuid){showToast('Para marcar como facturada captura el UUID.');return}
- const{error}=await supabaseClient.from('sale_fiscal_records').upsert(payload,{onConflict:'business_id,appointment_id'});if(error){console.error(error);showToast('No se pudo guardar el control fiscal.');return}
- document.getElementById('sale-panel').classList.add('hidden');showToast('Control fiscal guardado.');await loadData();
-}
-function csvCell(v){return '"'+String(v??'').replaceAll('"','""')+'"'}
-function exportSalesCSV(){
- const rows=state.appointments.filter(a=>a.status==='completada'&&(a.appointment_date||'').startsWith(state.month));const head=['Fecha','Cliente','Servicio','Total','Estado cobro','Estado CFDI','Subtotal','IVA','RFC','Razon social','Regimen fiscal','CP fiscal','Uso CFDI','Forma pago','Metodo pago','UUID','Timbrado'];
- const body=rows.map(a=>{const f=fiscalByAppointment(a.id)||{};return [a.appointment_date,customerName(a),a.services?.name||'',Number(a.price_charged||0).toFixed(2),f.payment_status||'paid',f.cfdi_status||'not_required',Number(f.subtotal??a.price_charged??0).toFixed(2),Number(f.vat_amount||0).toFixed(2),f.receiver_rfc||'',f.receiver_fiscal_name||'',f.receiver_tax_regime||'',f.receiver_zip||'',f.cfdi_use||'',f.payment_form||'',f.payment_method||'',f.cfdi_uuid||'',f.stamped_at||'']});
- const csv='\ufeff'+[head,...body].map(r=>r.map(csvCell).join(',')).join('\r\n'),blob=new Blob([csv],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`ventas-${state.month}.csv`;a.click();URL.revokeObjectURL(url);
-}
-function renderAll(){
- const months=lastMonthKeys(6),perMonth=months.map(key=>{const appts=state.appointments.filter(a=>(a.appointment_date||'').startsWith(key)),income=appts.filter(a=>a.status==='completada').reduce((s,a)=>s+Number(a.price_charged||0),0),projected=appts.filter(a=>a.status==='confirmada').reduce((s,a)=>s+Number(a.price_charged||0),0),doneCount=appts.filter(a=>a.status==='completada').length,activeCount=appts.filter(a=>a.status==='confirmada'||a.status==='pendiente').length,expenses=state.expenses.filter(x=>(x.expense_date||'').startsWith(key)).reduce((s,x)=>s+Number(x.amount||0),0);return{key,income,projected,expenses,profit:income-expenses,doneCount,activeCount}});
- const current=perMonth.find(m=>m.key===state.month)||perMonth[perMonth.length-1];el.kpiIncome.textContent=formatMoney(current.income);el.kpiExpenses.textContent=formatMoney(current.expenses);el.kpiDone.textContent=current.doneCount;el.kpiProjected.textContent=formatMoney(current.projected);
- const monthReviews=state.reviews.filter(r=>String(r.created_at||'').startsWith(state.month)),shared=state.appointments.filter(a=>(a.appointment_date||'').startsWith(state.month)&&a.booking_source).length,avg=monthReviews.length?monthReviews.reduce((a,r)=>a+Number(r.rating||0),0)/monthReviews.length:0;
- document.getElementById('kpi-new-reviews').textContent=monthReviews.length;document.getElementById('kpi-review-rating').textContent=monthReviews.length?avg.toFixed(1)+' ★':'—';document.getElementById('kpi-shared-bookings').textContent=shared;el.kpiProfit.textContent=formatMoney(current.profit);el.kpiNote.textContent=`${current.doneCount} citas completadas · ${current.activeCount} agendadas/pendientes. Ingreso proyectado: ${formatMoney(current.projected)}.`;
- const monthExpenses=state.expenses.filter(x=>(x.expense_date||'').startsWith(state.month));el.listExpenses.innerHTML=monthExpenses.length?monthExpenses.map(expenseRow).join(''):'<p class="empty-state">Sin gastos registrados en este mes.</p>';
- document.querySelectorAll('.adm-exp-del').forEach(btn=>btn.addEventListener('click',async()=>{const{error}=await supabaseClient.from('expenses').delete().eq('id',btn.dataset.id);if(error){showToast('No se pudo eliminar el gasto.');return}await loadData()}));
- renderSales();renderFinanceChart(perMonth);renderPopularServices();const max=Math.max(1,...perMonth.map(m=>Math.max(m.income,m.expenses)));el.summary6m.innerHTML=perMonth.map(m=>`<div class="adm-6m-row"><div class="adm-6m-label">${monthLabel(m.key)}</div><div class="adm-6m-bars"><div class="adm-bar adm-bar-income" style="width:${Math.round(m.income/max*100)}%"></div><div class="adm-bar adm-bar-expense" style="width:${Math.round(m.expenses/max*100)}%"></div></div><div class="adm-6m-profit">${formatMoney(m.profit)}</div></div>`).join('');
-}
-function renderPopularServices(){const root=document.getElementById('popular-services');if(!root)return;const counts=new Map();state.appointments.filter(a=>a.status==='completada'&&(a.appointment_date||'').startsWith(state.month)).forEach(a=>{const name=a.services?.name||'Servicio';counts.set(name,(counts.get(name)||0)+1)});const rows=[...counts.entries()].sort((a,b)=>b[1]-a[1]).slice(0,6);if(!rows.length){root.innerHTML='<div class="ct-empty">Aún no hay servicios completados en este periodo.</div>';return}const max=Math.max(...rows.map(x=>x[1]),1);root.innerHTML=rows.map(([name,n])=>`<div class="popular-row"><div><b>${esc(name)}</b><small>${n} cita${n===1?'':'s'} completada${n===1?'':'s'}</small><div class="popular-track"><i style="width:${n/max*100}%"></i></div></div><strong>${n}</strong></div>`).join('')}
-function renderFinanceChart(perMonth){const canvas=document.getElementById('finance-chart');if(!canvas||typeof Chart==='undefined')return;if(financeChart)financeChart.destroy();const ctx=canvas.getContext('2d'),gradient=ctx.createLinearGradient(0,0,0,240);gradient.addColorStop(0,'rgba(124,58,237,.24)');gradient.addColorStop(1,'rgba(124,58,237,.015)');financeChart=new Chart(ctx,{type:'line',data:{labels:perMonth.map(m=>monthLabel(m.key)),datasets:[{label:'Ingresos',data:perMonth.map(m=>m.income),borderColor:'#7c3aed',backgroundColor:gradient,borderWidth:2.4,tension:.38,fill:true},{label:'Gastos',data:perMonth.map(m=>m.expenses),borderColor:'#17181c',backgroundColor:'transparent',borderWidth:2,tension:.38}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{beginAtZero:true,ticks:{callback:v=>'$'+Number(v).toLocaleString('es-MX',{notation:'compact'})}}}}})}
+function renderExpenses(){$('list-expenses').innerHTML=state.expenses.filter(x=>(x.expense_date||'').startsWith(state.month)).map(x=>`<div class="adm-row"><div>${money(x.amount)}</div><div>${x.concept||'Gasto'}<small>${x.expense_date||''}</small></div></div>`).join('')||'<p>Sin gastos registrados.</p>'}
+function renderPopular(){const c=new Map();state.appointments.filter(a=>a.status==='completada'&&(a.appointment_date||'').startsWith(state.month)).forEach(a=>c.set(svcName(a),(c.get(svcName(a))||0)+1));$('popular-services').innerHTML=[...c.entries()].sort((a,b)=>b[1]-a[1]).map(([n,v])=>`<div class="popular-row"><div><b>${n}</b><small>${v} citas</small></div><strong>${v}</strong></div>`).join('')||'<div>Sin datos.</div>'}
+function renderHistory(per){$('summary-6m').innerHTML=per.map(m=>`<div class="adm-6m-row"><div>${monthLabel(m.key)}</div><div>Ingresos ${money(m.income)} · Gastos ${money(m.expenses)}</div><div>${money(m.profit)}</div></div>`).join('')}
+function renderChart(per){const c=$('finance-chart');if(!c||typeof Chart==='undefined')return;if(financeChart)financeChart.destroy();financeChart=new Chart(c,{type:'line',data:{labels:per.map(x=>monthLabel(x.key)),datasets:[{label:'Ingresos',data:per.map(x=>x.income)},{label:'Gastos',data:per.map(x=>x.expenses)}]},options:{responsive:true,maintainAspectRatio:false}})}
+function csv(v){return '"'+String(v??'').replaceAll('"','""')+'"'}
+function exportCSV(){const rows=state.appointments.filter(a=>a.status==='completada'&&(a.appointment_date||'').startsWith(state.month)),body=rows.map(a=>{const f=fiscal(a.id),calc=computeVatFromTotal(Number(a.price_charged||0),f?f.vat_applies!==false:true,Number(f?.vat_rate??0.16));return[a.appointment_date,svcName(a),Number(a.price_charged||0).toFixed(2),Number(f?.subtotal??calc.subtotal).toFixed(2),Number(f?.vat_amount??calc.vat).toFixed(2),f?.vat_applies===false?'No':'Sí',f?.cfdi_status||'not_required',f?.cfdi_uuid||'']});const head=['Fecha','Servicio','Total','Subtotal','IVA','Aplica IVA','CFDI','UUID'],blob=new Blob(['\ufeff'+[head,...body].map(r=>r.map(csv).join(',')).join('\r\n')],{type:'text/csv;charset=utf-8'}),u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=`ventas-${state.month}.csv`;a.click();URL.revokeObjectURL(u)}
 document.addEventListener('DOMContentLoaded',init);

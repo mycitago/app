@@ -8,7 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/styles.css">
   <link rel="stylesheet" href="../css/citago-admin.css">
-  <link rel="stylesheet" href="../css/admin-reports.css">
+  <link rel="stylesheet" href="../css/admin-reports.css?v=20260909-reportfix2">
   <link rel="stylesheet" href="../css/mycitago-themes.css">
   <script src="../js/ui-theme.js"></script>
 </head>
@@ -16,19 +16,14 @@
 <div id="citago-shell"></div>
 <main class="reports-page">
   <header class="ct-page-head reports-head">
-    <div>
-      <span class="ct-eyebrow">REPORTES</span>
-      <h1>Decisiones basadas en datos</h1>
-      <p>Ventas, ingresos, gastos, citas y control fiscal en una vista clara.</p>
-    </div>
-    <div class="reports-controls">
-      <label>Periodo<input type="month" id="month-picker"></label>
-      <button id="open-expense" class="ct-btn ct-btn-secondary" type="button">+ Registrar gasto</button>
-    </div>
+    <div><span class="ct-eyebrow">REPORTES</span><h1>Decisiones basadas en datos</h1><p>Ventas, ingresos, gastos, citas y control fiscal en una vista clara.</p></div>
+    <div class="reports-controls"><label>Periodo<input type="month" id="month-picker"></label><button id="open-expense" class="ct-btn ct-btn-secondary" type="button">+ Registrar gasto</button></div>
   </header>
 
+  <div id="report-load-status" class="report-load-status" role="status">Cargando información…</div>
+
   <section class="reports-kpis">
-    <article><span>Ingresos realizados</span><strong id="kpi-income">$0.00</strong><small id="kpi-income-note">Citas completadas</small></article>
+    <article><span>Ingresos realizados</span><strong id="kpi-income">$0.00</strong><small>Citas completadas</small></article>
     <article><span>Citas realizadas</span><strong id="kpi-done">0</strong><small>Servicios completados</small></article>
     <article><span>Ingreso proyectado</span><strong id="kpi-projected">$0.00</strong><small>Citas confirmadas</small></article>
     <article><span>Gastos</span><strong id="kpi-expenses">$0.00</strong><small>Periodo seleccionado</small></article>
@@ -40,87 +35,60 @@
 
   <section class="report-card sales-module">
     <div class="report-card-head sales-title">
-      <div>
-        <span class="ct-eyebrow">VENTAS Y FACTURACIÓN</span>
-        <h2>Control comercial y fiscal</h2>
-        <p class="report-help">Control administrativo para preparar y conciliar la facturación. MyCitaGo no sustituye el timbrado CFDI de un PAC autorizado.</p>
-      </div>
-      <div class="sales-actions">
-        <button id="export-sales" class="ct-btn ct-btn-secondary" type="button">Exportar ventas CSV</button>
-      </div>
+      <div><span class="ct-eyebrow">VENTAS Y FACTURACIÓN</span><h2>Control comercial y fiscal</h2><p class="report-help">Control administrativo. No sustituye el timbrado CFDI de un PAC autorizado.</p></div>
+      <button id="export-sales" class="ct-btn ct-btn-secondary" type="button">Exportar ventas CSV</button>
     </div>
-
     <div class="fiscal-kpis">
       <article><span>Ventas del periodo</span><strong id="fiscal-sales">$0.00</strong><small>Servicios completados</small></article>
       <article><span>Facturado</span><strong id="fiscal-invoiced">$0.00</strong><small>Con CFDI registrado</small></article>
       <article><span>Pendiente de facturar</span><strong id="fiscal-pending">$0.00</strong><small>Control interno</small></article>
-      <article><span>IVA trasladado</span><strong id="fiscal-vat">$0.00</strong><small>Según datos fiscales capturados</small></article>
+      <article><span>IVA trasladado</span><strong id="fiscal-vat">$0.00</strong><small>Según control fiscal capturado</small></article>
     </div>
-
-    <div class="sales-table-wrap">
-      <table class="sales-table">
-        <thead>
-          <tr>
-            <th>Fecha</th><th>Cliente / servicio</th><th>Total</th><th>Cobro</th><th>CFDI</th><th>UUID</th><th></th>
-          </tr>
-        </thead>
-        <tbody id="sales-list"><tr><td colspan="7" class="ct-empty">Cargando ventas…</td></tr></tbody>
-      </table>
-    </div>
+    <div class="sales-table-wrap"><table class="sales-table"><thead><tr><th>Fecha</th><th>Servicio</th><th>Total</th><th>IVA</th><th>Cobro</th><th>CFDI</th><th>UUID</th><th></th></tr></thead><tbody id="sales-list"><tr><td colspan="8">Cargando ventas…</td></tr></tbody></table></div>
   </section>
 
   <section class="reports-grid">
-    <article class="report-card report-chart">
-      <div class="report-card-head"><div><span class="ct-eyebrow">EVOLUCIÓN</span><h2>Ingresos vs. gastos</h2></div><span>Últimos 6 meses</span></div>
-      <div class="report-chart-wrap"><canvas id="finance-chart"></canvas></div>
-    </article>
-    <article class="report-card">
-      <div class="report-card-head"><div><span class="ct-eyebrow">DEMANDA</span><h2>Servicios más realizados</h2></div></div>
-      <div id="popular-services" class="popular-services"><div class="ct-empty">Cargando…</div></div>
-    </article>
+    <article class="report-card report-chart"><div class="report-card-head"><div><span class="ct-eyebrow">EVOLUCIÓN</span><h2>Ingresos vs. gastos</h2></div><span>Últimos 6 meses</span></div><div class="report-chart-wrap"><canvas id="finance-chart"></canvas></div></article>
+    <article class="report-card"><div class="report-card-head"><div><span class="ct-eyebrow">DEMANDA</span><h2>Servicios más realizados</h2></div></div><div id="popular-services" class="popular-services"></div></article>
   </section>
-
   <section class="reports-grid lower">
-    <article class="report-card"><div class="report-card-head"><div><span class="ct-eyebrow">HISTÓRICO</span><h2>Resumen de 6 meses</h2></div></div><div id="summary-6m" class="adm-list"></div></article>
-    <article class="report-card"><div class="report-card-head"><div><span class="ct-eyebrow">GASTOS</span><h2>Gastos del mes</h2></div></div><div id="list-expenses" class="adm-list"></div></article>
+    <article class="report-card"><div class="report-card-head"><div><span class="ct-eyebrow">HISTÓRICO</span><h2>Resumen de 6 meses</h2></div></div><div id="summary-6m"></div></article>
+    <article class="report-card"><div class="report-card-head"><div><span class="ct-eyebrow">GASTOS</span><h2>Gastos del mes</h2></div></div><div id="list-expenses"></div></article>
   </section>
 
   <aside id="expense-panel" class="expense-panel hidden">
-    <div class="expense-backdrop" data-close-expense></div>
-    <div class="expense-card">
+    <div class="expense-backdrop" data-close-expense></div><div class="expense-card">
       <div class="report-card-head"><div><span class="ct-eyebrow">NUEVO GASTO</span><h2>Registrar gasto</h2></div><button data-close-expense class="ct-icon-btn">×</button></div>
-      <div class="ct-form-grid">
-        <label class="ct-form-field full"><span>Concepto</span><input id="exp-concept" placeholder="Ej. Compra de insumos"></label>
-        <label class="ct-form-field"><span>Categoría</span><select id="exp-category"><option value="insumos">Insumos</option><option value="renta">Renta</option><option value="sueldos">Sueldos</option><option value="servicios">Servicios</option><option value="marketing">Marketing</option><option value="mantenimiento">Mantenimiento</option><option value="otros">Otros</option></select></label>
-        <label class="ct-form-field"><span>Monto</span><input type="number" id="exp-amount" min="0.01" step="0.01"></label>
-        <label class="ct-form-field full"><span>Fecha</span><input type="date" id="exp-date"></label>
-      </div>
-      <button id="btn-add-expense" class="ct-btn ct-btn-primary" type="button">Guardar gasto</button>
+      <div class="ct-form-grid"><label class="ct-form-field full"><span>Concepto</span><input id="exp-concept"></label><label class="ct-form-field"><span>Categoría</span><select id="exp-category"><option value="insumos">Insumos</option><option value="renta">Renta</option><option value="sueldos">Sueldos</option><option value="servicios">Servicios</option><option value="marketing">Marketing</option><option value="mantenimiento">Mantenimiento</option><option value="otros">Otros</option></select></label><label class="ct-form-field"><span>Monto</span><input type="number" id="exp-amount" min=".01" step=".01"></label><label class="ct-form-field full"><span>Fecha</span><input type="date" id="exp-date"></label></div>
+      <button id="btn-add-expense" class="ct-btn ct-btn-primary">Guardar gasto</button>
     </div>
   </aside>
 
   <aside id="sale-panel" class="expense-panel hidden">
-    <div class="expense-backdrop" data-close-sale></div>
-    <div class="expense-card sale-detail-card">
+    <div class="expense-backdrop" data-close-sale></div><div class="expense-card">
       <div class="report-card-head"><div><span class="ct-eyebrow">CONTROL FISCAL</span><h2>Datos de la venta</h2></div><button data-close-sale class="ct-icon-btn">×</button></div>
       <input type="hidden" id="sale-appointment-id">
+      <div class="vat-toggle-row">
+        <label class="vat-toggle"><input id="sale-vat-applies" type="checkbox" checked><span>Aplicar IVA 16%</span></label>
+        <small>Activado por defecto. Si la operación es exenta o no causa IVA, desactívalo.</small>
+      </div>
       <div class="ct-form-grid">
         <label class="ct-form-field"><span>Estado de cobro</span><select id="sale-payment-status"><option value="paid">Pagado</option><option value="pending">Pendiente</option><option value="partial">Parcial</option><option value="refunded">Reembolsado</option></select></label>
         <label class="ct-form-field"><span>Estado CFDI</span><select id="sale-cfdi-status"><option value="not_required">Sin factura solicitada</option><option value="pending">Pendiente</option><option value="invoiced">Facturada</option><option value="cancelled">Cancelada</option></select></label>
-        <label class="ct-form-field"><span>Subtotal</span><input type="number" id="sale-subtotal" min="0" step="0.01"></label>
-        <label class="ct-form-field"><span>IVA</span><input type="number" id="sale-vat" min="0" step="0.01"></label>
-        <label class="ct-form-field full"><span>UUID / folio fiscal</span><input id="sale-uuid" maxlength="36" placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"></label>
-        <label class="ct-form-field"><span>Forma de pago SAT</span><input id="sale-payment-form" maxlength="3" placeholder="Ej. 01, 03, 04"></label>
+        <label class="ct-form-field"><span>Subtotal</span><input type="number" id="sale-subtotal" min="0" step=".01"></label>
+        <label class="ct-form-field"><span>IVA</span><input type="number" id="sale-vat" min="0" step=".01" readonly></label>
+        <label class="ct-form-field full"><span>UUID / folio fiscal</span><input id="sale-uuid" maxlength="36"></label>
+        <label class="ct-form-field"><span>Forma de pago SAT</span><input id="sale-payment-form" maxlength="3" placeholder="03"></label>
         <label class="ct-form-field"><span>Método de pago</span><select id="sale-payment-method"><option value="">—</option><option value="PUE">PUE</option><option value="PPD">PPD</option></select></label>
-        <label class="ct-form-field full"><span>RFC receptor</span><input id="sale-rfc" maxlength="13" placeholder="RFC"></label>
-        <label class="ct-form-field full"><span>Razón social / nombre fiscal</span><input id="sale-fiscal-name" maxlength="254"></label>
-        <label class="ct-form-field"><span>Régimen fiscal</span><input id="sale-tax-regime" maxlength="3" placeholder="Ej. 601"></label>
-        <label class="ct-form-field"><span>C.P. fiscal</span><input id="sale-zip" maxlength="5" inputmode="numeric"></label>
-        <label class="ct-form-field"><span>Uso CFDI</span><input id="sale-cfdi-use" maxlength="4" placeholder="Ej. G03"></label>
-        <label class="ct-form-field"><span>Fecha de timbrado</span><input type="datetime-local" id="sale-stamped-at"></label>
+        <label class="ct-form-field full"><span>RFC receptor</span><input id="sale-rfc" maxlength="13"></label>
+        <label class="ct-form-field full"><span>Razón social / nombre fiscal</span><input id="sale-fiscal-name"></label>
+        <label class="ct-form-field"><span>Régimen fiscal</span><input id="sale-tax-regime" maxlength="3"></label>
+        <label class="ct-form-field"><span>C.P. fiscal</span><input id="sale-zip" maxlength="5"></label>
+        <label class="ct-form-field"><span>Uso CFDI</span><input id="sale-cfdi-use" maxlength="4"></label>
+        <label class="ct-form-field"><span>Fecha de timbrado</span><input id="sale-stamped-at" type="datetime-local"></label>
       </div>
-      <p class="fiscal-warning">Estos campos son de control. Registrar un UUID no genera ni valida un CFDI ante el SAT.</p>
-      <button id="save-sale-fiscal" class="ct-btn ct-btn-primary" type="button">Guardar control fiscal</button>
+      <p class="fiscal-warning">Control interno: registrar estos datos no genera ni valida un CFDI ante el SAT.</p>
+      <button id="save-sale-fiscal" class="ct-btn ct-btn-primary">Guardar control fiscal</button>
     </div>
   </aside>
 </main>
@@ -128,6 +96,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script>
 <script src="../js/config.js"></script><script src="../js/supabase.js"></script><script src="../js/admin-auth.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
-<script src="../js/admin-accounting.js"></script><script src="../js/citago-shell.js"></script>
+<script src="../js/admin-accounting.js?v=20260909-reportfix2"></script><script src="../js/citago-shell.js"></script>
 <script>document.addEventListener('DOMContentLoaded',()=>CitagoShell.mount({mode:'tenant',activePage:'reportes'}));</script>
 </body></html>
