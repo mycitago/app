@@ -35,6 +35,82 @@ const SERVICE_TEMPLATE_LIBRARY = {
   classes:[{name:'Clase individual',suggestedPrice:350,category:'Clases',duration:60,description:'Sesión individual personalizada.',image:'class.svg'},{name:'Clase grupal',suggestedPrice:250,category:'Clases',duration:60,description:'Sesión grupal programada.',image:'class.svg'}],
   other:[{name:'Servicio personalizado',suggestedPrice:500,category:'Servicios',duration:60,description:'Personaliza este servicio según tu negocio.',image:'consulting.svg'}]
 };
+
+const SERVICE_CATEGORY_RULES = {
+  barber:['Barbería'],
+  beauty:['Belleza y cuidado'],
+  nails:['Uñas'],
+  spa:['Spa'],
+  dental:['Consultas'],
+  therapy:['Consultas'],
+  nutrition:['Consultas'],
+  physio:['Salud y bienestar'],
+  veterinary:['Consultas'],
+  consulting:['Servicios profesionales'],
+  automotive:['Mantenimiento'],
+  photo:['Servicios profesionales'],
+  classes:['Clases'],
+  other:['Servicios']
+};
+
+const BUSINESS_CATEGORY_LABELS = {
+  barber:'Barbería',
+  beauty:'Salón / Estética',
+  nails:'Uñas',
+  spa:'Spa / Masajes',
+  dental:'Dentista',
+  therapy:'Psicología / Terapia',
+  nutrition:'Nutrición',
+  physio:'Fisioterapia',
+  veterinary:'Veterinaria',
+  consulting:'Consultoría',
+  automotive:'Automotriz',
+  photo:'Fotografía',
+  classes:'Clases',
+  other:'Otro'
+};
+
+function currentBusinessCategoryKey(){
+  const key=String(biz?.business_category_id||'').trim();
+  return SERVICE_TEMPLATE_LIBRARY[key]?key:'other';
+}
+
+function allowedServiceCategories(){
+  return SERVICE_CATEGORY_RULES[currentBusinessCategoryKey()]||SERVICE_CATEGORY_RULES.other;
+}
+
+function isAllowedServiceCategory(category){
+  const value=String(category||'').trim().toLocaleLowerCase('es-MX');
+  return allowedServiceCategories().some(x=>String(x).toLocaleLowerCase('es-MX')===value);
+}
+
+function templateBelongsToBusiness(t){
+  const allowed=SERVICE_TEMPLATE_LIBRARY[currentBusinessCategoryKey()]||[];
+  return allowed.some(x=>x.name===t?.name && x.category===t?.category);
+}
+
+function serviceBelongsToBusiness(service){
+  return isAllowedServiceCategory(service?.category);
+}
+
+function lockBusinessTypeSelector(){
+  const select=$('business-type');
+  if(!select)return;
+  const key=currentBusinessCategoryKey();
+  select.value=key;
+  select.disabled=true;
+  select.setAttribute('aria-disabled','true');
+  select.title='El giro se define al crear el negocio. Para cambiarlo, contacta a soporte.';
+
+  const host=select.closest('.svc-business-type');
+  if(host&&!host.querySelector('.svc-business-lock-note')){
+    const note=document.createElement('div');
+    note.className='svc-business-lock-note';
+    note.innerHTML=`<span aria-hidden="true">🔒</span><span><b>${BUSINESS_CATEGORY_LABELS[key]||key}</b> · Giro bloqueado. Para cambiarlo, contacta a soporte.</span>`;
+    host.appendChild(note);
+  }
+}
+
 let currentTemplateCategory='barber';
 let commercialSettings=null;
 let autoSaveTimer=null;
@@ -107,10 +183,47 @@ function templateAssetKey(t){return `${currentTemplateCategory}:${String(t.name|
 function platformAssetForTemplate(t){return platformDefaultAssets.find(a=>a.kind==='service'&&(a.asset_key===templateAssetKey(t)||a.asset_key===String(t.name||'')))?.image_url||null}
 function suggestedPriceForTemplate(t){const similar=items.filter(x=>x.active!==false&&Number(x.price)>0&&(String(x.category||'').toLowerCase()===String(t.category||'').toLowerCase()||Math.abs(Number(x.duration_minutes||0)-Number(t.duration||0))<=15));return similar.length?Math.round(similar.reduce((a,x)=>a+Number(x.price||0),0)/similar.length):Number(t.suggestedPrice||0)}
 async function loadPlatformDefaultAssets(){const {data,error}=await supabaseClient.from('platform_default_assets').select('kind,asset_key,category,image_url').eq('active',true);if(!error)platformDefaultAssets=data||[]}
-function renderServiceTemplates(category=currentTemplateCategory){currentTemplateCategory=category;selectedTemplateNames.clear();const root=$('service-template-library');if(!root)return;const list=SERVICE_TEMPLATE_LIBRARY[category]||SERVICE_TEMPLATE_LIBRARY.other;root.replaceChildren();const tools=document.createElement('div');tools.className='svc-template-batch-tools';tools.innerHTML='<div class="svc-template-step-copy"><b><span class="svc-template-step-number">2</span> Elige servicios para agregar</b><span>Selecciona una o varias plantillas.</span></div><button id="add-selected-templates" type="button">Agregar seleccionados</button>';root.appendChild(tools);list.forEach(t=>{const card=document.createElement('label');card.className='svc-template-card svc-template-select';const check=document.createElement('input');check.type='checkbox';check.onchange=()=>check.checked?selectedTemplateNames.add(t.name):selectedTemplateNames.delete(t.name);const img=document.createElement('img');img.src=platformAssetForTemplate(t)||assetUrl(t.image);img.alt='';const body=document.createElement('span'),b=document.createElement('b'),small=document.createElement('small');b.textContent=t.name;const price=suggestedPriceForTemplate(t);small.textContent=`${t.duration} min · ${price?money(price)+' sugerido':'precio por definir'}`;body.append(b,small);const use=document.createElement('button');use.type='button';use.textContent='Usar';use.onclick=e=>{e.preventDefault();applyServiceTemplate(t)};card.append(check,img,body,use);root.appendChild(card)});root.querySelector('#add-selected-templates')?.addEventListener('click',openBatchTemplateReview)}
-function applyServiceTemplate(t){clearForm();$('sname').value=t.name;$('category').value=t.category;$('duration').value=t.duration;$('sdesc').value=t.description||'';const price=suggestedPriceForTemplate(t);$('price').value=price||'';selectedPresetImage=platformAssetForTemplate(t)||assetUrl(t.image);$('preset-image-url').value=selectedPresetImage;updateSummary();calculateServiceIntelligence();saveLocalDraft();$('price').focus();toast(`${t.name}: revisa y confirma el precio sugerido`)}
+function renderServiceTemplates(category=currentTemplateCategory){
+  const businessCategory=currentBusinessCategoryKey();
+  if(category!==businessCategory){
+    console.warn('[services] Se ignoró un intento de cargar plantillas de otro giro:',category,'→',businessCategory);
+  }
+  currentTemplateCategory=businessCategory;
+  selectedTemplateNames.clear();
+  const root=$('service-template-library');
+  if(!root)return;
+  const list=SERVICE_TEMPLATE_LIBRARY[businessCategory]||SERVICE_TEMPLATE_LIBRARY.other;
+  root.replaceChildren();
+  const tools=document.createElement('div');
+  tools.className='svc-template-batch-tools';
+  tools.innerHTML='<div class="svc-template-step-copy"><b><span class="svc-template-step-number">2</span> Elige servicios para agregar</b><span>Selecciona una o varias plantillas compatibles con tu giro.</span></div><button id="add-selected-templates" type="button">Agregar seleccionados</button>';
+  root.appendChild(tools);
+  list.forEach(t=>{
+    const card=document.createElement('label');
+    card.className='svc-template-card svc-template-select';
+    const check=document.createElement('input');
+    check.type='checkbox';
+    check.onchange=()=>check.checked?selectedTemplateNames.add(t.name):selectedTemplateNames.delete(t.name);
+    const img=document.createElement('img');
+    img.src=platformAssetForTemplate(t)||assetUrl(t.image);
+    img.alt='';
+    const body=document.createElement('span'),b=document.createElement('b'),small=document.createElement('small');
+    b.textContent=t.name;
+    const price=suggestedPriceForTemplate(t);
+    small.textContent=`${t.duration} min · ${price?money(price)+' sugerido':'precio por definir'}`;
+    body.append(b,small);
+    const use=document.createElement('button');
+    use.type='button';
+    use.textContent='Usar';
+    use.onclick=e=>{e.preventDefault();applyServiceTemplate(t)};
+    card.append(check,img,body,use);
+    root.appendChild(card);
+  });
+  root.querySelector('#add-selected-templates')?.addEventListener('click',openBatchTemplateReview);
+}
+function applyServiceTemplate(t){if(!templateBelongsToBusiness(t)){toast('Esta plantilla no pertenece al giro de tu negocio');return;}clearForm();$('sname').value=t.name;$('category').value=t.category;$('duration').value=t.duration;$('sdesc').value=t.description||'';const price=suggestedPriceForTemplate(t);$('price').value=price||'';selectedPresetImage=platformAssetForTemplate(t)||assetUrl(t.image);$('preset-image-url').value=selectedPresetImage;updateSummary();calculateServiceIntelligence();saveLocalDraft();$('price').focus();toast(`${t.name}: revisa y confirma el precio sugerido`)}
 function openBatchTemplateReview(){const list=(SERVICE_TEMPLATE_LIBRARY[currentTemplateCategory]||[]).filter(t=>selectedTemplateNames.has(t.name));if(!list.length)return toast('Selecciona al menos una plantilla');let box=$('template-batch-review');if(!box){box=document.createElement('section');box.id='template-batch-review';box.className='svc-card svc-batch-review';$('service-template-library').after(box)}box.innerHTML=`<div class="svc-card-title"><div><h2>Revisa antes de crear</h2><p>Los precios son sugerencias y no se guardan hasta confirmar.</p></div></div>${list.map((t,i)=>`<label>${t.name}<span>${t.duration} min</span><input data-batch-price="${i}" type="number" min="0" step="0.01" value="${suggestedPriceForTemplate(t)}"></label>`).join('')}<button id="confirm-batch-services" class="svc-btn svc-btn-primary" type="button">Confirmar y crear ${list.length} servicios</button>`;$('confirm-batch-services').onclick=()=>createBatchServices(list,box)}
-async function createBatchServices(list,box){const btn=$('confirm-batch-services');btn.disabled=true;try{for(let i=0;i<list.length;i++){const t=list[i],price=Number(box.querySelector(`[data-batch-price="${i}"]`).value)||0;const generic=platformAssetForTemplate(t)||assetUrl(t.image);let image_url=generic;if(platformAssetForTemplate(t)&&window.CitagoMedia){image_url=(await CitagoMedia.adoptPublicImage(generic,{businessId:biz.id,kind:'services'})).url}const {error}=await supabaseClient.from('services').insert({business_id:biz.id,name:t.name,category:t.category,price,duration_minutes:t.duration,description:t.description||'',image_url,active:true});if(error)throw error}toast(`${list.length} servicios creados`);box.remove();await loadServices()}catch(e){toast('No se pudieron crear: '+e.message)}finally{btn.disabled=false}}
+async function createBatchServices(list,box){const btn=$('confirm-batch-services');btn.disabled=true;try{if(list.some(t=>!templateBelongsToBusiness(t)))throw new Error('Hay plantillas que no pertenecen al giro de tu negocio');for(let i=0;i<list.length;i++){const t=list[i],price=Number(box.querySelector(`[data-batch-price="${i}"]`).value)||0;const generic=platformAssetForTemplate(t)||assetUrl(t.image);let image_url=generic;if(platformAssetForTemplate(t)&&window.CitagoMedia){image_url=(await CitagoMedia.adoptPublicImage(generic,{businessId:biz.id,kind:'services'})).url}const {error}=await supabaseClient.from('services').insert({business_id:biz.id,name:t.name,category:t.category,price,duration_minutes:t.duration,description:t.description||'',image_url,active:true});if(error)throw error}toast(`${list.length} servicios creados`);box.remove();await loadServices()}catch(e){toast('No se pudieron crear: '+e.message)}finally{btn.disabled=false}}
 function openBulkPriceAdjust(){const pct=Number(prompt('Ajustar precios por lote. Escribe el porcentaje (ej. 10 o -5):','10'));if(!Number.isFinite(pct)||pct===0)return;const category=prompt('Categoría exacta a ajustar. Déjalo vacío para todos:','')||'';const targets=items.filter(x=>!category||String(x.category||'').toLowerCase()===category.toLowerCase());if(!targets.length)return toast('No hay servicios para ese filtro');const preview=targets.slice(0,5).map(x=>`${x.name}: ${money(x.price)} → ${money(Number(x.price)*(1+pct/100))}`).join('\n');if(!confirm(`Ajustar ${targets.length} servicios ${pct>0?'+':''}${pct}%?\n\n${preview}`))return;Promise.all(targets.map(x=>supabaseClient.from('services').update({price:Math.round(Number(x.price)*(1+pct/100)*100)/100}).eq('id',x.id).eq('business_id',biz.id))).then(async results=>{const bad=results.find(r=>r.error);if(bad)return toast('No se pudo actualizar: '+bad.error.message);toast('Precios actualizados');await loadServices()})}
 
 function weeklyBusinessMinutes(hours=biz?.opening_hours||{}){
@@ -332,6 +445,8 @@ function clearForm() {
 function catalogCard(service) {
   const card = document.createElement('article');
   card.className = 'svc-catalog-card';
+  const compatible=serviceBelongsToBusiness(service);
+  if(!compatible) card.classList.add('svc-incompatible');
 
   const thumb = document.createElement('div');
   thumb.className = 'svc-catalog-thumb';
@@ -351,6 +466,9 @@ function catalogCard(service) {
   meta.textContent = `${money(service.price)} · ${service.duration_minutes || 0} min`;
   const small = document.createElement('small');
   small.textContent = `${service.category || 'Servicios'} · ${service.active ? 'Activo' : 'Oculto'}`;
+  const compatibility=document.createElement('div');
+  compatibility.className='svc-compatibility';
+  if(!compatible) compatibility.textContent='⚠ Servicio de otro giro · requiere revisión';
 
   const actions = document.createElement('div');
   actions.className = 'svc-catalog-actions';
@@ -366,7 +484,9 @@ function catalogCard(service) {
   toggle.addEventListener('click', () => toggleService(service.id,!service.active));
 
   actions.append(edit,toggle);
-  body.append(title,meta,small,actions);
+  body.append(title,meta,small);
+  if(!compatible) body.appendChild(compatibility);
+  body.append(actions);
   card.append(thumb,body);
   return card;
 }
@@ -453,6 +573,44 @@ async function saveServiceStaff(serviceId) {
   if(error) throw error;
 }
 
+
+function ensureIncompatibleServicesButton(){
+  const toolbar=document.querySelector('.svc-bulk-toolbar');
+  if(!toolbar)return;
+  const incompatible=items.filter(s=>!serviceBelongsToBusiness(s)&&s.active);
+  let btn=$('bulk-hide-incompatible');
+  if(!incompatible.length){
+    btn?.remove();
+    return;
+  }
+  if(!btn){
+    btn=document.createElement('button');
+    btn.id='bulk-hide-incompatible';
+    btn.type='button';
+    btn.textContent='Ocultar incompatibles';
+    btn.addEventListener('click',hideIncompatibleServices);
+    toolbar.appendChild(btn);
+  }
+  btn.textContent=`Ocultar incompatibles (${incompatible.length})`;
+}
+
+async function hideIncompatibleServices(){
+  const incompatible=items.filter(s=>!serviceBelongsToBusiness(s)&&s.active);
+  if(!incompatible.length)return toast('No hay servicios incompatibles activos');
+  const label=BUSINESS_CATEGORY_LABELS[currentBusinessCategoryKey()]||currentBusinessCategoryKey();
+  if(!confirm(`Se ocultarán ${incompatible.length} servicios que no corresponden al giro ${label}. No se eliminarán. ¿Continuar?`))return;
+  for(const service of incompatible){
+    const {error}=await supabaseClient
+      .from('services')
+      .update({active:false})
+      .eq('id',service.id)
+      .eq('business_id',biz.id);
+    if(error)return toast('No se pudo ocultar '+service.name+': '+error.message);
+  }
+  toast(`${incompatible.length} servicios incompatibles ocultados`);
+  await loadServices();
+}
+
 async function loadServices() {
   const {data,error} = await supabaseClient
     .from('services')
@@ -469,9 +627,11 @@ async function loadServices() {
     empty.className = 'svc-empty';
     empty.textContent = 'Aún no has agregado servicios.';
     root.appendChild(empty);
+    $('bulk-hide-incompatible')?.remove();
     return;
   }
   items.forEach(s => root.appendChild(catalogCard(s)));
+  ensureIncompatibleServicesButton();
 }
 
 function editService(id) {
@@ -551,6 +711,11 @@ async function saveService() {
       featured:$('featured').checked,
       image_url:imageUrl
     };
+
+    if(!isAllowedServiceCategory(payload.category)){
+      const allowed=allowedServiceCategories().join(', ');
+      throw new Error(`La categoría "${payload.category}" no corresponde al giro ${BUSINESS_CATEGORY_LABELS[currentBusinessCategoryKey()]||currentBusinessCategoryKey()}. Usa: ${allowed}.`);
+    }
 
     const id = $('sid').value;
     const query = id
@@ -687,7 +852,7 @@ function bindUI() {
   });
 
   document.querySelectorAll('.svc-template').forEach(btn => btn.addEventListener('click',() => applyTemplate(btn.dataset.template)));
-  $('business-type')?.addEventListener('change',e=>renderServiceTemplates(e.target.value));
+  $('business-type')?.addEventListener('change',()=>{lockBusinessTypeSelector();renderServiceTemplates(currentBusinessCategoryKey())});
   document.querySelectorAll('input[name="schedule-mode"]').forEach(r=>r.addEventListener('change',syncScheduleMode));
   $('copy-monday')?.addEventListener('click',copyMondayToAll);
   $('bulk-activate')?.addEventListener('click',()=>bulkSetActive(true));
@@ -726,7 +891,7 @@ async function init() {
   biz = await getMyBusiness(session.user);
   if (!biz) return;
 
-  const category=biz.business_category_id||'barber';if($('business-type'))$('business-type').value=SERVICE_TEMPLATE_LIBRARY[category]?category:'barber';await loadPlatformDefaultAssets();renderServiceTemplates($('business-type')?.value||'barber');
+  lockBusinessTypeSelector();await loadPlatformDefaultAssets();renderServiceTemplates(currentBusinessCategoryKey());
   renderPresets();
   renderHours(biz.opening_hours || HOUR_TEMPLATES.office);
   bindUI();
