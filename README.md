@@ -1,29 +1,34 @@
-# MyCitaGo — Fix de guardado de reseña
+# MyCitaGo — Corrección banner + reseñas públicas
 
-La captura demuestra que el enlace ya funciona:
-- token válido
-- negocio identificado
-- servicio identificado
-- cita identificada como completada
+## Problemas corregidos
+1. El banner/portada ocupa demasiado espacio y empuja los servicios hacia abajo.
+2. Las reseñas no aparecen aunque exista el módulo de reseñas verificadas.
 
-El fallo ocurre al guardar la reseña.
+## Causa de reseñas
+`app.js` tiene su propia función local `loadPublicReviews()` que consulta solo Google.
+El archivo `public-reviews-verified.js` intenta reemplazar `window.loadPublicReviews`,
+pero esa sustitución no afecta la función local ya definida dentro de `app.js`.
 
-## 1. Supabase
-Ejecuta:
-`sql/FIX_GUARDAR_RESENA.sql`
+Este paquete carga las reseñas de forma independiente y segura:
+- primero `public_business_reviews_verified` por business_id;
+- si no hay datos o no existe, prueba `public_business_reviews` por slug.
 
-Luego:
-`sql/VERIFY_GUARDAR_RESENA.sql`
+## Subir a GitHub
+Reemplazar:
+- `reservar.html`
 
-## 2. GitHub
-Reemplaza:
-`js/public-review.js`
+Agregar:
+- `css/booking-public-fix.css`
+- `js/booking-public-fix.js`
 
-Con este JS, si aún existe un error del backend, la página mostrará el mensaje real de Supabase en lugar del texto genérico.
+No es necesario modificar Supabase para este bloque.
 
-## 3. Probar
-Genera un NUEVO enlace desde Agenda y prueba una reseña.
+## Resultado esperado
+- Portada compacta.
+- Servicios visibles mucho antes.
+- Reseñas aparecen ANTES de los servicios cuando existen.
+- Badge `Cliente verificado` para reseñas MyCitaGo verificadas.
+- Badge `Google` para reseñas de Google.
 
-Se mantienen separados:
-- internal = MyCitaGo / Cliente verificado
-- google = Google Business Profile
+## Probar
+https://mycitago.github.io/app/reservar.html?n=clinica&v=20260909-publicfix1
