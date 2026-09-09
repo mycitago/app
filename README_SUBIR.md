@@ -1,25 +1,30 @@
-# MyCitaGo — Contraste definitivo en Servicios
+# MyCitaGo · Reparación urgente de reservación
 
-Reemplaza COMPLETOS:
-- `js/admin-services.js`
-- `css/admin-services.css`
+## Archivo a reemplazar
+Solo:
+- `reservar.html`
 
-Qué corrige:
-- Texto de ayuda en "Revisa antes de crear"
-- Nombre del servicio
-- Duración
-- Inputs de precio
-- Botón de confirmación
-- Mobile
+## Cambio aplicado
+- Se eliminó `css/styles.css` de la página de reservación.
+- `css/booking-adaptive.css` queda como única fuente visual de la reservación.
+- Se agregó `?v=20260909-booking-fix1` a `booking-adaptive.css` y `app.js` para evitar caché vieja.
 
-La corrección usa clases explícitas y alta especificidad solo dentro de `.svc-batch-review`,
-por lo que no afecta el resto de la web.
+## No se toca
+- `js/appointments.js`
+- Supabase
+- RPC `create_appointment`
+- Servicios
+- Horarios
+- Branding
+- Reseñas
 
-Conserva:
-- candado de giro
-- plantillas compatibles
-- selección múltiple
-- cambios anteriores A+B
-
+## Verificación
 Después de subir:
-https://mycitago.github.io/app/admin/servicios.html?v=20260909-7
+1. Abrir `https://mycitago.github.io/app/reservar.html?n=clinica&v=20260909-booking-fix1`
+2. Elegir un servicio.
+3. Pulsar "Elegir fecha y hora".
+4. Elegir una fecha disponible.
+5. Confirmar que aparecen botones de horarios.
+6. Seleccionar un horario.
+7. Confirmar que "Continuar con mis datos" se habilita y ya no ocupa todo el ancho de la pantalla.
+8. Llegar al formulario de datos.
