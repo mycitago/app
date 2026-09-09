@@ -1,30 +1,37 @@
-# MyCitaGo · Reparación urgente de reservación
+# MyCitaGo — Corrección de zona horaria
 
-## Archivo a reemplazar
-Solo:
-- `reservar.html`
+## Archivos del paquete
 
-## Cambio aplicado
-- Se eliminó `css/styles.css` de la página de reservación.
-- `css/booking-adaptive.css` queda como única fuente visual de la reservación.
-- Se agregó `?v=20260909-booking-fix1` a `booking-adaptive.css` y `app.js` para evitar caché vieja.
+### Reemplazar completos
+- `admin/sucursales.html`
+- `js/admin-branches.js`
 
-## No se toca
-- `js/appointments.js`
-- Supabase
-- RPC `create_appointment`
-- Servicios
-- Horarios
-- Branding
-- Reseñas
+### Archivo nuevo
+- `js/dashboard-timezone-fix.js`
 
-## Verificación
-Después de subir:
-1. Abrir `https://mycitago.github.io/app/reservar.html?n=clinica&v=20260909-booking-fix1`
-2. Elegir un servicio.
-3. Pulsar "Elegir fecha y hora".
-4. Elegir una fecha disponible.
-5. Confirmar que aparecen botones de horarios.
-6. Seleccionar un horario.
-7. Confirmar que "Continuar con mis datos" se habilita y ya no ocupa todo el ancho de la pantalla.
-8. Llegar al formulario de datos.
+### Editar con dos reemplazos exactos
+- `admin/index.html`
+- Las instrucciones están en `PATCH_admin-index.txt`.
+
+## Resultado
+1. Dashboard → “Configurar zona horaria” abre Sucursales.
+2. Se abre automáticamente la sucursal principal.
+3. El campo Zona horaria queda resaltado y enfocado.
+4. Para Veracruz: elegir “Centro de México”.
+5. Al guardar, regresa al dashboard.
+6. El % de completitud incluye zona horaria.
+7. Citas hoy, próximas citas e ingresos del mes usan la fecha operativa del negocio.
+8. Si no hay timezone, el dashboard muestra “—” en datos dependientes de la fecha en vez de fingir valores confiables.
+
+## Después de subir
+Abrir:
+`https://mycitago.github.io/app/admin/index.html?v=20260909-timezone1`
+
+Pulsar “Configurar zona horaria”.
+Debe abrir:
+`sucursales.html?focus=timezone&return=index.html`
+
+Selecciona para Veracruz:
+`Centro de México — America/Mexico_City`
+
+Guarda y verifica que el aviso desaparezca al volver al dashboard.

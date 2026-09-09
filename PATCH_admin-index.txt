@@ -1,0 +1,18 @@
+ARCHIVO: admin/index.html
+
+CAMBIO 1
+Buscar:
+<a href="configuracion.html">Configurar zona horaria</a>
+
+Reemplazar por:
+<a href="sucursales.html?focus=timezone&return=index.html">Configurar zona horaria</a>
+
+CAMBIO 2
+Buscar:
+<script src="../js/admin-dashboard-pro.js"></script>
+
+Reemplazar por:
+<script src="../js/admin-dashboard-pro.js"></script>
+<script src="../js/dashboard-timezone-fix.js?v=20260909-timezone1"></script>
+
+No modificar ninguna otra línea de admin/index.html.

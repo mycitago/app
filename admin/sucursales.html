@@ -1,1 +1,105 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sucursales · MyCitaGo</title><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="../css/citago-admin.css"><link rel="stylesheet" href="../css/admin-team.css"></head><body><div id="citago-shell"></div><main class="team-page"><header class="ct-page-head"><div><span class="ct-eyebrow">UBICACIONES</span><h1>Sucursales</h1><p>Empieza con una sola ubicación y agrega más cuando tu negocio crezca.</p></div><button id="new-branch" class="ct-btn ct-btn-primary">+ Nueva sucursal</button></header><div id="branches" class="branch-grid"></div><div id="branch-dialog" class="team-modal hidden"><div class="team-backdrop" data-branch-close></div><form id="branch-form" class="team-form"><button type="button" class="team-close" data-branch-close>×</button><span class="ct-eyebrow">SUCURSAL</span><h2 id="branch-title">Nueva sucursal</h2><input id="branch-id" type="hidden"><div class="team-form-grid"><label>Nombre<input id="branch-name" required placeholder="Ej. Sucursal Centro"></label><label>Teléfono<input id="branch-phone" inputmode="tel"></label><label class="full">Dirección<input id="branch-address"></label><label>Zona horaria<select id="branch-timezone"><option value="America/Mexico_City">Centro de México</option><option value="America/Tijuana">Tijuana</option><option value="America/Cancun">Cancún</option></select></label><label class="switch-line"><input id="branch-active" type="checkbox" checked> Sucursal activa</label></div><div class="team-form-actions"><button type="button" class="ct-btn ct-btn-secondary" data-branch-close>Cancelar</button><button class="ct-btn ct-btn-primary" type="submit">Guardar sucursal</button></div></form></div></main><div id="toast" class="toast hidden"></div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script><script src="../js/config.js"></script><script src="../js/supabase.js"></script><script src="../js/admin-auth.js"></script><script src="../js/admin-branches.js"></script><script src="../js/citago-shell.js"></script><script>document.addEventListener('DOMContentLoaded',()=>CitagoShell.mount({mode:'tenant',activePage:'sucursales'}));</script></body></html>
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Sucursales · MyCitaGo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/citago-admin.css">
+  <link rel="stylesheet" href="../css/admin-team.css">
+  <style>
+    .timezone-focus{
+      border:2px solid #7c3aed!important;
+      box-shadow:0 0 0 4px rgba(124,58,237,.12)!important;
+      border-radius:12px;
+      padding:10px;
+      background:#faf8ff;
+    }
+    .timezone-help{
+      display:block;
+      margin-top:5px;
+      color:#6b6475;
+      font-size:11px;
+      line-height:1.45;
+    }
+  </style>
+</head>
+<body>
+<div id="citago-shell"></div>
+<main class="team-page">
+  <header class="ct-page-head">
+    <div>
+      <span class="ct-eyebrow">UBICACIONES</span>
+      <h1>Sucursales</h1>
+      <p>Configura la ubicación y zona horaria que MyCitaGo usa para citas, agenda y puntualidad.</p>
+    </div>
+    <button id="new-branch" class="ct-btn ct-btn-primary">+ Nueva sucursal</button>
+  </header>
+
+  <div id="timezone-return-note" class="ct-card hidden" style="margin-bottom:16px;padding:14px 16px">
+    <strong>Configura la zona horaria de tu sucursal principal</strong>
+    <p style="margin:5px 0 0">Al guardar, el dashboard podrá calcular correctamente “Citas hoy”, próximas citas y puntualidad.</p>
+  </div>
+
+  <div id="branches" class="branch-grid"></div>
+
+  <div id="branch-dialog" class="team-modal hidden">
+    <div class="team-backdrop" data-branch-close></div>
+    <form id="branch-form" class="team-form">
+      <button type="button" class="team-close" data-branch-close>×</button>
+      <span class="ct-eyebrow">SUCURSAL</span>
+      <h2 id="branch-title">Nueva sucursal</h2>
+      <input id="branch-id" type="hidden">
+
+      <div class="team-form-grid">
+        <label>Nombre
+          <input id="branch-name" required placeholder="Ej. Sucursal Centro">
+        </label>
+
+        <label>Teléfono
+          <input id="branch-phone" inputmode="tel">
+        </label>
+
+        <label class="full">Dirección
+          <input id="branch-address">
+        </label>
+
+        <label id="branch-timezone-field">Zona horaria
+          <select id="branch-timezone" required>
+            <option value="America/Mexico_City">Centro de México — CDMX, Veracruz, Puebla, Guadalajara</option>
+            <option value="America/Monterrey">Noreste — Monterrey y zona centro-noreste</option>
+            <option value="America/Cancun">Quintana Roo — Cancún</option>
+            <option value="America/Chihuahua">Chihuahua</option>
+            <option value="America/Hermosillo">Sonora — Hermosillo</option>
+            <option value="America/Mazatlan">Sinaloa — Mazatlán</option>
+            <option value="America/Tijuana">Baja California — Tijuana</option>
+          </select>
+          <small class="timezone-help">Para Veracruz selecciona <b>Centro de México</b>. Esta zona define qué significa “hoy” en el dashboard.</small>
+        </label>
+
+        <label class="switch-line">
+          <input id="branch-active" type="checkbox" checked> Sucursal activa
+        </label>
+      </div>
+
+      <div class="team-form-actions">
+        <button type="button" class="ct-btn ct-btn-secondary" data-branch-close>Cancelar</button>
+        <button class="ct-btn ct-btn-primary" type="submit">Guardar sucursal</button>
+      </div>
+    </form>
+  </div>
+</main>
+
+<div id="toast" class="toast hidden"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script>
+<script src="../js/config.js"></script>
+<script src="../js/supabase.js"></script>
+<script src="../js/admin-auth.js"></script>
+<script src="../js/admin-branches.js?v=20260909-timezone1"></script>
+<script src="../js/citago-shell.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded',()=>CitagoShell.mount({mode:'tenant',activePage:'sucursales'}));
+</script>
+</body>
+</html>
