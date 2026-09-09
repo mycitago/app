@@ -1,0 +1,9 @@
+
+.public-reviews-section{margin:34px 0 6px;padding:22px;border:1px solid #e6e1ed;border-radius:20px;background:#fff}
+.public-reviews-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px}
+.public-review-card{border:1px solid #e8e3ef;border-radius:15px;padding:15px;background:#fbfaff}
+.public-review-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.public-review-top strong{font-size:12px}
+.public-review-source{font-size:8px;font-weight:800;padding:5px 7px;border-radius:999px;background:#eef2ff;color:#4f46e5}
+.public-review-source.verified{background:#dcfce7;color:#15803d}.public-review-stars{display:block;color:#f5ad16;margin:7px 0;font-size:14px;letter-spacing:1px}
+.public-review-card p{font-size:10px;line-height:1.55;color:#625b6c;margin:0}.public-review-reply{margin-top:10px;padding:9px;border-radius:9px;background:#f1eef6;color:#615a69;font-size:9px}
+@media(max-width:800px){.public-reviews-grid{grid-template-columns:1fr}.public-reviews-section{padding:16px}}

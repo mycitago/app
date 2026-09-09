@@ -1,1 +1,61 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Deja tu reseña · MyCitaGo</title><link rel="stylesheet" href="css/styles.css"><link rel="stylesheet" href="css/public-review.css"></head><body class="review-public"><main class="review-shell"><section class="review-card"><span class="review-brand">MyCitaGo</span><h1 id="review-title">Tu opinión nos ayuda a crecer</h1><p id="review-business">Cargando…</p><div id="review-error" class="review-state hidden"></div><div id="review-choices" class="review-choices hidden"><button id="review-choice-internal" type="button"><strong>MyCitaGo</strong><span>Deja estrellas y comentario aquí</span></button><a id="review-choice-google" class="hidden" target="_blank" rel="noopener"><strong>Google</strong><span>Publica tu opinión en Google</span></a></div><form id="review-form" class="hidden"><label>Tu nombre<input id="review-name" maxlength="80" placeholder="Nombre"></label><div class="stars" id="review-stars" aria-label="Calificación"><button type="button" data-rating="1">★</button><button type="button" data-rating="2">★</button><button type="button" data-rating="3">★</button><button type="button" data-rating="4">★</button><button type="button" data-rating="5">★</button></div><label>Comentario<textarea id="review-comment" maxlength="1200" rows="5" placeholder="Cuéntanos cómo fue tu experiencia"></textarea></label><button id="review-submit" class="primary" type="submit">Enviar reseña</button></form><div id="review-success" class="review-state hidden"><strong>¡Gracias por tu opinión!</strong><span>Tu reseña fue publicada en MyCitaGo.</span></div></section></main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script><script src="js/config.js"></script><script src="js/supabase.js"></script><script src="js/public-review.js"></script></body></html>
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Deja tu reseña · MyCitaGo</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/public-review.css?v=20260909-r5">
+</head>
+<body class="review-public">
+<main class="review-shell">
+  <section class="review-card">
+    <span class="review-brand">MyCitaGo</span>
+    <span class="verified-pill">✓ Cliente verificado</span>
+    <h1 id="review-title">¿Cómo fue tu experiencia?</h1>
+    <p id="review-business">Validando tu cita…</p>
+    <p id="review-appointment" class="review-appointment"></p>
+
+    <div id="review-error" class="review-state hidden" role="alert"></div>
+
+    <form id="review-form" class="hidden">
+      <label>
+        Tu nombre <span class="optional">(opcional)</span>
+        <input id="review-name" maxlength="80" autocomplete="name" placeholder="Ej. María">
+      </label>
+
+      <fieldset class="rating-field">
+        <legend>Tu calificación</legend>
+        <div class="stars" id="review-stars" aria-label="Calificación de 1 a 5 estrellas">
+          <button type="button" data-rating="1" aria-label="1 estrella">★</button>
+          <button type="button" data-rating="2" aria-label="2 estrellas">★</button>
+          <button type="button" data-rating="3" aria-label="3 estrellas">★</button>
+          <button type="button" data-rating="4" aria-label="4 estrellas">★</button>
+          <button type="button" data-rating="5" aria-label="5 estrellas">★</button>
+        </div>
+        <span id="rating-help">Selecciona de 1 a 5 estrellas.</span>
+      </fieldset>
+
+      <label>
+        Comentario <span class="optional">(opcional)</span>
+        <textarea id="review-comment" maxlength="1200" rows="5" placeholder="Cuéntanos cómo fue tu experiencia"></textarea>
+        <small><span id="review-count">0</span>/1200</small>
+      </label>
+
+      <button id="review-submit" class="primary" type="submit">Publicar mi reseña</button>
+      <p class="review-privacy">Esta reseña queda vinculada a una cita completada. No publicamos tu teléfono ni datos de contacto.</p>
+    </form>
+
+    <div id="review-success" class="review-state hidden">
+      <strong>¡Gracias por compartir tu experiencia!</strong>
+      <span>Tu reseña verificada ya puede aparecer en la página pública del negocio.</span>
+    </div>
+  </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script>
+<script src="js/config.js"></script>
+<script src="js/supabase.js"></script>
+<script src="js/public-review.js?v=20260909-r5"></script>
+</body>
+</html>

@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/citago-admin.css">
   <link rel="stylesheet" href="../css/admin-reviews.css">
+  <link rel="stylesheet" href="../css/admin-reviews-verified.css?v=20260909-r5">
   <link rel="stylesheet" href="../css/mycitago-themes.css">
   <script src="../js/ui-theme.js"></script>
 </head>
@@ -18,7 +19,7 @@
     <div>
       <span class="ct-eyebrow">REPUTACIÓN</span>
       <h1>Reputación de tu negocio</h1>
-      <p>Administra reseñas de MyCitaGo y, cuando esté disponible, también las de Google.</p>
+      <p>Administra reseñas verificadas de MyCitaGo y, cuando esté disponible, también las de Google.</p>
     </div>
   </header>
 
@@ -26,10 +27,7 @@
     <div class="google-brand-badge" aria-hidden="true"><span>G</span></div>
     <div class="google-connect-copy">
       <div class="google-connect-title-row">
-        <div>
-          <span class="ct-eyebrow">GOOGLE BUSINESS PROFILE</span>
-          <h2>Conecta tu negocio con Google</h2>
-        </div>
+        <div><span class="ct-eyebrow">GOOGLE BUSINESS PROFILE</span><h2>Conecta tu negocio con Google</h2></div>
         <span id="google-connection-pill" class="connection-pill disconnected"><i></i> No conectado</span>
       </div>
       <p id="google-connect-description">Importa tus reseñas, consulta tu calificación y responde comentarios desde un solo lugar.</p>
@@ -46,26 +44,27 @@
   </section>
 
   <section id="google-location-card" class="ct-card google-location-card hidden">
-    <div>
-      <span class="ct-eyebrow">UBICACIÓN DE GOOGLE</span>
-      <h2>Selecciona el perfil correcto</h2>
-      <p>Si administras más de un negocio en Google, elige cuál corresponde a este espacio.</p>
-    </div>
-    <div class="google-location-controls">
-      <select id="google-location" class="ct-input"><option value="">Cargar ubicaciones…</option></select>
-      <button id="google-location-save" class="ct-btn ct-btn-primary" type="button">Usar ubicación</button>
-    </div>
+    <div><span class="ct-eyebrow">UBICACIÓN DE GOOGLE</span><h2>Selecciona el perfil correcto</h2><p>Si administras más de un negocio en Google, elige cuál corresponde a este espacio.</p></div>
+    <div class="google-location-controls"><select id="google-location" class="ct-input"><option value="">Cargar ubicaciones…</option></select><button id="google-location-save" class="ct-btn ct-btn-primary" type="button">Usar ubicación</button></div>
   </section>
 
   <section class="reviews-summary">
     <article class="ct-stat-card"><span>Calificación</span><strong id="review-rating">–</strong><small>Promedio de reseñas publicadas</small></article>
     <article class="ct-stat-card"><span>Reseñas</span><strong id="review-total">0</strong><small>MyCitaGo + Google</small></article>
+    <article class="ct-stat-card verified-stat"><span>Clientes verificados</span><strong id="verified-total">0</strong><small>Reseñas ligadas a citas completadas</small></article>
     <article class="ct-stat-card"><span>Estado Google</span><strong id="google-status" class="status-text">No conectado</strong><small id="google-status-help">Conecta Google para comenzar</small></article>
   </section>
 
   <div class="reviews-toolbar">
     <select id="review-filter" class="ct-input">
-      <option value="">Todas las reseñas</option><option value="5">5 estrellas</option><option value="4">4 estrellas</option><option value="low">3 o menos</option><option value="unanswered">Sin responder</option>
+      <option value="">Todas las reseñas</option>
+      <option value="verified">Clientes verificados</option>
+      <option value="internal">Solo MyCitaGo</option>
+      <option value="google">Solo Google</option>
+      <option value="5">5 estrellas</option>
+      <option value="4">4 estrellas</option>
+      <option value="low">3 o menos</option>
+      <option value="unanswered">Sin responder</option>
     </select>
   </div>
   <section id="reviews-list"></section>
@@ -75,7 +74,8 @@
 <script src="../js/config.js"></script>
 <script src="../js/supabase.js"></script>
 <script src="../js/admin-auth.js"></script>
-<script src="../js/admin-reviews.js"></script>
+<script src="../js/admin-reviews.js?v=20260909-r5"></script>
 <script src="../js/citago-shell.js"></script>
 <script>document.addEventListener('DOMContentLoaded',()=>CitagoShell.mount({mode:'tenant',activePage:'resenas'}));</script>
-</body></html>
+</body>
+</html>
