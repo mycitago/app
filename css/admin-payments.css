@@ -1,0 +1,45 @@
+*{box-sizing:border-box}
+body{font-family:Manrope,sans-serif}
+.payments-page{max-width:1180px;margin:0 auto;padding:28px 22px 80px}
+.payments-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:22px}
+.payments-head h1{margin:5px 0 5px;font-size:34px;letter-spacing:-.04em}
+.payments-head p{margin:0;color:var(--ct-muted,#737887)}
+.sandbox-badge{padding:8px 11px;border-radius:999px;background:#fff3cd;color:#795a00;font-size:10px;font-weight:900}
+.payments-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(280px,.65fr);gap:18px;align-items:start}
+.payments-side{display:grid;gap:18px}
+.payment-panel{background:var(--ct-surface,#fff);border:1px solid var(--ct-line,#e5e7ee);border-radius:20px;padding:22px;box-shadow:var(--ct-shadow,0 12px 30px rgba(24,20,38,.06))}
+.payment-panel h2{margin:5px 0 6px;font-size:21px;letter-spacing:-.025em}
+.payment-panel p{color:var(--ct-muted,#737887);font-size:12px;line-height:1.55}
+.payment-panel-head{display:flex;justify-content:space-between;align-items:flex-start;gap:18px}
+.switch-row{display:flex;gap:9px;align-items:center;padding:9px 11px;border:1px solid var(--ct-line,#e5e7ee);border-radius:12px;font-size:11px;font-weight:800;white-space:nowrap}
+.switch-row input{width:18px;height:18px;accent-color:var(--ct-primary,#743aed)}
+.stripe-account-card{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;margin:20px 0;padding:16px;border:1px solid var(--ct-line,#e5e7ee);border-radius:16px;background:var(--ct-surface-soft,#fafafe)}
+.stripe-symbol{width:42px;height:42px;display:grid;place-items:center;border-radius:12px;background:#635bff;color:white;font-weight:900;font-size:20px}
+.stripe-account-card small,.stripe-account-card strong,.stripe-account-card span{display:block}
+.stripe-account-card small{color:var(--ct-muted,#737887);font-size:8px;font-weight:900;letter-spacing:.08em}
+.stripe-account-card strong{font-size:14px;margin:2px 0}
+.stripe-account-card>div>span{font-size:10px;color:var(--ct-muted,#737887)}
+.stripe-account-actions{grid-column:2/4;display:flex;gap:8px}
+.status-pill{padding:6px 9px;border-radius:999px;font-size:9px;font-weight:900}
+.status-pill.neutral{background:#eef0f4;color:#59606d}.status-pill.good{background:#e5f7ed;color:#14774f}.status-pill.warn{background:#fff3d6;color:#8c6500}
+.payment-rules{border:0;padding:0;margin:0;display:grid;gap:9px}
+.payment-rules[disabled]{opacity:.58}
+.payment-rules legend{font-size:14px;font-weight:900;margin-bottom:9px}
+.pay-option{display:flex;gap:10px;align-items:flex-start;padding:13px;border:1px solid var(--ct-line,#e5e7ee);border-radius:13px;cursor:pointer}
+.pay-option:has(input:checked){border-color:var(--ct-primary,#743aed);box-shadow:0 0 0 2px rgba(116,58,237,.08)}
+.pay-option input{margin-top:2px;accent-color:var(--ct-primary,#743aed)}
+.pay-option strong,.pay-option span{display:block}.pay-option strong{font-size:11px}.pay-option span{margin-top:3px;color:var(--ct-muted,#737887);font-size:9px}
+.deposit-value-wrap{padding:13px;border-radius:13px;background:var(--ct-surface-soft,#f8f8fc)}
+.deposit-value-wrap.hidden{display:none}
+.deposit-value-wrap>label{font-size:10px;font-weight:800}
+.deposit-input{display:flex;align-items:center;gap:8px;margin-top:7px}
+.deposit-input input{width:150px;padding:10px;border:1px solid var(--ct-line,#e5e7ee);border-radius:10px;background:var(--ct-surface,#fff);color:var(--ct-text,#171820)}
+.deposit-input span{font-size:11px;font-weight:800}
+.methods-pref{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 4px;padding-top:13px;border-top:1px solid var(--ct-line,#e5e7ee)}
+.methods-pref h3,.methods-pref p{grid-column:1/-1;margin:0}.methods-pref h3{font-size:12px}.methods-pref p{font-size:9px}
+.methods-pref label{padding:10px;border:1px solid var(--ct-line,#e5e7ee);border-radius:10px;font-size:10px;font-weight:800}
+.subscription-status{display:grid;grid-template-columns:1fr auto;gap:8px;padding:13px;border-radius:13px;background:var(--ct-surface-soft,#f8f8fc);margin:13px 0}
+.subscription-status span{color:var(--ct-muted,#737887);font-size:9px}.subscription-status strong{font-size:10px;text-align:right}
+.safety-panel ul{margin:12px 0 0;padding-left:18px;color:var(--ct-muted,#737887);font-size:10px;line-height:1.7}
+@media(max-width:900px){.payments-grid{grid-template-columns:1fr}.payments-side{grid-template-columns:1fr 1fr}}
+@media(max-width:650px){.payments-page{padding:18px 12px 85px}.payments-head,.payment-panel-head{display:block}.sandbox-badge{display:inline-flex;margin-top:10px}.payments-head h1{font-size:28px}.switch-row{margin-top:12px;width:max-content}.payments-side{grid-template-columns:1fr}.stripe-account-card{grid-template-columns:auto 1fr}.stripe-account-card>.status-pill{grid-column:2}.stripe-account-actions{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr}.methods-pref{grid-template-columns:1fr}.methods-pref h3,.methods-pref p{grid-column:1}.payment-panel{padding:17px}}
