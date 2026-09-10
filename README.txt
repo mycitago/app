@@ -1,28 +1,13 @@
-MYCITAGO — FIX 2 REPORTES + IVA
+SUBIR SOLO ESTE ARCHIVO:
+css/booking-public-fix.css
 
-CAUSA QUE ESTAMOS ELIMINANDO:
-La carga anterior era de tipo "todo o nada": si fallaba citas, gastos o reseñas, no se renderizaba nada.
-Además, el HTML cargaba admin-accounting.js sin versión, por lo que el navegador podía conservar una copia anterior.
+No reemplazar reservar.html ni JS.
 
-ESTE PAQUETE:
-- Carga citas, gastos, reseñas, servicios y control fiscal de manera independiente.
-- Si falla una fuente, las demás sí se muestran.
-- El estado superior indica qué fuente falló.
-- Elimina relaciones embebidas de appointments.
-- Fuerza carga del JS nuevo con ?v=20260909-reportfix3.
-- IVA activado por defecto al 16%.
-- Puede desactivarse por venta.
-- Con IVA activo, el precio de la cita se trata como TOTAL IVA INCLUIDO; subtotal = total / 1.16.
-- Si se desactiva: subtotal = total e IVA = 0.
+La página ya carga este archivo. Después de subirlo:
+1. abre incógnito
+2. usa:
+https://mycitago.github.io/app/reservar.html?n=clinica&v=20260910-banner-css3
+3. prueba también el slug de barbería
+4. en móvil, el hero debe quedar en 180 px; escritorio máximo 260 px.
 
-ORDEN:
-1. Ejecutar sql/ALTER_SALES_IVA.sql en Supabase.
-2. Reemplazar admin/contabilidad.html
-3. Reemplazar js/admin-accounting.js
-4. Reemplazar css/admin-reports.css
-5. Abrir:
-https://mycitago.github.io/app/admin/contabilidad.html?v=20260909-reportfix3
-
-Si sale "Datos cargados parcialmente", el mismo mensaje indicará la fuente exacta que no tiene acceso.
-
-IMPORTANTE: El repo main que revisé todavía carga admin-accounting.js sin versión y conserva la carga anterior. Debes reemplazar los 3 archivos completos para que el navegador use esta versión.
+No toca Supabase ni el flujo de reserva.

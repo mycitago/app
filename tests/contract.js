@@ -1,18 +1,12 @@
 
-const fs=require('fs'), p=require('path'), root=process.argv[2];
-const H=fs.readFileSync(p.join(root,'admin','contabilidad.html'),'utf8');
-const J=fs.readFileSync(p.join(root,'js','admin-accounting.js'),'utf8');
-const S=fs.readFileSync(p.join(root,'sql','ALTER_SALES_IVA.sql'),'utf8');
-let bad=false; function ok(c,m){if(!c){console.error('FAIL:',m);bad=true}}
-ok(H.includes('report-load-status'),'falta estado de carga visible');
-ok(H.includes('sale-vat-applies'),'falta toggle IVA');
-ok(H.includes('admin-accounting.js?v=20260909-reportfix2'),'falta cache bust del JS');
-ok(J.includes('Promise.allSettled'),'carga de datos sigue siendo todo-o-nada');
-ok(J.includes("from('appointments').select('id,appointment_date,status,price_charged,booking_source,customer_id,service_id')"),'appointments sigue usando embeds fragiles');
-ok(J.includes("from('services').select('id,name')"),'falta carga separada de servicios');
-ok(J.includes('computeVatFromTotal'),'falta calculo IVA');
-ok(J.includes('vat_applies'),'falta persistir aplica IVA');
-ok(J.includes('0.16'),'falta tasa default 16%');
-ok(S.includes('vat_applies boolean not null default true'),'SQL sin default IVA');
-ok(S.includes('vat_rate numeric'),'SQL sin tasa IVA');
+const fs=require('fs'),p=require('path');
+const f=p.join(process.argv[2],'css','booking-public-fix.css');
+const c=fs.existsSync(f)?fs.readFileSync(f,'utf8'):'';
+let bad=false;const ok=(x,m)=>{if(!x){console.error('FAIL',m);bad=true}};
+ok(c.includes('#hero.adaptive-hero'),'falta selector fuerte');
+ok(c.includes('max-height:260px!important'),'falta max desktop');
+ok(c.includes('height:clamp(190px,22vw,260px)!important'),'falta altura desktop');
+ok(c.includes('height:180px!important'),'falta mobile');
+ok(c.includes('overflow:hidden!important'),'falta recorte');
+ok(c.includes('.public-reviews-section'),'se perdieron estilos reseñas');
 process.exit(bad?1:0);
