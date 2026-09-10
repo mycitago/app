@@ -1,48 +1,11 @@
-async function loadPublishedBranding(businessId){const {data,error}=await supabaseClient.from('business_branding_public').select('business_id,primary_color,secondary_color,background_color,text_color,font_family,button_style,card_style,logo_url,cover_url,hero_title,hero_subtitle,section_order,section_visibility,published_config,published_at').eq('business_id',businessId).maybeSingle();if(error){console.warn('[branding]',error);return null}return data}
+
+async function loadPublishedBranding(businessId){const{data,error}=await supabaseClient.from('business_branding_public').select('business_id,primary_color,secondary_color,background_color,text_color,font_family,button_style,card_style,logo_url,cover_url,hero_title,hero_subtitle,section_order,section_visibility,published_config,published_at').eq('business_id',businessId).maybeSingle();if(error){console.warn('[branding]',error);return null}return data}
 function safeColor(v,f){return /^#[0-9a-f]{6}$/i.test(String(v||''))?v:f}
-function applyPublishedBranding(b){
-  if(!b)return;
-  const cfg=b.published_config||{};
-  const value=(key,fallback)=>cfg[key]??b[key]??fallback;
-  const theme_mode=value('theme_mode','light');
-  document.body.dataset.publicTheme=theme_mode;
-  const light={primary:'#7c3aed',secondary:'#a855f7',bg:'#ffffff',text:'#191724'};
-  const dark={primary:'#8b5cf6',secondary:'#c084fc',bg:'#0e0b17',text:'#ffffff'};
-  const p=theme_mode==='dark'?dark:light;
-  const r=document.documentElement;
-  r.style.setProperty('--color-primary',safeColor(value('primary_color'),p.primary));
-  r.style.setProperty('--color-primary-dark',safeColor(value('secondary_color'),p.secondary));
-  r.style.setProperty('--booking-accent',safeColor(value('primary_color'),p.primary));
-  r.style.setProperty('--page-bg',safeColor(value('background_color'),p.bg));
-  r.style.setProperty('--page-text',safeColor(value('text_color'),p.text));
-  document.body.style.background='var(--page-bg)';
-  document.body.style.color='var(--page-text)';
-  document.body.style.fontFamily=['Manrope','Inter','Georgia','Arial'].includes(value('font_family'))?value('font_family'):'Manrope';
-  document.body.dataset.buttonStyle=value('button_style','rounded');
-  document.body.dataset.cardStyle=value('card_style','soft');
-  document.body.dataset.scheduleStyle=value('schedule_style','modern');
-  document.body.dataset.bookingDensity=value('booking_density','comfortable');
-
-  const heroTitle=value('hero_title');
-  if(heroTitle&&document.getElementById('hero-name'))document.getElementById('hero-name').textContent=heroTitle;
-  const sub=document.getElementById('brand-hero-subtitle');
-  const heroSubtitle=value('hero_subtitle');
-  if(sub){sub.textContent=heroSubtitle||'';sub.hidden=!heroSubtitle;}
-
-  const cover=value('cover_url');
-  const hero=document.getElementById('hero');
-  if(hero&&cover){
-    hero.style.setProperty('--booking-cover',`url("${cover}")`);
-    hero.classList.add('has-cover');
-    hero.style.removeProperty('background-image');
-  }
-  const logo=value('logo_url');
-  if(logo){
-    const i=document.getElementById('hero-logo');
-    if(i){i.src=logo;i.classList.remove('hidden');}
-  }
-}
-function renderPublicSections(b){if(!b)return;const visibility=b.section_visibility||{};document.querySelectorAll('[data-brand-section]').forEach(el=>{el.hidden=visibility[el.dataset.brandSection]===false})}
-window.loadPublishedBranding=loadPublishedBranding;window.applyPublishedBranding=applyPublishedBranding;window.renderPublicSections=renderPublicSections;
-async function loadPublicBusinessReviews(slug){if(!slug)return;const {data,error}=await supabaseClient.rpc('public_business_reviews',{p_slug:slug,p_limit:12});if(error){console.warn('[public reviews]',error);return}const rows=data||[],section=document.getElementById('public-reviews-section'),host=document.getElementById('public-reviews'),rating=document.getElementById('public-rating');if(!section||!host)return;if(!rows.length){section.hidden=true;return}section.hidden=false;const avg=rows.reduce((a,r)=>a+Number(r.rating||0),0)/rows.length;if(rating)rating.textContent=`${avg.toFixed(1)} ★ · ${rows.length} reseña${rows.length===1?'':'s'}`;host.innerHTML=rows.map(r=>`<article class="public-review-card"><div><strong>${String(r.reviewer_name||'Cliente').replace(/[<>]/g,'')}</strong><span>${r.source==='google'?'Google':'MyCitaGo'}</span></div><b>${'★'.repeat(Number(r.rating||0))}${'☆'.repeat(Math.max(0,5-Number(r.rating||0)))}</b>${r.comment?`<p>${String(r.comment).replace(/[<>]/g,'')}</p>`:''}${r.reply_text?`<small>Respuesta del negocio: ${String(r.reply_text).replace(/[<>]/g,'')}</small>`:''}</article>`).join('')}
-window.loadPublicBusinessReviews=loadPublicBusinessReviews;
+function rgb(hex){const h=safeColor(hex,'#000000').slice(1);return[0,2,4].map(i=>parseInt(h.slice(i,i+2),16))}
+function lum(hex){const v=rgb(hex).map(x=>{x/=255;return x<=.03928?x/12.92:Math.pow((x+.055)/1.055,2.4)});return .2126*v[0]+.7152*v[1]+.0722*v[2]}
+function contrastRatio(a,b){const x=lum(a),y=lum(b);return(Math.max(x,y)+.05)/(Math.min(x,y)+.05)}
+function bestTextColor(bg){return contrastRatio(bg,'#ffffff')>=contrastRatio(bg,'#17151f')?'#ffffff':'#17151f'}
+function applyPublishedBranding(b){if(!b)return;const cfg=b.published_config||{},v=(k,f)=>cfg[k]??b[k]??f,mode=v('theme_mode','light'),d=mode==='dark'?{p:'#8b5cf6',s:'#c084fc',bg:'#0e0b17',t:'#ffffff'}:{p:'#7c3aed',s:'#a855f7',bg:'#f6f7fb',t:'#17151f'};const primary=safeColor(v('primary_color'),d.p),bg=safeColor(v('background_color'),d.bg);let text=safeColor(v('text_color'),d.t);if(contrastRatio(text,bg)<4.5)text=bestTextColor(bg);const r=document.documentElement;r.style.setProperty('--booking-accent',primary);r.style.setProperty('--booking-on-accent',bestTextColor(primary));r.style.setProperty('--booking-bg',bg);r.style.setProperty('--booking-text',text);document.body.dataset.publicTheme=mode;document.body.dataset.buttonStyle=v('button_style','rounded');document.body.dataset.cardStyle=v('card_style','soft');document.body.dataset.scheduleStyle=v('schedule_style','modern');document.body.dataset.bookingDensity=v('booking_density','comfortable');document.body.style.fontFamily=['Manrope','Inter','Georgia','Arial'].includes(v('font_family'))?v('font_family'):'Manrope';const title=v('hero_title');if(title&&document.getElementById('hero-name'))document.getElementById('hero-name').textContent=title;const sub=document.getElementById('brand-hero-subtitle'),st=v('hero_subtitle');if(sub){sub.textContent=st||'';sub.hidden=!st}const hero=document.getElementById('hero'),cover=v('cover_url');if(hero&&cover){hero.style.setProperty('--booking-cover',`url("${cover}")`);hero.classList.add('has-cover')}const logo=v('logo_url');if(logo){const i=document.getElementById('hero-logo');if(i){i.src=logo;i.classList.remove('hidden')}}}
+function renderPublicSections(b){if(!b)return;const vis=(b.published_config||{}).section_visibility||b.section_visibility||{};document.querySelectorAll('[data-brand-section]').forEach(el=>el.hidden=vis[el.dataset.brandSection]===false)}
+window.loadPublishedBranding=loadPublishedBranding;window.applyPublishedBranding=applyPublishedBranding;window.renderPublicSections=renderPublicSections;window.bestTextColor=bestTextColor;
+window.addEventListener('message',e=>{if(e.origin!==location.origin)return;if(!new URLSearchParams(location.search).has('preview'))return;if(e.data?.type!=='MYCITAGO_PREVIEW_THEME')return;applyPublishedBranding(e.data.config||{});renderPublicSections({published_config:e.data.config||{}})});
