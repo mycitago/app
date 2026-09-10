@@ -19,7 +19,30 @@ function goToStep(stepEl){[$('step-services'),el.bookingStep,el.formStep,el.succ
 function setProgress(step){document.querySelectorAll('[data-progress-step]').forEach(node=>{const n=Number(node.dataset.progressStep);node.classList.toggle('is-active',n===step);node.classList.toggle('is-done',n<step)})}
 function validateForm(){return !!(el.inputName.value.trim()&&validateWhatsapp(el.inputWhatsapp.value))}
 async function handleConfirmBooking(){if(!validateForm())return showToast('Revisa tus datos.');const result=await bookAppointment({business:state.business,service:state.selectedService,dateKey:toDateKey(state.selectedDate),startTime:state.selectedSlot.start,endTime:state.selectedSlot.end,name:el.inputName.value.trim(),whatsappDigits:validateWhatsapp(el.inputWhatsapp.value),notes:el.inputNotes.value.trim()});if(!result.ok)return showToast(result.reason);renderSuccess();setProgress(4);goToStep(el.successStep)}
-function renderSuccess(){const dateLabel=state.selectedDate.toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long'});$('summary-service').textContent=state.selectedService.name;$('summary-date').textContent=dateLabel;$('summary-time').textContent=state.selectedSlot.start;$('summary-duration').textContent=formatDuration(state.selectedService.duration_minutes);$('summary-business').textContent=state.business.name;$('summary-address').textContent=state.business.address||''}
+function renderSuccess(){
+  const dateLabel=state.selectedDate.toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long'});
+  $('summary-service').textContent=state.selectedService.name;
+  $('summary-date').textContent=dateLabel;
+  $('summary-time').textContent=state.selectedSlot.start;
+  $('summary-duration').textContent=formatDuration(state.selectedService.duration_minutes);
+  $('summary-business').textContent=state.business.name;
+  $('summary-address').textContent=state.business.address||'';
+
+  // El helper ya existe en appointments.js. Antes el botón se mostraba,
+  // pero nunca recibía un href, por eso al hacer clic no ocurría nada.
+  const whatsappUrl=buildWhatsappConfirmationUrl(state.business,{
+    serviceName:state.selectedService.name,
+    dateLabel,
+    startTime:state.selectedSlot.start,
+    price:state.selectedService.price
+  });
+
+  if(el.btnWhatsapp&&whatsappUrl){
+    el.btnWhatsapp.href=whatsappUrl;
+    el.btnWhatsapp.classList.remove('hidden');
+    el.btnWhatsapp.setAttribute('aria-disabled','false');
+  }
+}
 function reviewCard(r){const card=document.createElement('article');card.className='review-card';const top=document.createElement('div');top.className='review-card-top';const who=document.createElement('strong');who.textContent=r.reviewer_name||'Cliente';const source=document.createElement('span');source.className='review-source';source.textContent=r.source==='internal'&&r.verified?'✓ Verificado':(r.source==='google'?'Google':'MyCitaGo');const stars=document.createElement('div');stars.className='review-stars';const n=Math.max(0,Math.min(5,Number(r.rating||0)));stars.textContent='★'.repeat(n)+'☆'.repeat(5-n);top.append(who,source);card.append(top,stars);if(r.comment){const p=document.createElement('p');p.textContent=r.comment;card.appendChild(p)}return card}
 function updateReviewSurfaces(rows){state.reviews=rows||[];const reviewsSection=$('support-reviews'),list=$('reviews-list'),rating=$('reviews-rating'),heroRating=$('hero-rating');if(!state.reviews.length){reviewsSection.hidden=true;heroRating.hidden=true;list.replaceChildren();return}const avg=state.reviews.reduce((s,r)=>s+Number(r.rating||0),0)/state.reviews.length,label=`${avg.toFixed(1)} ★ · ${state.reviews.length} ${state.reviews.length===1?'reseña':'reseñas'}`;rating.textContent=label;heroRating.textContent=label;heroRating.hidden=false;list.replaceChildren();state.reviews.forEach(r=>list.appendChild(reviewCard(r)));reviewsSection.hidden=false}
 async function loadVerifiedReviews(){const rows=await window.fetchVerifiedPublicReviews?.(state.business.id,8,state.business.slug)||[];updateReviewSurfaces(rows)}

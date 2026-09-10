@@ -1,27 +1,23 @@
-MyCitaGo — Rediseño real de reservar.html
+MyCitaGo — Fix botón Confirmar por WhatsApp
 
-SUBIR / REEMPLAZAR
-1. reservar.html
-2. css/booking-adaptive.css
-3. js/public-branding.js
-4. js/app.js
+CAUSA:
+El botón #btn-whatsapp existía en reservar.html y appointments.js ya tenía
+buildWhatsappConfirmationUrl(), pero renderSuccess() nunca asignaba la URL
+al atributo href. Por eso el botón se veía correcto y no hacía nada.
 
-NO TOCAR
-- Supabase / SQL / RLS
-- RPCs de disponibilidad
+SUBIR:
+js/app.js
+
+NO SE MODIFICA:
+- reservar.html
+- CSS
+- Supabase
+- RPC create_appointment
 - appointments.js
-- services.js
+- servicios / reseñas
 
-CAMBIOS
-- Desaparece la cuadrícula de 3 columnas tipo dashboard.
-- Hero en 3 zonas de flujo normal; sin superposición.
-- Servicios uniformes y flujo centrado.
-- Reseñas y galería debajo del flujo.
-- Galería = fotos reales únicamente; no repite tarjetas.
-- CTA sticky solo en móvil; CTA dentro del resumen en desktop.
-- Todos los componentes consumen tokens semánticos.
-- `--text`, `--hero-text` y `--brand-contrast` se calculan automáticamente.
-- El color de texto manual ya no puede producir una combinación ilegible.
-
-PRUEBA
-https://mycitago.github.io/app/reservar.html?n=clinica&v=20260910-redesign
+PRUEBA:
+1. Crear una cita.
+2. Llegar a Paso 4.
+3. Pulsar “Confirmar por WhatsApp”.
+4. Debe abrir wa.me con negocio, servicio, fecha, hora y precio.
