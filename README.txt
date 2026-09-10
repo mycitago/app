@@ -1,23 +1,25 @@
-MyCitaGo — Fix botón Confirmar por WhatsApp
+MyCitaGo Platform — Super Admin Redesign
 
-CAUSA:
-El botón #btn-whatsapp existía en reservar.html y appointments.js ya tenía
-buildWhatsappConfirmationUrl(), pero renderSuccess() nunca asignaba la URL
-al atributo href. Por eso el botón se veía correcto y no hacía nada.
+SUBIR / REEMPLAZAR
+1) admin/plataforma.html
+2) css/admin-platform.css
 
-SUBIR:
-js/app.js
+NO HAY SQL NI RPC NUEVO.
 
-NO SE MODIFICA:
-- reservar.html
-- CSS
-- Supabase
-- RPC create_appointment
-- appointments.js
-- servicios / reseñas
+IMPORTANTE
+- El frontend actual ya obtiene businesses/subs/plans/payments/incidents mediante platform_dashboard_snapshot.
+- Las variaciones históricas de MRR/negocios NO se inventan. La UI muestra “historial no disponible”.
+- Riesgo usa el filtro real `risk` que ya existe en el portal.
+- Los pagos de 3/6/12 meses se calculan únicamente a partir de `platformState.payments`.
+- OXXO/SPEI/Tarjeta se muestran “No conectado”. No se declara ningún proveedor conectado.
+- El pie duplicado del sidebar generado por citago-shell.js se limpia al montar y conserva solo “Abrir panel negocio”.
 
-PRUEBA:
-1. Crear una cita.
-2. Llegar a Paso 4.
-3. Pulsar “Confirmar por WhatsApp”.
-4. Debe abrir wa.me con negocio, servicio, fecha, hora y precio.
+VERIFICAR DESPUÉS DE SUBIR
+https://mycitago.github.io/app/admin/plataforma.html#resumen
+
+Pruebas:
+- Resumen en desktop y móvil.
+- Clic en Riesgo filtra Negocios por “En riesgo”.
+- Selector 3/6/12 cambia la gráfica.
+- Botones Configurar de métodos de cobro informan que falta proveedor.
+- Tema claro y oscuro.

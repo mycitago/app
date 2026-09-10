@@ -8,10 +8,14 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/styles.css">
 <link rel="stylesheet" href="../css/admin.css">
-<link rel="stylesheet" href="../css/citago-admin.css"><link rel="stylesheet" href="../css/admin-platform.css"><link rel="stylesheet" href="../css/mycitago-themes.css">
+<link rel="stylesheet" href="../css/citago-admin.css">
+<link rel="stylesheet" href="../css/admin-platform.css?v=20260910-ops">
+<link rel="stylesheet" href="../css/mycitago-themes.css">
 <script src="../js/ui-theme.js"></script>
 </head>
-<body class="creator-body"><div id="citago-shell"></div>
+<body class="creator-body">
+<div id="citago-shell"></div>
+
 <header class="creator-topbar">
   <div class="creator-brand"><span class="creator-logo">N</span><div><strong>Super Admin</strong><small>Control de la plataforma</small></div></div>
   <div class="creator-top-actions">
@@ -22,86 +26,170 @@
 </header>
 
 <div class="creator-layout">
-  <aside class="creator-sidebar">
-    <nav>
-      <a href="#resumen" class="active">⌂ <span>Resumen</span></a>
-      <a href="#negocios">▦ <span>Negocios</span></a>
-      <a href="#suscripciones">◇ <span>Suscripciones</span></a>
-      <a href="#soporte">? <span>Soporte</span></a>
-      <a href="#plantillas">▤ <span>Plantillas</span></a>
-      <a href="#pagos">$ <span>Pagos</span></a>
-      <a href="#incidencias">! <span>Incidencias</span></a>
-      <a href="#integraciones">◎ <span>Integraciones</span></a>
-      <a href="#auditoria">≡ <span>Auditoría</span></a>
-    </nav>
-    <div class="creator-sidebar-foot">Vista exclusiva del creador</div>
-  </aside>
+<aside class="creator-sidebar">
+  <nav>
+    <a href="#resumen" class="active">⌂ <span>Resumen</span></a>
+    <a href="#negocios">▦ <span>Negocios</span></a>
+    <a href="#suscripciones">◇ <span>Suscripciones</span></a>
+    <a href="#soporte">? <span>Soporte</span></a>
+    <a href="#plantillas">▤ <span>Plantillas</span></a>
+    <a href="#pagos">$ <span>Pagos</span></a>
+    <a href="#incidencias">! <span>Incidencias</span></a>
+    <a href="#integraciones">◎ <span>Integraciones</span></a>
+    <a href="#auditoria">≡ <span>Auditoría</span></a>
+  </nav>
+  <div class="creator-sidebar-foot"><a href="index.html" class="btn btn-ghost">Abrir panel negocio</a></div>
+</aside>
 
-  <main class="creator-main">
-    <section id="resumen" class="creator-hero">
-      <div><div class="eyebrow">MYCITAGO PLATFORM</div><h1>Centro de operaciones</h1><p>Negocios, soporte, suscripciones, plantillas y salud operativa desde un solo lugar.</p><div class="platform-hero-actions"><button id="invite-business" class="ct-btn ct-btn-primary" type="button">+ Invitar negocio</button><button id="refresh-platform" class="ct-btn ct-btn-secondary" type="button">Actualizar datos</button></div></div>
-      <div class="creator-date" id="creator-date">—</div>
-    </section>
+<main class="creator-main">
 
-    <section class="creator-kpis">
-      <article><span>MRR</span><strong id="kpi-mrr">—</strong><small id="kpi-mrr-note">Mensual recurrente</small></article>
-      <article><span>Negocios</span><strong id="kpi-businesses">—</strong><small id="kpi-businesses-note">registrados</small></article>
-      <article><span>En prueba</span><strong id="kpi-trials">—</strong><small id="kpi-trials-note">30 días gratis</small></article>
-      <article><span>Pagando</span><strong id="kpi-paying">—</strong><small id="kpi-paying-note">suscripciones activas</small></article>
-      <article><span>Riesgo</span><strong id="kpi-risk">—</strong><small>vencidas / por vencer</small></article>
-    </section>
+<section id="resumen" class="platform-overview-head">
+  <div class="platform-overview-copy">
+    <div class="eyebrow">MYCITAGO PLATFORM</div>
+    <h1>Centro de operaciones</h1>
+    <div class="platform-context"><span id="creator-date">—</span><span>·</span><span>Estado actual de la plataforma</span></div>
+    <p>Supervisa clientes, cobros, suscripciones y salud operativa desde un solo lugar.</p>
+  </div>
+  <div class="platform-hero-actions">
+    <button id="invite-business" class="ct-btn ct-btn-primary" type="button">+ Invitar negocio</button>
+    <button id="refresh-platform" class="ct-btn ct-btn-secondary" type="button">Actualizar datos</button>
+  </div>
+</section>
 
-    <section class="creator-grid-2" id="suscripciones">
-      <article class="creator-card">
-        <div class="creator-card-head"><div><span class="eyebrow">PLANES</span><h2>Distribución de suscripciones</h2></div><span class="creator-soft" id="plans-total">0 negocios</span></div>
-        <div id="plan-distribution" class="plan-distribution"></div>
-      </article>
-      <article class="creator-card">
-        <div class="creator-card-head"><div><span class="eyebrow">INGRESOS</span><h2>Pagos de plataforma</h2></div><span class="creator-soft" id="payments-period">Últimos 6 meses</span></div>
-        <div id="payment-chart" class="creator-bars"></div>
-        <div class="creator-inline-stats"><div><span>Cobrado</span><strong id="payments-collected">$0</strong></div><div><span>Pendiente/fallido</span><strong id="payments-risk">$0</strong></div></div>
-      </article>
-    </section>
+<section class="creator-kpis platform-kpis" aria-label="Indicadores principales">
+  <article class="platform-kpi neutral">
+    <span>MRR</span><strong id="kpi-mrr">—</strong>
+    <small id="kpi-mrr-note">Historial mensual no disponible</small>
+  </article>
+  <article class="platform-kpi neutral">
+    <span>Negocios</span><strong id="kpi-businesses">—</strong>
+    <small id="kpi-businesses-note">Total registrado · histórico no disponible</small>
+  </article>
+  <article class="platform-kpi trial">
+    <span>En prueba</span><strong id="kpi-trials">—</strong>
+    <small id="kpi-trials-note">Pruebas vigentes</small>
+  </article>
+  <article class="platform-kpi healthy">
+    <span>Pagando</span><strong id="kpi-paying">—</strong>
+    <small id="kpi-paying-note">Suscripciones activas</small>
+  </article>
+  <article id="kpi-risk-card" class="platform-kpi risk platform-kpi-action" tabindex="0" role="link" aria-label="Ver negocios en riesgo">
+    <span>Riesgo</span><strong id="kpi-risk">—</strong>
+    <small>Ver negocios vencidos o por vencer →</small>
+  </article>
+</section>
 
-    <section class="creator-card" id="alertas">
-      <div class="creator-card-head"><div><span class="eyebrow">ATENCIÓN</span><h2>Alertas de plataforma</h2></div><span id="alert-count" class="creator-soft">0 alertas</span></div>
-      <div id="platform-alerts" class="creator-alerts"></div>
-    </section>
+<section class="platform-insights-grid" id="suscripciones">
+  <article class="creator-card platform-chart-card">
+    <div class="creator-card-head">
+      <div><span class="eyebrow">PLANES</span><h2>Distribución de suscripciones</h2><p>Negocios activos o en prueba por plan.</p></div>
+      <span class="creator-soft" id="plans-total">0 negocios</span>
+    </div>
+    <div id="plan-distribution" class="plan-distribution"></div>
+  </article>
 
-    <section class="creator-grid-2" id="soporte">
-      <article class="creator-card platform-support-card"><div class="creator-card-head"><div><span class="eyebrow">SOPORTE</span><h2>Soporte · Bandeja de ayuda</h2></div><div class="platform-card-actions"><select id="support-history-filter" class="input" aria-label="Filtrar tickets"><option value="open">Abiertos</option><option value="closed">Cerrados</option><option value="all">Todos</option></select><span id="support-open-count" class="creator-soft">0 abiertos</span></div></div><div id="platform-support-list" class="platform-support-list"><div class="creator-empty">Cargando tickets…</div></div></article>
-      <article class="creator-card" id="plantillas"><div class="creator-card-head"><div><span class="eyebrow">CATÁLOGO MYCITAGO</span><h2>Plantillas de servicios</h2></div><div style="display:flex;gap:6px"><button id="new-template" class="btn btn-primary" type="button">+ Plantilla</button><button id="refresh-templates" class="btn btn-ghost" type="button">Actualizar</button></div></div><div id="template-create-panel" class="platform-template-form hidden"><select id="template-category" class="input"></select><input id="template-name" class="input" placeholder="Nombre del servicio"><input id="template-duration" class="input" type="number" min="5" step="5" value="60" placeholder="Duración"><select id="template-image" class="input"><option value="/app/assets/service-presets/barber-cut.svg">Corte</option><option value="/app/assets/service-presets/beauty-hair.svg">Belleza</option><option value="/app/assets/service-presets/nails.svg">Uñas</option><option value="/app/assets/service-presets/spa.svg">Spa</option><option value="/app/assets/service-presets/dental.svg">Salud</option><option value="/app/assets/service-presets/consulting.svg">Profesional</option></select><button id="save-template" class="btn btn-primary" type="button">Guardar</button></div><div id="platform-template-summary" class="platform-template-summary"><div class="creator-empty">Cargando catálogo…</div></div><div class="platform-default-media"><h3>Imágenes genéricas de ejemplo</h3><p>Al adoptarlas, se copian al espacio del negocio y quedan congeladas.</p><div class="platform-media-grid"><label>Logo<input id="platform-logo-file" type="file" accept="image/jpeg,image/png,image/webp"><button type="button" data-platform-asset="logo">Subir / reemplazar</button></label><label>Banner<input id="platform-banner-file" type="file" accept="image/jpeg,image/png,image/webp"><button type="button" data-platform-asset="banner">Subir / reemplazar</button></label></div><div id="platform-default-assets-list"></div></div></article>
-    </section>
+  <article class="creator-card platform-chart-card">
+    <div class="creator-card-head platform-chart-head">
+      <div><span class="eyebrow">INGRESOS</span><h2>Pagos de plataforma</h2><p>Montos reales registrados en el periodo.</p></div>
+      <label class="platform-period-control">Periodo
+        <select id="payment-period-select" class="input" aria-label="Periodo de pagos">
+          <option value="3">3 meses</option>
+          <option value="6" selected>6 meses</option>
+          <option value="12">12 meses</option>
+        </select>
+      </label>
+    </div>
+    <div id="payment-chart" class="creator-bars platform-payment-chart"></div>
+    <div class="creator-inline-stats">
+      <div><span>Cobrado</span><strong id="payments-collected">$0</strong></div>
+      <div><span>Pendiente/fallido</span><strong id="payments-risk">$0</strong></div>
+    </div>
+  </article>
+</section>
 
-    <section class="creator-grid-2 platform-ops-grid"><article class="creator-card"><div class="creator-card-head"><div><span class="eyebrow">INVITACIONES</span><h2>Registros enviados</h2></div><span id="invite-open-count" class="creator-soft">0 pendientes</span></div><div id="platform-invites" class="platform-compact-list"></div></article><article class="creator-card"><div class="creator-card-head"><div><span class="eyebrow">SOLICITUDES</span><h2>Cambios de giro</h2></div><span id="category-request-count" class="creator-soft">0 pendientes</span></div><div id="category-requests" class="platform-compact-list"></div></article></section>
+<section class="creator-card platform-payment-methods" id="metodos-cobro">
+  <div class="creator-card-head">
+    <div><span class="eyebrow">COBROS</span><h2>Métodos de cobro</h2><p>Preparados para conectar un proveedor de pagos. Ningún método está activo todavía.</p></div>
+    <span class="creator-soft">Proveedor pendiente</span>
+  </div>
+  <div class="payment-method-grid">
+    <article class="payment-method-card">
+      <div class="payment-method-icon">▣</div>
+      <div><h3>OXXO / pago en efectivo</h3><p>Permitirá generar una referencia para que el negocio pague en efectivo en tienda.</p></div>
+      <span class="payment-method-status disconnected">No conectado</span>
+      <button class="btn btn-ghost" type="button" data-payment-method="OXXO">Configurar</button>
+    </article>
+    <article class="payment-method-card">
+      <div class="payment-method-icon">⇄</div>
+      <div><h3>Transferencia bancaria (SPEI)</h3><p>Permitirá recibir transferencias bancarias cuando se conecte un proveedor compatible.</p></div>
+      <span class="payment-method-status disconnected">No conectado</span>
+      <button class="btn btn-ghost" type="button" data-payment-method="SPEI">Configurar</button>
+    </article>
+    <article class="payment-method-card">
+      <div class="payment-method-icon">▱</div>
+      <div><h3>Tarjeta de débito / crédito</h3><p>Permitirá cobrar suscripciones por tarjeta una vez que se defina el proveedor.</p></div>
+      <span class="payment-method-status disconnected">No conectado</span>
+      <button class="btn btn-ghost" type="button" data-payment-method="Tarjeta">Configurar</button>
+    </article>
+  </div>
+</section>
 
-    <section class="creator-grid-2 platform-ops-grid">
-      <article class="creator-card" id="pagos"><div class="creator-card-head"><div><span class="eyebrow">PAGOS</span><h2>Movimientos de plataforma</h2></div><button id="export-payments" class="btn btn-ghost" type="button">Exportar CSV</button></div><div id="platform-payments-list" class="platform-compact-list"><div class="creator-empty">Cargando pagos…</div></div></article>
-      <article class="creator-card" id="incidencias"><div class="creator-card-head"><div><span class="eyebrow">INCIDENCIAS</span><h2>Salud operativa</h2></div></div><div id="platform-incidents-list" class="platform-compact-list"><div class="creator-empty">Cargando incidencias…</div></div></article>
-    </section>
-    <section class="creator-grid-2 platform-ops-grid">
-      <article class="creator-card" id="integraciones"><div class="creator-card-head"><div><span class="eyebrow">INTEGRACIONES</span><h2>Conexiones de negocios</h2></div></div><div id="platform-integrations-list" class="platform-compact-list"><div class="creator-empty">Cargando integraciones…</div></div></article>
-      <article class="creator-card" id="auditoria"><div class="creator-card-head"><div><span class="eyebrow">AUDITORÍA</span><h2>Actividad reciente</h2></div><button id="export-audit" class="btn btn-ghost" type="button">Exportar CSV</button></div><div id="platform-audit-list" class="platform-compact-list"><div class="creator-empty">Cargando auditoría…</div></div></article>
-    </section>
+<section class="creator-card" id="alertas">
+  <div class="creator-card-head"><div><span class="eyebrow">ATENCIÓN</span><h2>Alertas de plataforma</h2></div><span id="alert-count" class="creator-soft">0 alertas</span></div>
+  <div id="platform-alerts" class="creator-alerts"></div>
+</section>
 
-    <section class="creator-card" id="negocios">
-      <div class="creator-card-head creator-business-head">
-        <div><span class="eyebrow">CLIENTES SAAS</span><h2>Negocios</h2></div>
-        <div class="creator-controls">
-          <input id="business-search" class="input" placeholder="Buscar nombre, correo, teléfono o slug" aria-label="Buscar negocios">
-          <select id="business-filter" class="input" aria-label="Filtrar por estado"><option value="all">Todos</option><option value="trial">En prueba</option><option value="active">Pagando</option><option value="risk">En riesgo</option><option value="suspended">Suspendido</option><option value="no-sub">Sin suscripción</option></select>
-          <select id="business-sort" class="input" aria-label="Ordenar negocios"><option value="business-created-desc">Alta: recientes primero</option><option value="business-created-asc">Alta: antiguos primero</option><option value="business-expiry-asc">Vencimiento: próximo primero</option><option value="business-expiry-desc">Vencimiento: lejano primero</option><option value="name-asc">Nombre A-Z</option></select>
-          <button id="export-businesses" class="btn btn-ghost" type="button">Exportar CSV</button>
-        </div>
-      </div>
-      <div id="business-bulk-bar" class="platform-bulk-bar" aria-live="polite">
-        <label><input id="business-select-visible" type="checkbox"> Seleccionar visibles</label>
-        <span id="business-selected-count">0 seleccionados</span>
-        <div><button id="bulk-suspend" class="btn btn-ghost" type="button" disabled>Suspender seleccionados</button><button id="bulk-reactivate" class="btn btn-primary" type="button" disabled>Reactivar seleccionados</button></div>
-      </div>
-      <div id="business-table" class="creator-business-table"></div>
-    </section>
-  </main>
+<section class="creator-grid-2" id="soporte">
+  <article class="creator-card platform-support-card">
+    <div class="creator-card-head"><div><span class="eyebrow">SOPORTE</span><h2>Bandeja de ayuda</h2></div><div class="platform-card-actions"><select id="support-history-filter" class="input" aria-label="Filtrar tickets"><option value="open">Abiertos</option><option value="closed">Cerrados</option><option value="all">Todos</option></select><span id="support-open-count" class="creator-soft">0 abiertos</span></div></div>
+    <div id="platform-support-list" class="platform-support-list"><div class="creator-empty">Cargando tickets…</div></div>
+  </article>
+  <article class="creator-card" id="plantillas">
+    <div class="creator-card-head"><div><span class="eyebrow">CATÁLOGO MYCITAGO</span><h2>Plantillas de servicios</h2></div><div class="platform-card-actions"><button id="new-template" class="btn btn-primary" type="button">+ Plantilla</button><button id="refresh-templates" class="btn btn-ghost" type="button">Actualizar</button></div></div>
+    <div id="template-create-panel" class="platform-template-form hidden">
+      <select id="template-category" class="input"></select><input id="template-name" class="input" placeholder="Nombre del servicio"><input id="template-duration" class="input" type="number" min="5" step="5" value="60" placeholder="Duración">
+      <select id="template-image" class="input"><option value="/app/assets/service-presets/barber-cut.svg">Corte</option><option value="/app/assets/service-presets/beauty-hair.svg">Belleza</option><option value="/app/assets/service-presets/nails.svg">Uñas</option><option value="/app/assets/service-presets/spa.svg">Spa</option><option value="/app/assets/service-presets/dental.svg">Salud</option><option value="/app/assets/service-presets/consulting.svg">Profesional</option></select>
+      <button id="save-template" class="btn btn-primary" type="button">Guardar</button>
+    </div>
+    <div id="platform-template-summary" class="platform-template-summary"><div class="creator-empty">Cargando catálogo…</div></div>
+    <div class="platform-default-media"><h3>Imágenes genéricas de ejemplo</h3><p>Al adoptarlas, se copian al espacio del negocio y quedan congeladas.</p><div class="platform-media-grid"><label>Logo<input id="platform-logo-file" type="file" accept="image/jpeg,image/png,image/webp"><button type="button" data-platform-asset="logo">Subir / reemplazar</button></label><label>Banner<input id="platform-banner-file" type="file" accept="image/jpeg,image/png,image/webp"><button type="button" data-platform-asset="banner">Subir / reemplazar</button></label></div><div id="platform-default-assets-list"></div></div>
+  </article>
+</section>
+
+<section class="creator-grid-2 platform-ops-grid">
+  <article class="creator-card"><div class="creator-card-head"><div><span class="eyebrow">INVITACIONES</span><h2>Registros enviados</h2></div><span id="invite-open-count" class="creator-soft">0 pendientes</span></div><div id="platform-invites" class="platform-compact-list"></div></article>
+  <article class="creator-card"><div class="creator-card-head"><div><span class="eyebrow">SOLICITUDES</span><h2>Cambios de giro</h2></div><span id="category-request-count" class="creator-soft">0 pendientes</span></div><div id="category-requests" class="platform-compact-list"></div></article>
+</section>
+
+<section class="creator-grid-2 platform-ops-grid">
+  <article class="creator-card" id="pagos"><div class="creator-card-head"><div><span class="eyebrow">PAGOS</span><h2>Movimientos de plataforma</h2></div><button id="export-payments" class="btn btn-ghost" type="button">Exportar CSV</button></div><div id="platform-payments-list" class="platform-compact-list"><div class="creator-empty">Cargando pagos…</div></div></article>
+  <article class="creator-card" id="incidencias"><div class="creator-card-head"><div><span class="eyebrow">INCIDENCIAS</span><h2>Salud operativa</h2></div></div><div id="platform-incidents-list" class="platform-compact-list"><div class="creator-empty">Cargando incidencias…</div></div></article>
+</section>
+
+<section class="creator-grid-2 platform-ops-grid">
+  <article class="creator-card" id="integraciones"><div class="creator-card-head"><div><span class="eyebrow">INTEGRACIONES</span><h2>Conexiones de negocios</h2></div></div><div id="platform-integrations-list" class="platform-compact-list"><div class="creator-empty">Cargando integraciones…</div></div></article>
+  <article class="creator-card" id="auditoria"><div class="creator-card-head"><div><span class="eyebrow">AUDITORÍA</span><h2>Actividad reciente</h2></div><button id="export-audit" class="btn btn-ghost" type="button">Exportar CSV</button></div><div id="platform-audit-list" class="platform-compact-list"><div class="creator-empty">Cargando auditoría…</div></div></article>
+</section>
+
+<section class="creator-card" id="negocios">
+  <div class="creator-card-head creator-business-head">
+    <div><span class="eyebrow">CLIENTES SAAS</span><h2>Negocios</h2></div>
+    <div class="creator-controls">
+      <input id="business-search" class="input" placeholder="Buscar nombre, correo, teléfono o slug" aria-label="Buscar negocios">
+      <select id="business-filter" class="input" aria-label="Filtrar por estado"><option value="all">Todos</option><option value="trial">En prueba</option><option value="active">Pagando</option><option value="risk">En riesgo</option><option value="suspended">Suspendido</option><option value="no-sub">Sin suscripción</option></select>
+      <select id="business-sort" class="input" aria-label="Ordenar negocios"><option value="business-created-desc">Alta: recientes primero</option><option value="business-created-asc">Alta: antiguos primero</option><option value="business-expiry-asc">Vencimiento: próximo primero</option><option value="business-expiry-desc">Vencimiento: lejano primero</option><option value="name-asc">Nombre A-Z</option></select>
+      <button id="export-businesses" class="btn btn-ghost" type="button">Exportar CSV</button>
+    </div>
+  </div>
+  <div id="business-bulk-bar" class="platform-bulk-bar" aria-live="polite">
+    <label><input id="business-select-visible" type="checkbox"> Seleccionar visibles</label>
+    <span id="business-selected-count">0 seleccionados</span>
+    <div><button id="bulk-suspend" class="btn btn-ghost" type="button" disabled>Suspender seleccionados</button><button id="bulk-reactivate" class="btn btn-primary" type="button" disabled>Reactivar seleccionados</button></div>
+  </div>
+  <div id="business-table" class="creator-business-table"></div>
+</section>
+
+</main>
 </div>
 
 <nav class="creator-mobile-nav" aria-label="Super Admin móvil">
@@ -116,14 +204,135 @@
   </aside>
 </div>
 
-<div id="invite-business-dialog" class="platform-modal hidden"><div class="platform-modal-backdrop" data-invite-close></div><form id="invite-business-form" class="platform-modal-card"><button type="button" class="platform-modal-close" data-invite-close>×</button><span class="eyebrow">NUEVO PROSPECTO</span><h2>Invitar negocio</h2><p>Genera un enlace de registro y compártelo por WhatsApp, correo o el canal que prefieras.</p><label>Nombre del negocio<input id="invite-business-name" class="input" placeholder="Ej. Studio Bella"></label><label>Correo<input id="invite-email" class="input" type="email" placeholder="cliente@correo.com"></label><label>Teléfono<input id="invite-phone" class="input" inputmode="tel" placeholder="+52 229 000 0000"></label><button class="ct-btn ct-btn-primary" type="submit">Generar invitación</button><div id="invite-result" class="invite-result hidden"><label>Enlace de registro</label><div><input id="invite-url" readonly><button id="invite-copy" type="button">Copiar</button></div><div class="invite-share"><a id="invite-whatsapp" target="_blank" rel="noopener">WhatsApp</a><a id="invite-email-link">Correo</a></div></div></form></div>
+<div id="invite-business-dialog" class="platform-modal hidden">
+  <div class="platform-modal-backdrop" data-invite-close></div>
+  <form id="invite-business-form" class="platform-modal-card">
+    <button type="button" class="platform-modal-close" data-invite-close>×</button>
+    <span class="eyebrow">NUEVO PROSPECTO</span><h2>Invitar negocio</h2>
+    <p>Genera un enlace de registro y compártelo por WhatsApp, correo o el canal que prefieras.</p>
+    <label>Nombre del negocio<input id="invite-business-name" class="input" placeholder="Ej. Studio Bella"></label>
+    <label>Correo<input id="invite-email" class="input" type="email" placeholder="cliente@correo.com"></label>
+    <label>Teléfono<input id="invite-phone" class="input" inputmode="tel" placeholder="+52 229 000 0000"></label>
+    <button class="ct-btn ct-btn-primary" type="submit">Generar invitación</button>
+    <div id="invite-result" class="invite-result hidden">
+      <label>Enlace de registro</label>
+      <div><input id="invite-url" readonly><button id="invite-copy" type="button">Copiar</button></div>
+      <div class="invite-share"><a id="invite-whatsapp" target="_blank" rel="noopener">WhatsApp</a><a id="invite-email-link">Correo</a></div>
+    </div>
+  </form>
+</div>
+
 <div id="toast" class="toast hidden"></div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script>
 <script src="../js/config.js"></script>
 <script src="../js/supabase.js"></script>
 <script src="../js/admin-auth.js"></script>
 <script src="../js/extension-noise.js"></script>
 <script src="../js/platform-api.js"></script>
-<script src="../js/admin-platform.js"></script>
-<script src="../js/citago-shell.js"></script><script>document.addEventListener('DOMContentLoaded',()=>CitagoShell.mount({mode:'platform',activePage:'resumen'}));</script></body>
+<script src="../js/admin-platform.js?v=20260910-ops"></script>
+<script src="../js/citago-shell.js"></script>
+<script>
+/*
+  Presentation adapter only.
+  Existing platform data, RPCs and mutations remain in admin-platform.js.
+*/
+(function(){
+  const paidStatuses=['paid','approved','succeeded'];
+
+  function moneyUi(n){
+    return '$'+Number(n||0).toLocaleString('es-MX',{maximumFractionDigits:0});
+  }
+
+  function monthKeysUi(n){
+    const a=[],d=new Date();
+    d.setDate(1);
+    for(let i=n-1;i>=0;i--){
+      const x=new Date(d.getFullYear(),d.getMonth()-i,1);
+      a.push(`${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}`);
+    }
+    return a;
+  }
+
+  function renderPaymentChartForPeriod(){
+    if(typeof platformState==='undefined') return;
+    const select=document.getElementById('payment-period-select');
+    const count=Number(select?.value||6);
+    const months=monthKeysUi(count);
+    const sums=months.map(m=>
+      (platformState.payments||[])
+        .filter(p=>String(p.paid_at||p.created_at||'').slice(0,7)===m&&paidStatuses.includes(p.status))
+        .reduce((a,p)=>a+Number(p.amount||0),0)
+    );
+    const max=Math.max(...sums,1);
+    const chart=document.getElementById('payment-chart');
+    if(!chart)return;
+    chart.innerHTML=months.map((m,i)=>{
+      const amount=sums[i];
+      const height=amount?Math.max(8,amount/max*100):3;
+      const label=new Date(m+'-01T12:00:00').toLocaleDateString('es-MX',{month:'short'});
+      return `<div class="creator-bar-col">
+        <div class="creator-bar-value">${amount?moneyUi(amount):'$0'}</div>
+        <div class="creator-bar-track"><i style="height:${height}%"></i></div>
+        <span>${label}</span>
+      </div>`;
+    }).join('');
+  }
+
+  function goToRisk(){
+    const filter=document.getElementById('business-filter');
+    if(filter){
+      filter.value='risk';
+      if(typeof applyBusinessFilters==='function')applyBusinessFilters();
+    }
+    location.hash='negocios';
+    document.getElementById('negocios')?.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+
+  function cleanRuntimeSidebar(){
+    const foot=document.querySelector('#citago-shell .ct-side-foot');
+    if(!foot)return;
+    foot.innerHTML='<a class="ct-btn ct-btn-secondary" href="index.html">Abrir panel negocio</a>';
+  }
+
+  function bindOpsUi(){
+    document.getElementById('payment-period-select')?.addEventListener('change',renderPaymentChartForPeriod);
+
+    const risk=document.getElementById('kpi-risk-card');
+    risk?.addEventListener('click',goToRisk);
+    risk?.addEventListener('keydown',e=>{
+      if(e.key==='Enter'||e.key===' '){e.preventDefault();goToRisk();}
+    });
+
+    document.querySelectorAll('[data-payment-method]').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const name=btn.dataset.paymentMethod;
+        if(typeof toast==='function')toast(`${name}: todavía no hay proveedor de pagos conectado.`);
+      });
+    });
+
+    // Repaint after the original snapshot renderer fills platformState.
+    const chart=document.getElementById('payment-chart');
+    if(chart)new MutationObserver(()=>{}).observe(chart,{childList:true});
+    setTimeout(renderPaymentChartForPeriod,350);
+  }
+
+  document.addEventListener('DOMContentLoaded',()=>{
+    CitagoShell.mount({mode:'platform',activePage:'resumen'});
+    cleanRuntimeSidebar();
+    bindOpsUi();
+  });
+
+  // Existing renderPayments uses 6 months. Re-run selected period after every platform refresh.
+  const originalLoadData=window.loadData;
+  if(typeof originalLoadData==='function'){
+    window.loadData=async function(){
+      const result=await originalLoadData();
+      renderPaymentChartForPeriod();
+      return result;
+    };
+  }
+})();
+</script>
+</body>
 </html>
