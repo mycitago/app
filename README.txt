@@ -1,25 +1,26 @@
-MyCitaGo Platform — Super Admin Redesign
+MyCitaGo · Edge Functions STANDALONE
 
-SUBIR / REEMPLAZAR
-1) admin/plataforma.html
-2) css/admin-platform.css
+Estas versiones no dependen de ../_shared/stripe.ts y están preparadas
+para pegarlas directamente en el editor web de Supabase.
 
-NO HAY SQL NI RPC NUEVO.
+ORDEN DE DESPLIEGUE
+1. stripe-connect-start
+2. stripe-connect-status
+3. stripe-platform-checkout
+4. stripe-customer-checkout
+5. stripe-webhook
 
-IMPORTANTE
-- El frontend actual ya obtiene businesses/subs/plans/payments/incidents mediante platform_dashboard_snapshot.
-- Las variaciones históricas de MRR/negocios NO se inventan. La UI muestra “historial no disponible”.
-- Riesgo usa el filtro real `risk` que ya existe en el portal.
-- Los pagos de 3/6/12 meses se calculan únicamente a partir de `platformState.payments`.
-- OXXO/SPEI/Tarjeta se muestran “No conectado”. No se declara ningún proveedor conectado.
-- El pie duplicado del sidebar generado por citago-shell.js se limpia al montar y conserva solo “Abrir panel negocio”.
+PARA CADA FUNCIÓN
+- Supabase > Edge Functions > Deploy a new function
+- Abre el index.ts de la carpeta correspondiente
+- Copia TODO
+- Sustituye todo el código de ejemplo de Supabase
+- Function name: exactamente el nombre de la carpeta
+- Deploy function
 
-VERIFICAR DESPUÉS DE SUBIR
-https://mycitago.github.io/app/admin/plataforma.html#resumen
+SECRETS
+STRIPE_SECRET_KEY
+APP_PUBLIC_URL=https://mycitago.github.io/app
+STRIPE_WEBHOOK_SECRET   (se configurará al crear el webhook)
 
-Pruebas:
-- Resumen en desktop y móvil.
-- Clic en Riesgo filtra Negocios por “En riesgo”.
-- Selector 3/6/12 cambia la gráfica.
-- Botones Configurar de métodos de cobro informan que falta proveedor.
-- Tema claro y oscuro.
+No pongas valores secretos dentro del código.
