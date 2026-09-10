@@ -1,13 +1,30 @@
-SUBIR SOLO ESTE ARCHIVO:
+MyCitaGo — R1 Reserva pública premium
+
+SUBIR A GITHUB (reemplazar):
+reservar.html
+js/app.js
+js/services.js
+js/public-reviews-verified.js
+css/booking-adaptive.css
 css/booking-public-fix.css
 
-No reemplazar reservar.html ni JS.
+RESULTADO
+- Portada compacta 220–260 px escritorio.
+- 170 px móvil / 155 px teléfonos pequeños.
+- Rating real en portada solo cuando hay reseñas reales.
+- Reseñas verificadas en columna izquierda (escritorio).
+- Movimiento suave de reseñas.
+- Botón Recomendar con compartir nativo o copiar enlace.
+- Galería derecha preparada, pero oculta hasta tener una fuente real de fotos.
+- Servicios usan image_url real cuando existe.
+- Móvil en una sola columna y reseñas después de servicios.
+- Portada desaparece al pasar a Horario/Datos/Listo.
 
-La página ya carga este archivo. Después de subirlo:
-1. abre incógnito
-2. usa:
-https://mycitago.github.io/app/reservar.html?n=clinica&v=20260910-banner-css3
-3. prueba también el slug de barbería
-4. en móvil, el hero debe quedar en 180 px; escritorio máximo 260 px.
+NO TOCA
+- Supabase / SQL
+- Super Admin
+- Reportes
+- Favoritos persistentes
 
-No toca Supabase ni el flujo de reserva.
+PROBAR
+https://mycitago.github.io/app/reservar.html?n=clinica&v=20260910-r1
