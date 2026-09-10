@@ -19,6 +19,9 @@ function applyPublishedBranding(b){
   document.body.style.color='var(--page-text)';
   document.body.style.fontFamily=['Manrope','Inter','Georgia','Arial'].includes(value('font_family'))?value('font_family'):'Manrope';
   document.body.dataset.buttonStyle=value('button_style','rounded');
+  document.body.dataset.cardStyle=value('card_style','soft');
+  document.body.dataset.scheduleStyle=value('schedule_style','modern');
+  document.body.dataset.bookingDensity=value('booking_density','comfortable');
 
   const heroTitle=value('hero_title');
   if(heroTitle&&document.getElementById('hero-name'))document.getElementById('hero-name').textContent=heroTitle;

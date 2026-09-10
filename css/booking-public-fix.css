@@ -93,3 +93,207 @@
 @media(max-width:420px){
   .mobile-gallery-list{grid-template-columns:1fr}
 }
+
+
+/* =========================================================
+   R3 · Restauración del flujo profesional
+   No cambia lógica. Solo normaliza tipografía y componentes.
+   ========================================================= */
+body{
+  font-family:Inter,Manrope,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  line-height:1.5;
+}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+button:disabled{cursor:not-allowed}
+
+/* Jerarquía tipográfica */
+.booking-heading h2{
+  font-family:inherit!important;
+  font-size:clamp(1.8rem,3vw,2.35rem)!important;
+  line-height:1.08!important;
+  letter-spacing:-.035em!important;
+  margin:6px 0 8px!important;
+}
+.booking-heading p,.back-link,.date-chip,.slot-pill,.btn{
+  font-family:inherit!important;
+}
+.back-link{
+  appearance:none!important;
+  border:0!important;
+  background:transparent!important;
+  color:var(--booking-accent)!important;
+  font-weight:800!important;
+  padding:8px 0!important;
+  margin:0 0 12px!important;
+  text-decoration:none!important;
+}
+
+/* Fechas */
+.date-scroller{
+  display:flex!important;
+  gap:10px!important;
+  overflow-x:auto!important;
+  padding:4px 2px 14px!important;
+  scrollbar-width:thin;
+}
+.date-chip{
+  appearance:none!important;
+  flex:0 0 76px!important;
+  min-width:76px!important;
+  min-height:78px!important;
+  border:1px solid var(--booking-line)!important;
+  border-radius:16px!important;
+  background:var(--booking-surface)!important;
+  color:var(--booking-text)!important;
+  display:grid!important;
+  place-items:center!important;
+  align-content:center!important;
+  gap:2px!important;
+  box-shadow:0 4px 14px rgba(20,34,48,.04)!important;
+  transition:.16s ease!important;
+}
+.date-chip:hover:not(:disabled){
+  transform:translateY(-2px);
+  border-color:color-mix(in srgb,var(--booking-accent) 45%,var(--booking-line));
+}
+.date-chip.is-selected{
+  background:var(--booking-accent)!important;
+  border-color:var(--booking-accent)!important;
+  color:#fff!important;
+  box-shadow:0 8px 20px color-mix(in srgb,var(--booking-accent) 22%,transparent)!important;
+}
+.date-chip.is-disabled{opacity:.35!important}
+.date-chip-dow{font-size:.7rem!important;text-transform:uppercase!important;font-weight:800!important;letter-spacing:.06em}
+.date-chip-num{font-size:1.28rem!important;line-height:1!important}
+
+/* Horarios */
+.slot-grid{display:grid!important;gap:20px!important;margin-top:20px!important}
+.slot-period{display:grid!important;gap:8px!important}
+.slot-period h3{margin:0!important;font-size:.88rem!important;font-weight:800!important;color:var(--booking-muted)!important}
+.slot-period-grid{
+  display:grid!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:10px!important;
+}
+.slot-pill{
+  appearance:none!important;
+  min-height:52px!important;
+  border:1px solid var(--booking-line)!important;
+  border-radius:13px!important;
+  background:var(--booking-surface)!important;
+  color:var(--booking-text)!important;
+  font-weight:750!important;
+  box-shadow:0 3px 12px rgba(20,34,48,.035)!important;
+  transition:.16s ease!important;
+}
+.slot-pill:hover{
+  border-color:var(--booking-accent)!important;
+  transform:translateY(-1px);
+}
+.slot-pill.is-selected{
+  background:var(--booking-accent)!important;
+  border-color:var(--booking-accent)!important;
+  color:#fff!important;
+  box-shadow:0 8px 20px color-mix(in srgb,var(--booking-accent) 22%,transparent)!important;
+}
+.step-action{
+  display:flex!important;
+  justify-content:flex-end!important;
+  margin-top:28px!important;
+}
+.btn{
+  appearance:none!important;
+  min-height:50px!important;
+  border:0!important;
+  border-radius:13px!important;
+  padding:0 20px!important;
+  font-weight:800!important;
+  text-align:center!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  text-decoration:none!important;
+  transition:.16s ease!important;
+}
+.btn-primary{
+  background:var(--booking-accent)!important;
+  color:#fff!important;
+  box-shadow:0 8px 20px color-mix(in srgb,var(--booking-accent) 20%,transparent)!important;
+}
+.btn-primary:hover:not(:disabled){transform:translateY(-1px);filter:brightness(.98)}
+.btn-primary:disabled{opacity:.45!important;box-shadow:none!important}
+
+/* Formularios */
+.form-card,.success-card{
+  border:1px solid var(--booking-line)!important;
+  border-radius:22px!important;
+  background:var(--booking-surface)!important;
+  box-shadow:var(--booking-shadow)!important;
+}
+.field label{font-weight:750!important}
+.field input,.field textarea{
+  border:1px solid var(--booking-line)!important;
+  border-radius:12px!important;
+  background:var(--booking-surface)!important;
+  color:var(--booking-text)!important;
+  padding:13px 14px!important;
+  outline:none!important;
+}
+.field input:focus,.field textarea:focus{
+  border-color:var(--booking-accent)!important;
+  box-shadow:0 0 0 4px color-mix(in srgb,var(--booking-accent) 14%,transparent)!important;
+}
+
+/* Presets seguros publicados desde Mi página */
+body[data-button-style="pill"] .btn,
+body[data-button-style="pill"] .slot-pill,
+body[data-button-style="pill"] .recommend-btn{border-radius:999px!important}
+body[data-button-style="square"] .btn,
+body[data-button-style="square"] .slot-pill,
+body[data-button-style="square"] .recommend-btn{border-radius:6px!important}
+
+body[data-card-style="bordered"] .service-card{
+  box-shadow:none!important;
+  border-width:2px!important;
+}
+body[data-card-style="elevated"] .service-card{
+  box-shadow:0 12px 30px rgba(20,34,48,.11)!important;
+  border-color:transparent!important;
+}
+body[data-card-style="soft"] .service-card{
+  box-shadow:0 5px 18px rgba(20,34,48,.05)!important;
+}
+
+body[data-schedule-style="soft"] .slot-pill,
+body[data-schedule-style="soft"] .date-chip{
+  background:color-mix(in srgb,var(--booking-accent-soft) 55%,var(--booking-surface))!important;
+}
+body[data-schedule-style="compact"] .date-chip{
+  min-height:62px!important;
+  flex-basis:64px!important;
+  min-width:64px!important;
+  border-radius:12px!important;
+}
+body[data-schedule-style="compact"] .slot-pill{
+  min-height:42px!important;
+  border-radius:10px!important;
+}
+body[data-schedule-style="compact"] .slot-period-grid{
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+}
+
+body[data-booking-density="compact"] .adaptive-container{padding-top:20px!important}
+body[data-booking-density="compact"] .booking-heading{margin-bottom:14px!important}
+body[data-booking-density="compact"] .services-grid{gap:10px!important}
+body[data-booking-density="compact"] .service-card-body{padding:12px!important}
+
+/* Mobile profesional */
+@media(max-width:600px){
+  .booking-heading h2{font-size:1.75rem!important}
+  .date-chip{flex-basis:68px!important;min-width:68px!important;min-height:70px!important}
+  .slot-period-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  body[data-schedule-style="compact"] .slot-period-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .slot-pill{min-height:52px!important;font-size:.95rem!important}
+  .step-action .btn{width:100%!important}
+}
