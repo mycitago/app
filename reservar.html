@@ -6,10 +6,10 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="Reserva una cita en línea de forma rápida y sencilla.">
 <title>Reservar cita · MyCitaGo</title>
-<link rel="stylesheet" href="css/booking-adaptive.css?v=20260910-r1">
+<link rel="stylesheet" href="css/booking-adaptive.css?v=20260910-r2">
 <style id="booking-flow-fix">#hero[hidden]{display:none!important}.booking-flow-active .booking-progress{margin-top:18px}.booking-flow-active .adaptive-container{padding-top:24px}</style>
 <link rel="stylesheet" href="css/public-reviews.css?v=20260909-r5">
-<link rel="stylesheet" href="css/booking-public-fix.css?v=20260910-r1">
+<link rel="stylesheet" href="css/booking-public-fix.css?v=20260910-r2">
 </head>
 <body>
 <a class="skip-link" href="#booking-main">Saltar a la reserva</a>
@@ -21,6 +21,7 @@
       <div>
         <span class="hero-eyebrow" id="hero-eyebrow">Reserva en línea</span>
         <h1 id="hero-name">Cargando…</h1>
+        <p id="brand-hero-subtitle" class="brand-hero-subtitle" hidden></p>
         <div class="hero-meta"><span id="hero-address"></span><span id="hero-schedule"></span></div>
       </div>
     </div>
@@ -89,6 +90,11 @@
     <div id="mobile-reviews-list" class="mobile-reviews-list"></div>
     <button id="btn-recommend-business-mobile" class="recommend-btn" type="button">♡ Recomendar</button>
   </section>
+
+  <section id="mobile-gallery-section" class="mobile-gallery-section" hidden>
+    <div class="services-heading-row"><h3>Galería de servicios</h3><span>Fotos reales</span></div>
+    <div id="mobile-gallery-list" class="mobile-gallery-list"></div>
+  </section>
 </section>
 
 <section id="booking-step" class="booking-step hidden">
@@ -133,10 +139,10 @@
 <script src="js/theme.js"></script>
 <script src="js/booking-category-presets.js"></script>
 <script src="js/adaptive-booking.js"></script>
-<script src="js/services.js?v=20260910-r1"></script>
+<script src="js/services.js?v=20260910-r2"></script>
 <script src="js/appointments.js"></script>
-<script src="js/public-branding.js"></script>
-<script src="js/public-reviews-verified.js?v=20260910-r1"></script>
-<script src="js/app.js?v=20260910-r1"></script>
+<script src="js/public-branding.js?v=20260910-r2"></script>
+<script src="js/public-reviews-verified.js?v=20260910-r2"></script>
+<script src="js/app.js?v=20260910-r2"></script>
 </body>
 </html>

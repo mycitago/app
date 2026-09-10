@@ -11,3 +11,85 @@
 @media(max-width:600px){#hero.adaptive-hero{height:170px!important;min-height:170px!important;max-height:170px!important}.hero-side-meta{position:absolute;right:12px;bottom:12px}.hero-trust{display:none!important}.booking-center-column .services-grid{grid-template-columns:1fr}}
 @media(max-width:380px){#hero.adaptive-hero{height:155px!important;min-height:155px!important;max-height:155px!important}}
 @media(prefers-reduced-motion:reduce){.reviews-marquee .rail-review-card{animation:none!important}}
+
+
+/* R2 · Conexión real con Mi página + galería de servicios */
+.brand-hero-subtitle{
+  max-width:540px;
+  margin:4px 0 6px;
+  color:rgba(255,255,255,.88);
+  font-size:.78rem;
+  line-height:1.35;
+}
+.service-gallery-card{
+  margin:0;
+  overflow:hidden;
+  border:1px solid var(--booking-line);
+  border-radius:14px;
+  background:var(--booking-surface);
+  box-shadow:0 6px 18px rgba(20,24,35,.06);
+}
+.service-gallery-card img{
+  display:block;
+  width:100%;
+  aspect-ratio:4/3;
+  object-fit:cover;
+}
+.service-gallery-card figcaption{
+  padding:9px 10px;
+  color:var(--booking-text);
+  font-size:.75rem;
+  font-weight:800;
+}
+.gallery-carousel{
+  display:grid;
+  gap:10px;
+  max-height:560px;
+  overflow:auto;
+  scrollbar-width:thin;
+}
+.mobile-gallery-section{
+  display:none;
+  margin-top:18px;
+  padding:16px;
+  border:1px solid var(--booking-line);
+  border-radius:18px;
+  background:var(--booking-surface);
+}
+.mobile-gallery-section[hidden]{display:none!important}
+.mobile-gallery-list{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+
+/* Si ambas barras existen, mantener el centro amplio y legible. */
+@media(min-width:1181px){
+  .booking-desktop-grid{
+    max-width:1380px;
+    margin-inline:auto;
+  }
+  .booking-center-column .service-card-main{
+    gap:14px;
+  }
+}
+
+@media(max-width:980px){
+  .mobile-gallery-section:not([hidden]){display:block}
+}
+
+@media(max-width:600px){
+  .brand-hero-subtitle{
+    max-width:68vw;
+    font-size:.68rem;
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+  }
+  .mobile-gallery-list{grid-template-columns:1fr 1fr}
+  .mobile-gallery-section{padding:12px}
+}
+@media(max-width:420px){
+  .mobile-gallery-list{grid-template-columns:1fr}
+}

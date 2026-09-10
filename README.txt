@@ -1,30 +1,36 @@
-MyCitaGo — R1 Reserva pública premium
+MyCitaGo · R2 Reserva conectada con “Mi página”
 
-SUBIR A GITHUB (reemplazar):
-reservar.html
-js/app.js
-js/services.js
-js/public-reviews-verified.js
-css/booking-adaptive.css
-css/booking-public-fix.css
+QUÉ CORRIGE
+1. reservar.html ahora consume el branding PUBLICADO desde business_branding_public.
+2. Logo, portada, colores, tipografía, botones, título y texto de bienvenida publicados pasan a la página real.
+3. La portada usa un solo mecanismo (--booking-cover + has-cover), evitando competencia de estilos.
+4. Las reseñas intentan primero public_business_reviews_verified y, si no devuelve filas, usan el feed público real public_business_reviews.
+5. La columna derecha ya no queda permanentemente vacía: muestra una galería SOLO con service.image_url reales.
+   Nunca usa ilustraciones fallback para la galería.
+6. En móvil, reseñas y galería aparecen después del flujo de servicios.
+7. No hay reseñas ni fotos inventadas.
 
-RESULTADO
-- Portada compacta 220–260 px escritorio.
-- 170 px móvil / 155 px teléfonos pequeños.
-- Rating real en portada solo cuando hay reseñas reales.
-- Reseñas verificadas en columna izquierda (escritorio).
-- Movimiento suave de reseñas.
-- Botón Recomendar con compartir nativo o copiar enlace.
-- Galería derecha preparada, pero oculta hasta tener una fuente real de fotos.
-- Servicios usan image_url real cuando existe.
-- Móvil en una sola columna y reseñas después de servicios.
-- Portada desaparece al pasar a Horario/Datos/Listo.
+ARCHIVOS A REEMPLAZAR
+- reservar.html
+- js/app.js
+- js/public-branding.js
+- js/public-reviews-verified.js
+- css/booking-public-fix.css
 
-NO TOCA
-- Supabase / SQL
-- Super Admin
-- Reportes
-- Favoritos persistentes
+NO ES NECESARIO REEMPLAZAR
+- js/services.js (se incluye solo como referencia del paquete R1 y no cambia)
+- css/booking-adaptive.css (se incluye como base R1 y no cambia)
 
-PROBAR
-https://mycitago.github.io/app/reservar.html?n=clinica&v=20260910-r1
+PRUEBA
+https://mycitago.github.io/app/reservar.html?n=clinica&v=20260910-r2
+
+VERIFICAR
+A) Cambia un color o título en admin/mi-pagina.html.
+B) Pulsa “Publicar cambios”.
+C) Recarga la URL pública con ?v=20260910-r2.
+D) Debe cambiar la página pública.
+E) Si existen reseñas públicas reales, aparece el rail izquierdo.
+F) Si algún servicio tiene image_url real, aparece el rail/galería de la derecha.
+
+IMPORTANTE
+Este paquete no modifica Supabase, RLS, Reportes ni Super Admin.

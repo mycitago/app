@@ -19,7 +19,70 @@ async function handleConfirmBooking(){if(!validateForm())return showToast('Revis
 function renderSuccess(){const dateLabel=state.selectedDate.toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long'});$('summary-service').textContent=state.selectedService.name;$('summary-date').textContent=dateLabel;$('summary-time').textContent=state.selectedSlot.start;$('summary-duration').textContent=formatDuration(state.selectedService.duration_minutes);$('summary-business').textContent=state.business.name;$('summary-address').textContent=state.business.address||''}
 function reviewCard(r){const card=document.createElement('article');card.className='rail-review-card';const top=document.createElement('div');top.className='rail-review-top';const who=document.createElement('strong');who.textContent=r.reviewer_name||'Cliente';const source=document.createElement('span');source.className='rail-review-source';source.textContent=r.source==='internal'&&r.verified?'✓ Verificado':(r.source==='google'?'Google':'MyCitaGo');const stars=document.createElement('div');stars.className='rail-review-stars';const n=Math.max(0,Math.min(5,Number(r.rating||0)));stars.textContent='★'.repeat(n)+'☆'.repeat(5-n);top.append(who,source);card.append(top,stars);if(r.comment){const p=document.createElement('p');p.textContent=r.comment;card.appendChild(p)}return card}
 function updateReviewSurfaces(rows){state.reviews=rows||[];const desktop=$('desktop-reviews-rail'),mobile=$('mobile-reviews-section'),heroRating=$('hero-rating');if(!state.reviews.length){desktop.hidden=true;mobile.hidden=true;heroRating.hidden=true;return}const avg=state.reviews.reduce((s,r)=>s+Number(r.rating||0),0)/state.reviews.length,label=`${avg.toFixed(1)} ★ · ${state.reviews.length} ${state.reviews.length===1?'reseña':'reseñas'}`;$('desktop-review-rating').textContent=label;$('mobile-review-rating').textContent=label;heroRating.textContent=label;heroRating.hidden=false;const d=$('desktop-reviews-list'),m=$('mobile-reviews-list');d.replaceChildren();m.replaceChildren();state.reviews.forEach(r=>{d.appendChild(reviewCard(r));m.appendChild(reviewCard(r).cloneNode(true))});desktop.hidden=false;mobile.hidden=false}
-async function loadVerifiedReviews(){const rows=await window.fetchVerifiedPublicReviews?.(state.business.id,8)||[];updateReviewSurfaces(rows)}
+async function loadVerifiedReviews(){const rows=await window.fetchVerifiedPublicReviews?.(state.business.id,8,state.business.slug)||[];updateReviewSurfaces(rows)}
 async function recommendBusiness(){const url=location.href.split('#')[0],text=`Te recomiendo ${state.business.name}. Reserva aquí: ${url}`;try{if(navigator.share){await navigator.share({title:state.business.name,text,url});return}if(navigator.clipboard){await navigator.clipboard.writeText(text);showToast('Enlace de recomendación copiado.');return}}catch(err){if(err?.name==='AbortError')return}showToast('Copia el enlace para recomendar el negocio.')}
-async function init(){const result=await loadBusiness();if(!result.business){renderBusinessError(result.error);return}state.business=result.business;state.preset=window.applyAdaptiveBookingPreset?.(state.business)||null;applyTheme?.(state.business.theme);renderHero();state.services=await loadActiveServices(state.business.id);renderCategoryTabs(state.services,el.categoryTabs,category=>{state.activeCategory=category;renderServices(state.services,el.servicesList,selectService,state.activeCategory,state.serviceSearch)});renderServices(state.services,el.servicesList,selectService,state.activeCategory,state.serviceSearch);$('services-count').textContent=state.services.length?`${state.services.length} opciones`:'';el.serviceSearch?.addEventListener('input',()=>{state.serviceSearch=el.serviceSearch.value.trim();renderServices(state.services,el.servicesList,selectService,state.activeCategory,state.serviceSearch)});renderDateScroller();loadVerifiedReviews();syncFlowChrome($('step-services'));$('btn-recommend-business')?.addEventListener('click',recommendBusiness);$('btn-recommend-business-mobile')?.addEventListener('click',recommendBusiness);el.btnAgendar.onclick=()=>{if(!state.selectedService)return;setProgress(2);goToStep(el.bookingStep)};el.btnGoToForm.onclick=()=>{if(!state.selectedSlot)return;setProgress(3);goToStep(el.formStep)};el.btnConfirmBooking.onclick=handleConfirmBooking;document.querySelectorAll('[data-back]').forEach(btn=>btn.onclick=()=>{const target=$(btn.dataset.back);setProgress(target.id==='booking-step'?2:1);goToStep(target)})}
+
+function renderServiceGallery(){
+  const desktop=$('desktop-gallery-rail');
+  const desktopHost=$('desktop-gallery-list');
+  const mobile=$('mobile-gallery-section');
+  const mobileHost=$('mobile-gallery-list');
+  if(!desktop||!desktopHost||!mobile||!mobileHost)return;
+
+  // Dato real o nada: NO usar serviceFallbackImage aquí.
+  const photos=[];
+  const seen=new Set();
+  (state.services||[]).forEach(service=>{
+    const url=String(service.image_url||'').trim();
+    if(!url||seen.has(url))return;
+    seen.add(url);
+    photos.push({url,name:service.name||'Servicio'});
+  });
+
+  if(!photos.length){
+    desktop.hidden=true;
+    mobile.hidden=true;
+    desktopHost.replaceChildren();
+    mobileHost.replaceChildren();
+    return;
+  }
+
+  const makeCard=photo=>{
+    const figure=document.createElement('figure');
+    figure.className='service-gallery-card';
+    const img=document.createElement('img');
+    img.src=photo.url;
+    img.alt=`${photo.name} · ${state.business.name}`;
+    img.loading='lazy';
+    img.decoding='async';
+    const cap=document.createElement('figcaption');
+    cap.textContent=photo.name;
+    figure.append(img,cap);
+    return figure;
+  };
+
+  desktopHost.replaceChildren();
+  mobileHost.replaceChildren();
+  photos.slice(0,6).forEach(photo=>{
+    desktopHost.appendChild(makeCard(photo));
+    mobileHost.appendChild(makeCard(photo).cloneNode(true));
+  });
+
+  desktop.hidden=false;
+  mobile.hidden=false;
+}
+
+async function init(){const result=await loadBusiness();if(!result.business){renderBusinessError(result.error);return}state.business=result.business;
+state.preset=window.applyAdaptiveBookingPreset?.(state.business)||null;
+applyTheme?.(state.business.theme);
+renderHero();
+
+const publishedBranding=await window.loadPublishedBranding?.(state.business.id);
+if(publishedBranding){
+  window.applyPublishedBranding?.(publishedBranding);
+  window.renderPublicSections?.(publishedBranding);
+}
+
+state.services=await loadActiveServices(state.business.id);
+renderServiceGallery();renderCategoryTabs(state.services,el.categoryTabs,category=>{state.activeCategory=category;renderServices(state.services,el.servicesList,selectService,state.activeCategory,state.serviceSearch)});renderServices(state.services,el.servicesList,selectService,state.activeCategory,state.serviceSearch);$('services-count').textContent=state.services.length?`${state.services.length} opciones`:'';el.serviceSearch?.addEventListener('input',()=>{state.serviceSearch=el.serviceSearch.value.trim();renderServices(state.services,el.servicesList,selectService,state.activeCategory,state.serviceSearch)});renderDateScroller();loadVerifiedReviews();syncFlowChrome($('step-services'));$('btn-recommend-business')?.addEventListener('click',recommendBusiness);$('btn-recommend-business-mobile')?.addEventListener('click',recommendBusiness);el.btnAgendar.onclick=()=>{if(!state.selectedService)return;setProgress(2);goToStep(el.bookingStep)};el.btnGoToForm.onclick=()=>{if(!state.selectedSlot)return;setProgress(3);goToStep(el.formStep)};el.btnConfirmBooking.onclick=handleConfirmBooking;document.querySelectorAll('[data-back]').forEach(btn=>btn.onclick=()=>{const target=$(btn.dataset.back);setProgress(target.id==='booking-step'?2:1);goToStep(target)})}
 document.addEventListener('DOMContentLoaded',init);

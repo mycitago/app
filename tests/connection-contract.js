@@ -1,0 +1,23 @@
+
+const fs=require('fs'),p=require('path'),r=process.argv[2];
+const H=fs.readFileSync(p.join(r,'reservar.html'),'utf8');
+const A=fs.readFileSync(p.join(r,'js','app.js'),'utf8');
+const B=fs.readFileSync(p.join(r,'js','public-branding.js'),'utf8');
+const R=fs.readFileSync(p.join(r,'js','public-reviews-verified.js'),'utf8');
+const C=fs.readFileSync(p.join(r,'css','booking-public-fix.css'),'utf8');
+let bad=false; const ok=(c,m)=>{ if(!c){console.error('FAIL:',m);bad=true;} };
+ok(H.includes('brand-hero-subtitle'),'falta subtítulo publicado en hero');
+ok(H.includes('mobile-gallery-section'),'falta galería móvil');
+ok(A.includes('loadPublishedBranding'),'app no carga branding publicado');
+ok(A.includes('applyPublishedBranding'),'app no aplica branding publicado');
+ok(A.includes('renderServiceGallery'),'app no renderiza galería real');
+ok(A.includes('service.image_url'),'galería no usa solo imagen real de servicio');
+ok(A.includes('desktop-gallery-rail').toString(),'app no activa rail de galería');
+ok(R.includes('public_business_reviews_verified'),'falta RPC verificado');
+ok(R.includes('public_business_reviews'),'falta fallback de reseñas públicas reales');
+ok(B.includes("style.setProperty('--booking-cover'"),'branding no usa variable única de portada');
+ok(B.includes("classList.add('has-cover')"),'branding no activa has-cover');
+ok(!B.includes("style.setProperty('background-image'"),'branding conserva background inline competidor');
+ok(C.includes('.service-gallery-card'),'faltan estilos de galería');
+ok(C.includes('.mobile-gallery-section'),'faltan estilos galería móvil');
+process.exit(bad?1:0);
