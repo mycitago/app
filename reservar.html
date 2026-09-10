@@ -6,128 +6,151 @@
 <meta name="color-scheme" content="light dark">
 <meta name="description" content="Reserva una cita en línea de forma rápida y sencilla.">
 <title>Reservar cita · MyCitaGo</title>
-<link rel="stylesheet" href="css/booking-adaptive.css?v=20260910-r4">
-<style id="booking-flow-fix">#hero[hidden]{display:none!important}.booking-flow-active .booking-progress{margin-top:18px}.booking-flow-active .adaptive-container{padding-top:24px}</style>
+<link rel="stylesheet" href="css/booking-adaptive.css?v=20260910-redesign">
+<style>#hero[hidden]{display:none!important}</style>
 </head>
 <body>
 <a class="skip-link" href="#booking-main">Saltar a la reserva</a>
-<div id="app">
-<header class="adaptive-hero" id="hero">
-  <div class="adaptive-hero-inner">
-    <div class="business-identity">
-      <img id="hero-logo" class="hero-logo hidden" alt="">
-      <div>
-        <span class="hero-eyebrow" id="hero-eyebrow">Reserva en línea</span>
-        <h1 id="hero-name">Cargando…</h1>
-        <p id="brand-hero-subtitle" class="brand-hero-subtitle" hidden></p>
-        <div class="hero-meta"><span id="hero-address"></span><span id="hero-schedule"></span></div>
+<div id="app" class="public-booking-page">
+
+<header class="booking-hero" id="hero" data-brand-section="hero">
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="hero-top">
+      <div class="hero-identity">
+        <img id="hero-logo" class="hero-logo hidden" alt="">
+        <div class="hero-name-block">
+          <span class="hero-eyebrow" id="hero-eyebrow">Reserva en línea</span>
+          <h1 id="hero-name">Cargando…</h1>
+        </div>
       </div>
-    </div>
-    <div class="hero-side-meta">
-      <div class="hero-trust"><span>Reserva directa</span><span>Datos protegidos</span></div>
       <div id="hero-rating" class="hero-rating" hidden></div>
+    </div>
+
+    <div class="hero-message">
+      <p id="brand-hero-subtitle" class="hero-subtitle" hidden></p>
+    </div>
+
+    <div class="hero-bottom">
+      <div class="hero-meta">
+        <span id="hero-address" class="hero-meta-item"></span>
+        <span id="hero-schedule" class="hero-meta-item"></span>
+      </div>
+      <div class="hero-trust">
+        <span>Reserva directa</span>
+        <span>Datos protegidos</span>
+      </div>
     </div>
   </div>
 </header>
 
-<div class="booking-progress" aria-label="Progreso de la reserva">
-  <span data-progress-step="1" class="is-active"><b>1</b> Servicio</span>
-  <span data-progress-step="2"><b>2</b> Horario</span>
-  <span data-progress-step="3"><b>3</b> Datos</span>
-  <span data-progress-step="4"><b>4</b> Listo</span>
-</div>
+<nav class="booking-stepper" aria-label="Progreso de la reserva">
+  <span data-progress-step="1" class="is-active"><b>1</b><em>Servicio</em></span>
+  <span data-progress-step="2"><b>2</b><em>Horario</em></span>
+  <span data-progress-step="3"><b>3</b><em>Datos</em></span>
+  <span data-progress-step="4"><b>4</b><em>Listo</em></span>
+</nav>
 
-<main id="booking-main" class="adaptive-container">
-<div id="availability-live" class="sr-only" aria-live="polite"></div>
-<div id="error-live" class="sr-only" aria-live="assertive"></div>
+<main id="booking-main" class="booking-main">
+  <div id="availability-live" class="sr-only" aria-live="polite"></div>
+  <div id="error-live" class="sr-only" aria-live="assertive"></div>
 
-<section id="step-services">
-  <div class="booking-desktop-grid">
-    <aside id="desktop-reviews-rail" class="experience-rail reviews-rail" hidden>
-      <div class="experience-rail-head">
-        <span class="section-kicker">OPINIONES</span>
-        <h3>Lo que dicen sus clientes</h3>
-        <div id="desktop-review-rating" class="rail-rating"></div>
-      </div>
-      <div id="desktop-reviews-list" class="reviews-marquee"></div>
-      <button id="btn-recommend-business" class="recommend-btn" type="button">♡ Recomendar</button>
-    </aside>
-
-    <div class="booking-center-column">
-      <div class="booking-heading">
+  <div class="booking-flow-shell">
+    <section id="step-services" class="flow-step" data-brand-section="services">
+      <div class="flow-heading">
         <span id="booking-kicker" class="section-kicker">Reserva en línea</span>
-        <h2 id="booking-service-question" tabindex="-1">¿Qué servicio quieres reservar?</h2>
-        <p id="booking-service-subtitle">Selecciona un servicio y encuentra un horario disponible.</p>
+        <h2 id="booking-service-question" tabindex="-1">¿Qué servicio necesitas?</h2>
+        <p id="booking-service-subtitle">Selecciona una opción y después elige el horario que mejor te convenga.</p>
       </div>
-      <label class="service-search-wrap"><span class="sr-only">Buscar servicios</span><input id="service-search" class="service-search" type="search" placeholder="Buscar servicio…" autocomplete="off"></label>
+
+      <label class="service-search-wrap">
+        <span class="sr-only">Buscar servicios</span>
+        <input id="service-search" class="service-search" type="search" placeholder="Buscar servicio…" autocomplete="off">
+      </label>
+
       <div id="category-tabs" class="category-tabs hidden" aria-label="Categorías de servicios"></div>
-      <div class="booking-layout">
-        <div><div class="services-heading-row"><h3>Servicios disponibles</h3><span id="services-count"></span></div><div id="services-list" class="services-grid"></div></div>
-        <aside class="booking-summary-card">
+      <div class="services-heading-row"><h3>Servicios disponibles</h3><span id="services-count"></span></div>
+      <div id="services-list" class="services-grid"></div>
+
+      <aside id="booking-selection-summary" class="selection-summary" aria-live="polite">
+        <div>
           <span class="summary-kicker">Tu reserva</span>
           <strong id="booking-side-service">Selecciona un servicio</strong>
           <span id="booking-side-meta">Duración y precio aparecerán aquí</span>
           <span id="booking-side-time">Después elegirás fecha y hora</span>
+        </div>
+        <div class="selection-summary-action">
           <div class="privacy-note">🔒 Tus datos se usan únicamente para gestionar tu cita.</div>
-        </aside>
+          <button id="btn-agendar" class="btn btn-primary" disabled>Elegir fecha y hora</button>
+        </div>
+      </aside>
+    </section>
+
+    <section id="booking-step" class="flow-step hidden">
+      <button class="back-link" type="button" data-back="step-services">← Cambiar servicio</button>
+      <div class="flow-heading">
+        <span class="section-kicker">Paso 2</span>
+        <h2 id="booking-date-title" tabindex="-1">Elige fecha y hora</h2>
+        <p>Selecciona primero una fecha y después una hora disponible.</p>
       </div>
-      <div class="mobile-action-bar">
-        <div id="selected-service-mini" class="selected-service-mini hidden"><strong id="selected-service-name"></strong><span id="selected-service-meta"></span></div>
-        <button id="btn-agendar" class="btn btn-primary" disabled>Elegir fecha y hora</button>
+      <div class="date-scroller" id="date-scroller"></div>
+      <div id="slot-grid" class="slot-grid"><p class="empty-state">Elige una fecha para ver los horarios.</p></div>
+      <div class="step-action"><button id="btn-go-to-form" class="btn btn-primary" disabled>Continuar con mis datos</button></div>
+    </section>
+
+    <section id="form-step" class="flow-step hidden">
+      <button class="back-link" type="button" data-back="booking-step">← Cambiar horario</button>
+      <div class="flow-heading">
+        <span class="section-kicker">Paso 3</span>
+        <h2 id="booking-form-title" tabindex="-1">Tus datos</h2>
+        <p>Solo pedimos la información necesaria para gestionar tu cita.</p>
       </div>
+      <div class="form-card">
+        <div class="field"><label for="input-name">Nombre completo</label><input type="text" id="input-name" required><div class="field-error">Escribe tu nombre.</div></div>
+        <div class="field"><label for="input-whatsapp">WhatsApp</label><input type="tel" id="input-whatsapp" required><div class="field-error">Escribe un número válido.</div></div>
+        <div class="field"><label for="input-notes">Comentario <span>(opcional)</span></label><textarea id="input-notes"></textarea></div>
+        <button id="btn-confirm-booking" class="btn btn-primary btn-wide">Confirmar cita</button>
+      </div>
+    </section>
+
+    <section id="success-step" class="flow-step success-card hidden">
+      <span class="section-kicker">Paso 4</span>
+      <h2 id="booking-success-title">¡Cita confirmada!</h2>
+      <div class="appointment-summary">
+        <div><span>Servicio</span><strong id="summary-service"></strong></div>
+        <div><span>Fecha</span><strong id="summary-date"></strong></div>
+        <div><span>Hora</span><strong id="summary-time"></strong></div>
+        <div><span>Duración</span><strong id="summary-duration"></strong></div>
+        <div><span>Negocio</span><strong id="summary-business"></strong></div>
+        <div><span>Dirección</span><strong id="summary-address"></strong></div>
+      </div>
+      <a id="btn-whatsapp" class="btn btn-primary" target="_blank" rel="noopener">Confirmar por WhatsApp</a>
+    </section>
+  </div>
+
+  <section id="support-reviews" class="support-section" data-brand-section="reviews" hidden>
+    <div class="support-heading">
+      <div><span class="section-kicker">Opiniones</span><h2>Lo que dicen nuestros clientes</h2></div>
+      <div id="reviews-rating" class="support-rating"></div>
     </div>
-
-    <aside id="desktop-gallery-rail" class="experience-rail desktop-gallery-rail gallery-rail" hidden>
-      <div class="experience-rail-head"><span class="section-kicker">GALERÍA</span><h3>Conoce el establecimiento</h3></div>
-      <div id="desktop-gallery-list" class="gallery-carousel"></div>
-    </aside>
-  </div>
-
-  <section id="mobile-reviews-section" class="mobile-reviews-section" hidden>
-    <div class="services-heading-row"><h3>Opiniones de clientes</h3><span id="mobile-review-rating"></span></div>
-    <div id="mobile-reviews-list" class="mobile-reviews-list"></div>
-    <button id="btn-recommend-business-mobile" class="recommend-btn" type="button">♡ Recomendar</button>
+    <div id="reviews-list" class="reviews-carousel"></div>
+    <div class="support-action"><button id="btn-recommend-business" class="btn btn-secondary" type="button">♡ Recomendar</button></div>
   </section>
 
-  <section id="mobile-gallery-section" class="mobile-gallery-section" hidden>
-    <div class="services-heading-row"><h3>Galería de servicios</h3><span>Fotos reales</span></div>
-    <div id="mobile-gallery-list" class="mobile-gallery-list"></div>
+  <section id="support-gallery" class="support-section" data-brand-section="about" hidden>
+    <div class="support-heading"><div><span class="section-kicker">Galería</span><h2>Conoce nuestro trabajo</h2></div></div>
+    <div id="gallery-list" class="gallery-mosaic"></div>
   </section>
-</section>
-
-<section id="booking-step" class="booking-step hidden">
-  <button class="back-link" type="button" data-back="step-services">← Cambiar servicio</button>
-  <div class="booking-heading"><span class="section-kicker">Paso 2</span><h2 id="booking-date-title" tabindex="-1">Elige fecha y hora</h2><p>La disponibilidad se consulta al seleccionar la fecha.</p></div>
-  <div class="date-scroller" id="date-scroller"></div>
-  <div id="slot-grid" class="slot-grid"><p class="empty-state">Elige una fecha para ver los horarios.</p></div>
-  <div class="step-action"><button id="btn-go-to-form" class="btn btn-primary" disabled>Continuar con mis datos</button></div>
-</section>
-
-<section id="form-step" class="booking-step hidden">
-  <button class="back-link" type="button" data-back="booking-step">← Cambiar horario</button>
-  <div class="booking-heading"><span class="section-kicker">Paso 3</span><h2 id="booking-form-title" tabindex="-1">Tus datos</h2><p>Solo necesitamos la información necesaria para gestionar tu cita.</p></div>
-  <div class="form-card">
-    <div class="field"><label for="input-name">Nombre completo</label><input type="text" id="input-name" required><div class="field-error">Escribe tu nombre.</div></div>
-    <div class="field"><label for="input-whatsapp">WhatsApp</label><input type="tel" id="input-whatsapp" required><div class="field-error">Escribe un número válido.</div></div>
-    <div class="field"><label for="input-notes">Comentario <span>(opcional)</span></label><textarea id="input-notes"></textarea></div>
-    <button id="btn-confirm-booking" class="btn btn-primary btn-wide">Confirmar cita</button>
-  </div>
-</section>
-
-<section id="success-step" class="booking-step success-card hidden">
-  <h2 id="booking-success-title">¡Cita confirmada!</h2>
-  <div class="appointment-summary">
-    <div><span>Servicio</span><strong id="summary-service"></strong></div>
-    <div><span>Fecha</span><strong id="summary-date"></strong></div>
-    <div><span>Hora</span><strong id="summary-time"></strong></div>
-    <div><span>Duración</span><strong id="summary-duration"></strong></div>
-    <div><span>Negocio</span><strong id="summary-business"></strong></div>
-    <div><span>Dirección</span><strong id="summary-address"></strong></div>
-  </div>
-  <a id="btn-whatsapp" class="btn btn-whatsapp" target="_blank" rel="noopener">Confirmar por WhatsApp</a>
-</section>
 </main>
-<footer class="mycitago-public-footer"><span>Reservas gestionadas con MyCitaGo</span></footer>
+
+<div id="mobile-action-bar" class="mobile-action-bar">
+  <div id="selected-service-mini" class="selected-service-mini hidden">
+    <strong id="selected-service-name"></strong><span id="selected-service-meta"></span>
+  </div>
+  <button id="btn-agendar-mobile" class="btn btn-primary" disabled>Elegir fecha y hora</button>
+</div>
+
+<footer class="public-footer">Reservas gestionadas con MyCitaGo</footer>
 </div>
 <div id="toast" class="toast hidden" role="status"></div>
 
@@ -137,10 +160,10 @@
 <script src="js/theme.js"></script>
 <script src="js/booking-category-presets.js"></script>
 <script src="js/adaptive-booking.js"></script>
-<script src="js/services.js?v=20260910-r2"></script>
+<script src="js/services.js?v=20260910-redesign"></script>
 <script src="js/appointments.js"></script>
-<script src="js/public-branding.js?v=20260910-r4"></script>
-<script src="js/public-reviews-verified.js?v=20260910-r2"></script>
-<script src="js/app.js?v=20260910-r2"></script>
+<script src="js/public-branding.js?v=20260910-redesign"></script>
+<script src="js/public-reviews-verified.js?v=20260910-redesign"></script>
+<script src="js/app.js?v=20260910-redesign"></script>
 </body>
 </html>

@@ -1,88 +1,29 @@
 const state={business:null,services:[],selectedService:null,activeCategory:null,serviceSearch:'',days:[],selectedDate:null,selectedSlot:null,preset:null,reviews:[]};
 const $=id=>document.getElementById(id);
-const el={heroName:$('hero-name'),heroAddress:$('hero-address'),heroSchedule:$('hero-schedule'),heroLogo:$('hero-logo'),categoryTabs:$('category-tabs'),servicesList:$('services-list'),serviceSearch:$('service-search'),selectedServiceMini:$('selected-service-mini'),selectedServiceName:$('selected-service-name'),selectedServiceMeta:$('selected-service-meta'),bookingStep:$('booking-step'),dateScroller:$('date-scroller'),slotGrid:$('slot-grid'),formStep:$('form-step'),successStep:$('success-step'),btnAgendar:$('btn-agendar'),btnGoToForm:$('btn-go-to-form'),btnConfirmBooking:$('btn-confirm-booking'),btnWhatsapp:$('btn-whatsapp'),inputName:$('input-name'),inputWhatsapp:$('input-whatsapp'),inputNotes:$('input-notes'),toast:$('toast'),availabilityLive:$('availability-live'),errorLive:$('error-live')};
+const el={heroName:$('hero-name'),heroAddress:$('hero-address'),heroSchedule:$('hero-schedule'),heroLogo:$('hero-logo'),categoryTabs:$('category-tabs'),servicesList:$('services-list'),serviceSearch:$('service-search'),selectedServiceMini:$('selected-service-mini'),selectedServiceName:$('selected-service-name'),selectedServiceMeta:$('selected-service-meta'),bookingStep:$('booking-step'),dateScroller:$('date-scroller'),slotGrid:$('slot-grid'),formStep:$('form-step'),successStep:$('success-step'),btnAgendar:$('btn-agendar'),btnAgendarMobile:$('btn-agendar-mobile'),btnGoToForm:$('btn-go-to-form'),btnConfirmBooking:$('btn-confirm-booking'),btnWhatsapp:$('btn-whatsapp'),inputName:$('input-name'),inputWhatsapp:$('input-whatsapp'),inputNotes:$('input-notes'),toast:$('toast'),availabilityLive:$('availability-live'),errorLive:$('error-live')};
 const BUSINESS_ERROR_MESSAGES={missing_slug:'Este enlace no incluye un negocio.',not_found:'No encontramos un negocio asociado a este enlace.',query_failed:'No pudimos cargar la información.'};
 function announce(node,message){if(node)node.textContent=message}
 function showToast(message){el.toast.textContent=message;el.toast.classList.remove('hidden');setTimeout(()=>el.toast.classList.add('hidden'),3500)}
 function scrollToNode(node){node?.scrollIntoView({behavior:'smooth',block:'start'})}
-function renderBusinessError(code){$('app').innerHTML=`<main class="booking-error-shell"><div class="booking-error-card"><strong>No pudimos abrir esta reserva</strong><p>${BUSINESS_ERROR_MESSAGES[code]||BUSINESS_ERROR_MESSAGES.query_failed}</p></div></main>`}
-function renderHero(){const b=state.business;el.heroName.textContent=b.name;el.heroAddress.textContent=b.address||'';if(b.logo_url){el.heroLogo.src=b.logo_url;el.heroLogo.classList.remove('hidden')}const h=getDayHours(b,new Date());el.heroSchedule.textContent=h?`Hoy ${h.open} – ${h.close}`:'Hoy cerrado';const hero=$('hero');if(b.cover_image_url){hero.style.setProperty('--booking-cover',`url("${b.cover_image_url}")`);hero.classList.add('has-cover')}}
-function selectService(service){state.selectedService=service;document.querySelectorAll('.service-card').forEach(c=>{const selected=c.dataset.serviceId===service.id;c.classList.toggle('is-selected',selected);c.setAttribute('aria-pressed',selected?'true':'false')});el.btnAgendar.disabled=false;el.selectedServiceMini.classList.remove('hidden');el.selectedServiceName.textContent=service.name;el.selectedServiceMeta.textContent=`${formatDuration(service.duration_minutes)} · ${formatPrice(service.price)}`;$('booking-side-service').textContent=service.name;$('booking-side-meta').textContent=`${formatDuration(service.duration_minutes)} · ${formatPrice(service.price)}`}
-function renderDateScroller(){state.days=buildUpcomingDays(state.business);el.dateScroller.replaceChildren();state.days.forEach(day=>{const chip=document.createElement('button');chip.type='button';chip.className='date-chip'+(day.isClosed?' is-disabled':'');chip.disabled=day.isClosed;chip.dataset.dateKey=day.dateKey;chip.innerHTML=`<span class="date-chip-dow">${day.dow}</span><strong class="date-chip-num">${day.dayNum}</strong>`;if(!day.isClosed)chip.onclick=()=>selectDate(day);el.dateScroller.appendChild(chip)})}
-async function selectDate(day){state.selectedDate=day.date;state.selectedSlot=null;el.btnGoToForm.disabled=true;const slots=await getAvailableSlots(state.business,day.date,state.selectedService.duration_minutes);renderSlots(slots)}
-function renderSlots(slots){el.slotGrid.replaceChildren();const available=(slots||[]).filter(s=>s.available);if(!available.length){el.slotGrid.innerHTML='<p class="empty-state">No hay horarios disponibles este día.</p>';return}available.forEach(slot=>{const button=document.createElement('button');button.type='button';button.className='slot-pill';button.textContent=slot.label;button.onclick=()=>{state.selectedSlot=slot;document.querySelectorAll('.slot-pill').forEach(p=>p.classList.remove('is-selected'));button.classList.add('is-selected');el.btnGoToForm.disabled=false;$('booking-side-time').textContent=`${state.selectedDate.toLocaleDateString('es-MX',{day:'numeric',month:'short'})} · ${slot.start}`};el.slotGrid.appendChild(button)})}
-function syncFlowChrome(stepEl){const onServices=stepEl?.id==='step-services';document.body.classList.toggle('booking-flow-active',!onServices);const hero=$('hero');if(hero)hero.hidden=!onServices}
+function renderBusinessError(code){$('app').innerHTML=`<main class="booking-main"><div class="flow-step"><strong>No pudimos abrir esta reserva</strong><p>${BUSINESS_ERROR_MESSAGES[code]||BUSINESS_ERROR_MESSAGES.query_failed}</p></div></main>`}
+function renderHero(){const b=state.business;el.heroName.textContent=b.name;el.heroAddress.textContent=b.address?`📍 ${b.address}`:'';if(b.logo_url){el.heroLogo.src=b.logo_url;el.heroLogo.classList.remove('hidden')}const h=getDayHours(b,new Date());el.heroSchedule.textContent=h?`🕒 Hoy ${h.open} – ${h.close}`:'🕒 Hoy cerrado';const hero=$('hero');if(b.cover_image_url){hero.style.setProperty('--booking-cover',`url("${b.cover_image_url}")`);hero.classList.add('has-cover')}}
+function updateBookingButtons(enabled){if(el.btnAgendar)el.btnAgendar.disabled=!enabled;if(el.btnAgendarMobile)el.btnAgendarMobile.disabled=!enabled}
+function selectService(service){state.selectedService=service;document.querySelectorAll('.service-card').forEach(c=>{const selected=c.dataset.serviceId===service.id;c.classList.toggle('is-selected',selected);c.setAttribute('aria-pressed',selected?'true':'false')});updateBookingButtons(true);el.selectedServiceMini?.classList.remove('hidden');if(el.selectedServiceName)el.selectedServiceName.textContent=service.name;if(el.selectedServiceMeta)el.selectedServiceMeta.textContent=`${formatDuration(service.duration_minutes)} · ${formatPrice(service.price)}`;$('booking-side-service').textContent=service.name;$('booking-side-meta').textContent=`${formatDuration(service.duration_minutes)} · ${formatPrice(service.price)}`}
+function renderDateScroller(){state.days=buildUpcomingDays(state.business);el.dateScroller.replaceChildren();state.days.forEach(day=>{const chip=document.createElement('button');chip.type='button';chip.className='date-chip'+(day.isClosed?' is-disabled':'');chip.disabled=day.isClosed;chip.dataset.dateKey=day.dateKey;chip.innerHTML=`<span class="date-chip-dow">${day.dow}</span><strong class="date-chip-num">${day.dayNum}</strong>`;if(!day.isClosed)chip.onclick=()=>selectDate(day,chip);el.dateScroller.appendChild(chip)})}
+async function selectDate(day,chip){state.selectedDate=day.date;state.selectedSlot=null;el.btnGoToForm.disabled=true;document.querySelectorAll('.date-chip').forEach(n=>n.classList.remove('is-selected'));chip?.classList.add('is-selected');const slots=await getAvailableSlots(state.business,day.date,state.selectedService.duration_minutes);renderSlots(slots)}
+function slotPeriodLabel(time){const hour=Number(String(time||'0').split(':')[0]);if(hour<12)return'Mañana';if(hour<17)return'Tarde';return'Noche'}
+function renderSlotPeriods(slots){const groups=new Map([['Mañana',[]],['Tarde',[]],['Noche',[]]]);slots.forEach(s=>groups.get(slotPeriodLabel(s.start))?.push(s));const fragment=document.createDocumentFragment();groups.forEach((items,label)=>{if(!items.length)return;const section=document.createElement('section');section.className='slot-period';const heading=document.createElement('h3');heading.textContent=label;const grid=document.createElement('div');grid.className='slot-period-grid';items.forEach(slot=>{const button=document.createElement('button');button.type='button';button.className='slot-pill';button.textContent=slot.label;button.onclick=()=>{state.selectedSlot=slot;document.querySelectorAll('.slot-pill').forEach(n=>n.classList.remove('is-selected'));button.classList.add('is-selected');el.btnGoToForm.disabled=false;$('booking-side-time').textContent=`${state.selectedDate.toLocaleDateString('es-MX',{day:'numeric',month:'short'})} · ${slot.start}`};grid.appendChild(button)});section.append(heading,grid);fragment.appendChild(section)});return fragment}
+function renderSlots(slots){el.slotGrid.replaceChildren();const available=(slots||[]).filter(s=>s.available);if(!available.length){el.slotGrid.innerHTML='<p class="empty-state">No hay horarios disponibles este día.</p>';return}el.slotGrid.appendChild(renderSlotPeriods(available))}
+function syncFlowChrome(stepEl){const onServices=stepEl?.id==='step-services';const hero=$('hero');if(hero)hero.hidden=!onServices;const mobileBar=$('mobile-action-bar');if(mobileBar)mobileBar.hidden=!onServices}
 function goToStep(stepEl){[$('step-services'),el.bookingStep,el.formStep,el.successStep].forEach(s=>s?.classList.add('hidden'));stepEl.classList.remove('hidden');syncFlowChrome(stepEl);scrollToNode(stepEl)}
 function setProgress(step){document.querySelectorAll('[data-progress-step]').forEach(node=>{const n=Number(node.dataset.progressStep);node.classList.toggle('is-active',n===step);node.classList.toggle('is-done',n<step)})}
 function validateForm(){return !!(el.inputName.value.trim()&&validateWhatsapp(el.inputWhatsapp.value))}
 async function handleConfirmBooking(){if(!validateForm())return showToast('Revisa tus datos.');const result=await bookAppointment({business:state.business,service:state.selectedService,dateKey:toDateKey(state.selectedDate),startTime:state.selectedSlot.start,endTime:state.selectedSlot.end,name:el.inputName.value.trim(),whatsappDigits:validateWhatsapp(el.inputWhatsapp.value),notes:el.inputNotes.value.trim()});if(!result.ok)return showToast(result.reason);renderSuccess();setProgress(4);goToStep(el.successStep)}
 function renderSuccess(){const dateLabel=state.selectedDate.toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long'});$('summary-service').textContent=state.selectedService.name;$('summary-date').textContent=dateLabel;$('summary-time').textContent=state.selectedSlot.start;$('summary-duration').textContent=formatDuration(state.selectedService.duration_minutes);$('summary-business').textContent=state.business.name;$('summary-address').textContent=state.business.address||''}
-function reviewCard(r){const card=document.createElement('article');card.className='rail-review-card';const top=document.createElement('div');top.className='rail-review-top';const who=document.createElement('strong');who.textContent=r.reviewer_name||'Cliente';const source=document.createElement('span');source.className='rail-review-source';source.textContent=r.source==='internal'&&r.verified?'✓ Verificado':(r.source==='google'?'Google':'MyCitaGo');const stars=document.createElement('div');stars.className='rail-review-stars';const n=Math.max(0,Math.min(5,Number(r.rating||0)));stars.textContent='★'.repeat(n)+'☆'.repeat(5-n);top.append(who,source);card.append(top,stars);if(r.comment){const p=document.createElement('p');p.textContent=r.comment;card.appendChild(p)}return card}
-function updateReviewSurfaces(rows){state.reviews=rows||[];const desktop=$('desktop-reviews-rail'),mobile=$('mobile-reviews-section'),heroRating=$('hero-rating');if(!state.reviews.length){desktop.hidden=true;mobile.hidden=true;heroRating.hidden=true;return}const avg=state.reviews.reduce((s,r)=>s+Number(r.rating||0),0)/state.reviews.length,label=`${avg.toFixed(1)} ★ · ${state.reviews.length} ${state.reviews.length===1?'reseña':'reseñas'}`;$('desktop-review-rating').textContent=label;$('mobile-review-rating').textContent=label;heroRating.textContent=label;heroRating.hidden=false;const d=$('desktop-reviews-list'),m=$('mobile-reviews-list');d.replaceChildren();m.replaceChildren();state.reviews.forEach(r=>{d.appendChild(reviewCard(r));m.appendChild(reviewCard(r).cloneNode(true))});desktop.hidden=false;mobile.hidden=false}
+function reviewCard(r){const card=document.createElement('article');card.className='review-card';const top=document.createElement('div');top.className='review-card-top';const who=document.createElement('strong');who.textContent=r.reviewer_name||'Cliente';const source=document.createElement('span');source.className='review-source';source.textContent=r.source==='internal'&&r.verified?'✓ Verificado':(r.source==='google'?'Google':'MyCitaGo');const stars=document.createElement('div');stars.className='review-stars';const n=Math.max(0,Math.min(5,Number(r.rating||0)));stars.textContent='★'.repeat(n)+'☆'.repeat(5-n);top.append(who,source);card.append(top,stars);if(r.comment){const p=document.createElement('p');p.textContent=r.comment;card.appendChild(p)}return card}
+function updateReviewSurfaces(rows){state.reviews=rows||[];const reviewsSection=$('support-reviews'),list=$('reviews-list'),rating=$('reviews-rating'),heroRating=$('hero-rating');if(!state.reviews.length){reviewsSection.hidden=true;heroRating.hidden=true;list.replaceChildren();return}const avg=state.reviews.reduce((s,r)=>s+Number(r.rating||0),0)/state.reviews.length,label=`${avg.toFixed(1)} ★ · ${state.reviews.length} ${state.reviews.length===1?'reseña':'reseñas'}`;rating.textContent=label;heroRating.textContent=label;heroRating.hidden=false;list.replaceChildren();state.reviews.forEach(r=>list.appendChild(reviewCard(r)));reviewsSection.hidden=false}
 async function loadVerifiedReviews(){const rows=await window.fetchVerifiedPublicReviews?.(state.business.id,8,state.business.slug)||[];updateReviewSurfaces(rows)}
 async function recommendBusiness(){const url=location.href.split('#')[0],text=`Te recomiendo ${state.business.name}. Reserva aquí: ${url}`;try{if(navigator.share){await navigator.share({title:state.business.name,text,url});return}if(navigator.clipboard){await navigator.clipboard.writeText(text);showToast('Enlace de recomendación copiado.');return}}catch(err){if(err?.name==='AbortError')return}showToast('Copia el enlace para recomendar el negocio.')}
-
-function renderServiceGallery(){
-  const desktop=$('desktop-gallery-rail');
-  const desktopHost=$('desktop-gallery-list');
-  const mobile=$('mobile-gallery-section');
-  const mobileHost=$('mobile-gallery-list');
-  if(!desktop||!desktopHost||!mobile||!mobileHost)return;
-
-  // Dato real o nada: NO usar serviceFallbackImage aquí.
-  const photos=[];
-  const seen=new Set();
-  (state.services||[]).forEach(service=>{
-    const url=String(service.image_url||'').trim();
-    if(!url||seen.has(url))return;
-    seen.add(url);
-    photos.push({url,name:service.name||'Servicio'});
-  });
-
-  if(!photos.length){
-    desktop.hidden=true;
-    mobile.hidden=true;
-    desktopHost.replaceChildren();
-    mobileHost.replaceChildren();
-    return;
-  }
-
-  const makeCard=photo=>{
-    const figure=document.createElement('figure');
-    figure.className='service-gallery-card';
-    const img=document.createElement('img');
-    img.src=photo.url;
-    img.alt=`${photo.name} · ${state.business.name}`;
-    img.loading='lazy';
-    img.decoding='async';
-    const cap=document.createElement('figcaption');
-    cap.textContent=photo.name;
-    figure.append(img,cap);
-    return figure;
-  };
-
-  desktopHost.replaceChildren();
-  mobileHost.replaceChildren();
-  photos.slice(0,6).forEach(photo=>{
-    desktopHost.appendChild(makeCard(photo));
-    mobileHost.appendChild(makeCard(photo).cloneNode(true));
-  });
-
-  desktop.hidden=false;
-  mobile.hidden=false;
-}
-
-async function init(){const result=await loadBusiness();if(!result.business){renderBusinessError(result.error);return}state.business=result.business;
-state.preset=window.applyAdaptiveBookingPreset?.(state.business)||null;
-applyTheme?.(state.business.theme);
-renderHero();
-
-const publishedBranding=await window.loadPublishedBranding?.(state.business.id);
-if(publishedBranding){
-  window.applyPublishedBranding?.(publishedBranding);
-  window.renderPublicSections?.(publishedBranding);
-}
-
-state.services=await loadActiveServices(state.business.id);
-renderServiceGallery();renderCategoryTabs(state.services,el.categoryTabs,category=>{state.activeCategory=category;renderServices(state.services,el.servicesList,selectService,state.activeCategory,state.serviceSearch)});renderServices(state.services,el.servicesList,selectService,state.activeCategory,state.serviceSearch);$('services-count').textContent=state.services.length?`${state.services.length} opciones`:'';el.serviceSearch?.addEventListener('input',()=>{state.serviceSearch=el.serviceSearch.value.trim();renderServices(state.services,el.servicesList,selectService,state.activeCategory,state.serviceSearch)});renderDateScroller();loadVerifiedReviews();syncFlowChrome($('step-services'));$('btn-recommend-business')?.addEventListener('click',recommendBusiness);$('btn-recommend-business-mobile')?.addEventListener('click',recommendBusiness);el.btnAgendar.onclick=()=>{if(!state.selectedService)return;setProgress(2);goToStep(el.bookingStep)};el.btnGoToForm.onclick=()=>{if(!state.selectedSlot)return;setProgress(3);goToStep(el.formStep)};el.btnConfirmBooking.onclick=handleConfirmBooking;document.querySelectorAll('[data-back]').forEach(btn=>btn.onclick=()=>{const target=$(btn.dataset.back);setProgress(target.id==='booking-step'?2:1);goToStep(target)})}
+function renderServiceGallery(){const gallery=$('support-gallery'),host=$('gallery-list');if(!gallery||!host)return;const photos=[],seen=new Set();(state.services||[]).forEach(service=>{const url=String(service.image_url||'').trim();if(!url||seen.has(url))return;seen.add(url);photos.push({url,alt:`${service.name||'Servicio'} · ${state.business.name}`})});if(!photos.length){gallery.hidden=true;host.replaceChildren();return}host.replaceChildren();photos.slice(0,6).forEach(photo=>{const figure=document.createElement('figure');figure.className='gallery-photo';const img=document.createElement('img');img.src=photo.url;img.alt=photo.alt;img.loading='lazy';img.decoding='async';figure.appendChild(img);host.appendChild(figure)});gallery.hidden=false}
+async function init(){const result=await loadBusiness();if(!result.business){renderBusinessError(result.error);return}state.business=result.business;state.preset=window.applyAdaptiveBookingPreset?.(state.business)||null;applyTheme?.(state.business.theme);renderHero();const publishedBranding=await window.loadPublishedBranding?.(state.business.id);if(publishedBranding){window.applyPublishedBranding?.(publishedBranding);window.renderPublicSections?.(publishedBranding)}state.services=await loadActiveServices(state.business.id);renderCategoryTabs(state.services,el.categoryTabs,category=>{state.activeCategory=category;renderServices(state.services,el.servicesList,selectService,state.activeCategory,state.serviceSearch)});renderServices(state.services,el.servicesList,selectService,state.activeCategory,state.serviceSearch);$('services-count').textContent=state.services.length?`${state.services.length} opciones`:'';el.serviceSearch?.addEventListener('input',()=>{state.serviceSearch=el.serviceSearch.value.trim();renderServices(state.services,el.servicesList,selectService,state.activeCategory,state.serviceSearch)});renderServiceGallery();renderDateScroller();loadVerifiedReviews();syncFlowChrome($('step-services'));$('btn-recommend-business')?.addEventListener('click',recommendBusiness);const openSchedule=()=>{if(!state.selectedService)return;setProgress(2);goToStep(el.bookingStep)};el.btnAgendar.onclick=openSchedule;el.btnAgendarMobile.onclick=openSchedule;el.btnGoToForm.onclick=()=>{if(!state.selectedSlot)return;setProgress(3);goToStep(el.formStep)};el.btnConfirmBooking.onclick=handleConfirmBooking;document.querySelectorAll('[data-back]').forEach(btn=>btn.onclick=()=>{const target=$(btn.dataset.back);setProgress(target.id==='booking-step'?2:1);goToStep(target)})}
 document.addEventListener('DOMContentLoaded',init);
