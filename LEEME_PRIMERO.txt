@@ -1,35 +1,44 @@
-MYCITAGO — CORRECCIÓN BANNER EN RESERVACIÓN
+MYCITAGO — PAQUETE DE CONTINUACIÓN SIN CERRAR D2
+Fecha: 2026-09-11
 
-SUBIR A GITHUB reemplazando los archivos completos:
+D2 SE MANTIENE PENDIENTE:
+- Falta MP_WEBHOOK_SECRET.
+- Falta registrar el webhook de Mercado Pago.
+- No se considera cerrado hasta validar confirmación automática de pago.
 
-1) /reservar.html
-2) /js/app.js
+ARCHIVOS QUE SÍ DEBES SUBIR A GITHUB
+Respeta exactamente estas rutas y reemplaza los archivos existentes:
 
-NO cambies nombres ni rutas.
+1) admin/clientes.html
+2) js/admin-customers.js
+3) admin/resenas.html
+4) js/admin-reviews.js
+5) js/admin-accounting.js
 
-QUÉ CORRIGE
-- El banner/portada grande se muestra en el Paso 1: elegir servicio.
-- Al avanzar a Fecha/Hora, Datos o Confirmación, el banner se oculta.
-- Así el banner ya no tapa servicios, fechas ni horarios.
-- Al volver al Paso 1, la portada reaparece.
-- No modifica Supabase, creación de citas ni cálculo de disponibilidad.
+QUÉ RESUELVE ESTE PAQUETE
+- E1 Clientes: muestra cancelaciones reales desde customer_crm.cancelled_visits.
+- E1 Reseñas: permite Ocultar / Publicar / Eliminar lógicamente reseñas internas.
+  El backend moderate_internal_review ya quedó creado en Supabase.
+- E4 Contabilidad: una venta SIN registro fiscal ya NO asume IVA.
+  El IVA queda apagado por defecto y solo se calcula cuando vat_applies=true.
 
-DESPUÉS DEL DEPLOY
-Abrir:
-https://mycitago.github.io/app/reservar.html?n=clinica&v=20260909-banner-fix1
+NO SUBAS SQL:
+El backend necesario de estos cambios ya fue aplicado directamente en Supabase.
 
-PRUEBA
-1. Seleccionar un servicio.
-2. Pulsar continuar/agendar.
-3. Confirmar que desaparece la portada grande.
-4. Seleccionar fecha.
-5. Seleccionar hora.
-6. Continuar a datos.
-7. Confirmar la cita.
-8. Volver a Servicios y confirmar que la portada reaparece.
+D3:
+El backend de service_templates ya quedó reforzado y con precios sugeridos.
+admin-services.js todavía contiene el catálogo histórico hardcodeado. No se incluye
+un reemplazo de ese archivo en este ZIP porque el conector no entregó el archivo
+completo de forma segura para reconstruirlo sin riesgo de romper funciones no visibles.
+No se marcará esa limpieza visual/frontend como cerrada hasta reemplazarlo con evidencia completa.
 
-VERIFICACIÓN LOCAL DEL PAQUETE
-- Control de estado del hero: OK
-- Protección CSS de [hidden]: OK
-- Cache busting de app.js: OK
-- Sintaxis JavaScript: OK
+D4:
+Ya estaba protegido desde servidor por triggers de límites de staff y sucursales.
+
+D5:
+Storage ya tiene bucket, límites y policies reales; no requiere cambios.
+
+DESPUÉS DE SUBIR
+- Espera 1–2 minutos a GitHub Pages.
+- Ctrl+F5.
+- Prueba Clientes, Reseñas y Contabilidad.

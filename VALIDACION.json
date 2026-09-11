@@ -1,0 +1,14 @@
+{
+  "js/admin-customers.js": {
+    "ok": true,
+    "stderr": ""
+  },
+  "js/admin-reviews.js": {
+    "ok": true,
+    "stderr": ""
+  },
+  "js/admin-accounting.js": {
+    "ok": true,
+    "stderr": ""
+  }
+}

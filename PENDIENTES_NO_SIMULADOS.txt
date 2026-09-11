@@ -1,0 +1,22 @@
+PENDIENTES NO SIMULADOS
+
+D2
+- MP_WEBHOOK_SECRET
+- Registro del webhook Mercado Pago
+- Prueba real/sandbox del estado final del pago
+
+D3 frontend
+- Quitar SERVICE_TEMPLATE_LIBRARY hardcodeado de js/admin-services.js
+- Leer exclusivamente service_templates desde Supabase
+- Limpieza total de sidebar/CSS sigue reservada para F3
+
+E2
+- Pagos + banner en Mi página: requiere auditoría completa de los archivos actuales
+  antes de modificar para no crear otro sistema de temas.
+
+E3
+- Descuento/promoción real: NO se simula. Falta un modelo que haga cumplir el precio
+  promocional en la reserva; no basta con escribir un descuento en una imagen.
+
+F1–F3
+- Se mantienen para una pasada posterior después de cerrar las dependencias anteriores.
