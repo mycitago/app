@@ -1,34 +1,15 @@
 {
-  "public-promotion.js": {
-    "ok": true,
+  "accounting-metrics.js": {
+    "exit": 0,
     "stderr": ""
   },
-  "citago-final-bootstrap.js": {
-    "ok": true,
+  "admin-accounting.js": {
+    "exit": 0,
     "stderr": ""
   },
-  "config.js": {
-    "ok": true,
-    "stderr": ""
-  },
-  "admin-branding-banner.js": {
-    "ok": true,
-    "stderr": ""
-  },
-  "admin-plans.js": {
-    "ok": true,
-    "stderr": ""
-  },
-  "referral-tracking.js": {
-    "ok": true,
-    "stderr": ""
-  },
-  "public-branding-banner.js": {
-    "ok": true,
-    "stderr": ""
-  },
-  "admin-services-canonical.js": {
-    "ok": true,
+  "unit_test": {
+    "exit": 0,
+    "stdout": "accounting-metrics tests passed",
     "stderr": ""
   }
 }

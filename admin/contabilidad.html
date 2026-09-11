@@ -3,99 +3,117 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Reportes, ventas y finanzas · MyCitaGo</title>
+  <title>Contabilidad y reportes · MyCitaGo</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/styles.css">
   <link rel="stylesheet" href="../css/citago-admin.css">
-  <link rel="stylesheet" href="../css/admin-reports.css?v=20260909-reportfix3">
+  <link rel="stylesheet" href="../css/admin-reports.css?v=20260911-option2">
   <link rel="stylesheet" href="../css/mycitago-themes.css">
   <script src="../js/ui-theme.js"></script>
 </head>
 <body>
 <div id="citago-shell"></div>
-<main class="reports-page">
-  <header class="ct-page-head reports-head">
-    <div><span class="ct-eyebrow">REPORTES</span><h1>Decisiones basadas en datos</h1><p>Ventas, ingresos, gastos, citas y control fiscal en una vista clara.</p></div>
-    <div class="reports-controls"><label>Periodo<input type="month" id="month-picker"></label><button id="open-expense" class="ct-btn ct-btn-secondary" type="button">+ Registrar gasto</button></div>
+<main class="finance-page">
+  <header class="finance-head">
+    <div>
+      <span class="ct-eyebrow">CONTABILIDAD Y REPORTES</span>
+      <h1>Resumen financiero</h1>
+      <p>Visualiza ingresos, comisiones, impuestos y desempeño por sucursal y por profesional.</p>
+    </div>
+    <div class="finance-controls">
+      <label><span>Periodo</span><input type="month" id="month-picker"></label>
+      <label><span>Sucursal</span><select id="branch-filter"><option value="">Todas las sucursales</option></select></label>
+      <label><span>Profesional</span><select id="staff-filter"><option value="">Todos los profesionales</option></select></label>
+      <button id="export-sales" class="ct-btn ct-btn-primary" type="button">↓ Exportar</button>
+    </div>
   </header>
 
   <div id="report-load-status" class="report-load-status" role="status">Cargando información…</div>
 
-  <section class="reports-kpis">
-    <article><span>Ingresos realizados</span><strong id="kpi-income">$0.00</strong><small>Citas completadas</small></article>
-    <article><span>Citas realizadas</span><strong id="kpi-done">0</strong><small>Servicios completados</small></article>
-    <article><span>Ingreso proyectado</span><strong id="kpi-projected">$0.00</strong><small>Citas confirmadas</small></article>
-    <article><span>Gastos</span><strong id="kpi-expenses">$0.00</strong><small>Periodo seleccionado</small></article>
-    <article><span>Resultado</span><strong id="kpi-profit">$0.00</strong><small id="kpi-note">Resultado operativo del periodo</small></article>
-    <article><span>Nuevas reseñas</span><strong id="kpi-new-reviews">0</strong><small>Periodo seleccionado</small></article>
-    <article><span>Calificación</span><strong id="kpi-review-rating">—</strong><small>Promedio publicado</small></article>
-    <article><span>Reservas compartidas</span><strong id="kpi-shared-bookings">0</strong><small>Con origen identificado</small></article>
+  <section class="finance-kpis">
+    <article><i>$</i><div><span>Ingresos totales</span><strong id="kpi-income">$0.00</strong><small id="kpi-income-note">Citas completadas</small></div></article>
+    <article><i>▣</i><div><span>Citas realizadas</span><strong id="kpi-done">0</strong><small>Servicios completados</small></div></article>
+    <article><i>◫</i><div><span>Ticket promedio</span><strong id="kpi-ticket">$0.00</strong><small>Por cita completada</small></div></article>
+    <article><i>👥</i><div><span>Comisiones del periodo</span><strong id="kpi-commissions">$0.00</strong><small id="kpi-commission-rate">Según comisión configurada</small></div></article>
+    <article><i>◔</i><div><span>Utilidad estimada</span><strong id="kpi-profit">$0.00</strong><small>Ingresos − gastos − comisiones</small></div></article>
   </section>
 
-  <section class="report-card sales-module">
-    <div class="report-card-head sales-title">
-      <div><span class="ct-eyebrow">VENTAS Y FACTURACIÓN</span><h2>Control comercial y fiscal</h2><p class="report-help">Control administrativo. No sustituye el timbrado CFDI de un PAC autorizado.</p></div>
-      <button id="export-sales" class="ct-btn ct-btn-secondary" type="button">Exportar ventas CSV</button>
-    </div>
-    <div class="fiscal-kpis">
-      <article><span>Ventas del periodo</span><strong id="fiscal-sales">$0.00</strong><small>Servicios completados</small></article>
-      <article><span>Facturado</span><strong id="fiscal-invoiced">$0.00</strong><small>Con CFDI registrado</small></article>
-      <article><span>Pendiente de facturar</span><strong id="fiscal-pending">$0.00</strong><small>Control interno</small></article>
-      <article><span>IVA trasladado</span><strong id="fiscal-vat">$0.00</strong><small>Según control fiscal capturado</small></article>
-    </div>
-    <div class="sales-table-wrap"><table class="sales-table"><thead><tr><th>Fecha</th><th>Servicio</th><th>Total</th><th>IVA</th><th>Cobro</th><th>CFDI</th><th>UUID</th><th></th></tr></thead><tbody id="sales-list"><tr><td colspan="8">Cargando ventas…</td></tr></tbody></table></div>
+  <section class="finance-charts">
+    <article class="finance-card"><div class="card-title"><div><h2>Ingresos por sucursal</h2><p>Citas completadas del periodo</p></div></div><div class="chart-box"><canvas id="branch-chart"></canvas></div></article>
+    <article class="finance-card"><div class="card-title"><div><h2>Ingresos por servicio (Top 5)</h2><p>Servicios con mayor facturación</p></div></div><div class="chart-box"><canvas id="service-chart"></canvas></div></article>
+    <article class="finance-card"><div class="card-title distribution-title"><div><h2>Distribución de ingresos</h2><p id="distribution-subtitle">Por servicios</p></div><div class="mini-tabs"><button data-dist="services" class="active">Servicios</button><button data-dist="branches">Sucursales</button><button data-dist="staff">Profesionales</button></div></div><div class="chart-box donut"><canvas id="distribution-chart"></canvas></div></article>
   </section>
 
-  <section class="reports-grid">
-    <article class="report-card report-chart"><div class="report-card-head"><div><span class="ct-eyebrow">EVOLUCIÓN</span><h2>Ingresos vs. gastos</h2></div><span>Últimos 6 meses</span></div><div class="report-chart-wrap"><canvas id="finance-chart"></canvas></div></article>
-    <article class="report-card"><div class="report-card-head"><div><span class="ct-eyebrow">DEMANDA</span><h2>Servicios más realizados</h2></div></div><div id="popular-services" class="popular-services"></div></article>
-  </section>
-  <section class="reports-grid lower">
-    <article class="report-card"><div class="report-card-head"><div><span class="ct-eyebrow">HISTÓRICO</span><h2>Resumen de 6 meses</h2></div></div><div id="summary-6m"></div></article>
-    <article class="report-card"><div class="report-card-head"><div><span class="ct-eyebrow">GASTOS</span><h2>Gastos del mes</h2></div></div><div id="list-expenses"></div></article>
-  </section>
+  <section class="finance-card finance-detail">
+    <nav class="finance-tabs" aria-label="Detalle de reportes">
+      <button class="active" data-tab="branches">⌂ Sucursales</button>
+      <button data-tab="staff">♙ Profesionales</button>
+      <button data-tab="services">⌘ Servicios</button>
+      <button data-tab="commissions">$ Comisiones</button>
+      <button data-tab="taxes">▤ Impuestos</button>
+      <button data-tab="billing">▣ Pagos y facturación</button>
+    </nav>
 
-  <aside id="expense-panel" class="expense-panel hidden">
-    <div class="expense-backdrop" data-close-expense></div><div class="expense-card">
-      <div class="report-card-head"><div><span class="ct-eyebrow">NUEVO GASTO</span><h2>Registrar gasto</h2></div><button data-close-expense class="ct-icon-btn">×</button></div>
-      <div class="ct-form-grid"><label class="ct-form-field full"><span>Concepto</span><input id="exp-concept"></label><label class="ct-form-field"><span>Categoría</span><select id="exp-category"><option value="insumos">Insumos</option><option value="renta">Renta</option><option value="sueldos">Sueldos</option><option value="servicios">Servicios</option><option value="marketing">Marketing</option><option value="mantenimiento">Mantenimiento</option><option value="otros">Otros</option></select></label><label class="ct-form-field"><span>Monto</span><input type="number" id="exp-amount" min=".01" step=".01"></label><label class="ct-form-field full"><span>Fecha</span><input type="date" id="exp-date"></label></div>
-      <button id="btn-add-expense" class="ct-btn ct-btn-primary">Guardar gasto</button>
-    </div>
-  </aside>
+    <section class="tab-panel active" data-panel="branches">
+      <div class="section-title"><div><h2>Ingresos por sucursal</h2><p>Detalle de ingresos, citas, comisiones y utilidad por sucursal. Los gastos generales no se distribuyen artificialmente.</p></div></div>
+      <div class="table-scroll"><table class="finance-table"><thead><tr><th>Sucursal</th><th>Citas</th><th>Ingresos</th><th>Comisiones</th><th>Gastos atribuidos</th><th>Utilidad antes de gasto general</th><th>Ticket prom.</th></tr></thead><tbody id="branch-table"></tbody></table></div>
+    </section>
 
-  <aside id="sale-panel" class="expense-panel hidden">
-    <div class="expense-backdrop" data-close-sale></div><div class="expense-card">
-      <div class="report-card-head"><div><span class="ct-eyebrow">CONTROL FISCAL</span><h2>Datos de la venta</h2></div><button data-close-sale class="ct-icon-btn">×</button></div>
-      <input type="hidden" id="sale-appointment-id">
-      <div class="vat-toggle-row">
-        <label class="vat-toggle"><input id="sale-vat-applies" type="checkbox" checked><span>Aplicar IVA 16%</span></label>
-        <small>Activado por defecto. Si la operación es exenta o no causa IVA, desactívalo.</small>
+    <section class="tab-panel" data-panel="staff">
+      <div class="section-title"><div><h2>Desempeño por profesional</h2><p>Ingresos generados, comisión y número de citas por cada profesional.</p></div></div>
+      <div class="table-scroll"><table class="finance-table"><thead><tr><th>Profesional</th><th>Rol</th><th>Citas</th><th>Ingresos</th><th>Comisión %</th><th>Comisión total</th><th>Utilidad</th><th>Ticket prom.</th></tr></thead><tbody id="staff-table"></tbody></table></div>
+    </section>
+
+    <section class="tab-panel" data-panel="services">
+      <div class="section-title"><div><h2>Servicios</h2><p>Qué servicios generan más ingresos y citas.</p></div></div>
+      <div class="table-scroll"><table class="finance-table"><thead><tr><th>Servicio</th><th>Citas</th><th>Ingresos</th><th>Ticket prom.</th><th>Participación</th></tr></thead><tbody id="service-table"></tbody></table></div>
+    </section>
+
+    <section class="tab-panel" data-panel="commissions">
+      <div class="commission-summary">
+        <article><span>Comisiones del periodo</span><strong id="commission-total">$0.00</strong></article>
+        <article><span>Profesionales con comisión</span><strong id="commission-staff-count">0</strong></article>
+        <article><span>Ingreso después de comisiones</span><strong id="income-after-commissions">$0.00</strong></article>
       </div>
-      <div class="ct-form-grid">
-        <label class="ct-form-field"><span>Estado de cobro</span><select id="sale-payment-status"><option value="paid">Pagado</option><option value="pending">Pendiente</option><option value="partial">Parcial</option><option value="refunded">Reembolsado</option></select></label>
-        <label class="ct-form-field"><span>Estado CFDI</span><select id="sale-cfdi-status"><option value="not_required">Sin factura solicitada</option><option value="pending">Pendiente</option><option value="invoiced">Facturada</option><option value="cancelled">Cancelada</option></select></label>
-        <label class="ct-form-field"><span>Subtotal</span><input type="number" id="sale-subtotal" min="0" step=".01"></label>
-        <label class="ct-form-field"><span>IVA</span><input type="number" id="sale-vat" min="0" step=".01" readonly></label>
-        <label class="ct-form-field full"><span>UUID / folio fiscal</span><input id="sale-uuid" maxlength="36"></label>
-        <label class="ct-form-field"><span>Forma de pago SAT</span><input id="sale-payment-form" maxlength="3" placeholder="03"></label>
-        <label class="ct-form-field"><span>Método de pago</span><select id="sale-payment-method"><option value="">—</option><option value="PUE">PUE</option><option value="PPD">PPD</option></select></label>
-        <label class="ct-form-field full"><span>RFC receptor</span><input id="sale-rfc" maxlength="13"></label>
-        <label class="ct-form-field full"><span>Razón social / nombre fiscal</span><input id="sale-fiscal-name"></label>
-        <label class="ct-form-field"><span>Régimen fiscal</span><input id="sale-tax-regime" maxlength="3"></label>
-        <label class="ct-form-field"><span>C.P. fiscal</span><input id="sale-zip" maxlength="5"></label>
-        <label class="ct-form-field"><span>Uso CFDI</span><input id="sale-cfdi-use" maxlength="4"></label>
-        <label class="ct-form-field"><span>Fecha de timbrado</span><input id="sale-stamped-at" type="datetime-local"></label>
+      <div class="table-scroll"><table class="finance-table"><thead><tr><th>Profesional</th><th>Sucursal</th><th>Citas</th><th>Ingreso generado</th><th>Tasa</th><th>Comisión</th></tr></thead><tbody id="commission-table"></tbody></table></div>
+    </section>
+
+    <section class="tab-panel" data-panel="taxes">
+      <div class="fiscal-kpis">
+        <article><span>Ventas del periodo</span><strong id="fiscal-sales">$0.00</strong><small>Servicios completados</small></article>
+        <article><span>Facturado</span><strong id="fiscal-invoiced">$0.00</strong><small>Con CFDI registrado</small></article>
+        <article><span>Pendiente de facturar</span><strong id="fiscal-pending">$0.00</strong><small>Control interno</small></article>
+        <article><span>IVA trasladado</span><strong id="fiscal-vat">$0.00</strong><small>Solo ventas marcadas con IVA</small></article>
       </div>
       <p class="fiscal-warning">Control interno: registrar estos datos no genera ni valida un CFDI ante el SAT.</p>
-      <button id="save-sale-fiscal" class="ct-btn ct-btn-primary">Guardar control fiscal</button>
-    </div>
-  </aside>
+    </section>
+
+    <section class="tab-panel" data-panel="billing">
+      <div class="billing-grid">
+        <div>
+          <div class="section-title"><div><h2>Pagos y facturación</h2><p>Detalle fiscal de servicios completados.</p></div></div>
+          <div class="table-scroll"><table class="finance-table sales-table"><thead><tr><th>Fecha</th><th>Servicio</th><th>Sucursal</th><th>Profesional</th><th>Total</th><th>IVA</th><th>Cobro</th><th>CFDI</th><th></th></tr></thead><tbody id="sales-list"></tbody></table></div>
+        </div>
+        <aside class="payment-methods"><h3>Métodos de pago</h3><p>Según forma de pago fiscal capturada.</p><div id="payment-methods-list"></div></aside>
+      </div>
+    </section>
+  </section>
+
+  <section class="bottom-grid">
+    <article class="finance-card"><div class="card-title"><div><h2>Evolución</h2><p>Ingresos, gastos y comisiones · últimos 6 meses</p></div></div><div class="chart-box large"><canvas id="finance-chart"></canvas></div></article>
+    <article class="finance-card"><div class="card-title"><div><h2>Gastos generales del mes</h2><p>No asignados a sucursal</p></div><button id="open-expense" class="ct-btn ct-btn-secondary">+ Registrar gasto</button></div><div id="list-expenses"></div></article>
+  </section>
+
+  <aside id="expense-panel" class="expense-panel hidden"><div class="expense-backdrop" data-close-expense></div><div class="expense-card"><div class="report-card-head"><div><span class="ct-eyebrow">NUEVO GASTO</span><h2>Registrar gasto</h2></div><button data-close-expense class="ct-icon-btn">×</button></div><div class="ct-form-grid"><label class="ct-form-field full"><span>Concepto</span><input id="exp-concept"></label><label class="ct-form-field"><span>Categoría</span><select id="exp-category"><option value="insumos">Insumos</option><option value="renta">Renta</option><option value="sueldos">Sueldos</option><option value="servicios">Servicios</option><option value="marketing">Marketing</option><option value="mantenimiento">Mantenimiento</option><option value="otros">Otros</option></select></label><label class="ct-form-field"><span>Monto</span><input type="number" id="exp-amount" min=".01" step=".01"></label><label class="ct-form-field full"><span>Fecha</span><input type="date" id="exp-date"></label></div><button id="btn-add-expense" class="ct-btn ct-btn-primary">Guardar gasto</button></div></aside>
+
+  <aside id="sale-panel" class="expense-panel hidden"><div class="expense-backdrop" data-close-sale></div><div class="expense-card"><div class="report-card-head"><div><span class="ct-eyebrow">CONTROL FISCAL</span><h2>Datos de la venta</h2></div><button data-close-sale class="ct-icon-btn">×</button></div><input type="hidden" id="sale-appointment-id"><div class="vat-toggle-row"><label class="vat-toggle"><input id="sale-vat-applies" type="checkbox"><span>Aplicar IVA 16%</span></label><small>Desactivado por defecto. Actívalo únicamente cuando esta operación cause IVA.</small></div><div class="ct-form-grid"><label class="ct-form-field"><span>Estado de cobro</span><select id="sale-payment-status"><option value="paid">Pagado</option><option value="pending">Pendiente</option><option value="partial">Parcial</option><option value="refunded">Reembolsado</option></select></label><label class="ct-form-field"><span>Estado CFDI</span><select id="sale-cfdi-status"><option value="not_required">Sin factura solicitada</option><option value="pending">Pendiente</option><option value="invoiced">Facturada</option><option value="cancelled">Cancelada</option></select></label><label class="ct-form-field"><span>Subtotal</span><input type="number" id="sale-subtotal" min="0" step=".01"></label><label class="ct-form-field"><span>IVA</span><input type="number" id="sale-vat" min="0" step=".01" readonly></label><label class="ct-form-field full"><span>UUID / folio fiscal</span><input id="sale-uuid" maxlength="36"></label><label class="ct-form-field"><span>Forma de pago SAT</span><input id="sale-payment-form" maxlength="3" placeholder="03"></label><label class="ct-form-field"><span>Método de pago</span><select id="sale-payment-method"><option value="">—</option><option value="PUE">PUE</option><option value="PPD">PPD</option></select></label><label class="ct-form-field full"><span>RFC receptor</span><input id="sale-rfc" maxlength="13"></label><label class="ct-form-field full"><span>Razón social / nombre fiscal</span><input id="sale-fiscal-name"></label><label class="ct-form-field"><span>Régimen fiscal</span><input id="sale-tax-regime" maxlength="3"></label><label class="ct-form-field"><span>C.P. fiscal</span><input id="sale-zip" maxlength="5"></label><label class="ct-form-field"><span>Uso CFDI</span><input id="sale-cfdi-use" maxlength="4"></label><label class="ct-form-field"><span>Fecha de timbrado</span><input id="sale-stamped-at" type="datetime-local"></label></div><p class="fiscal-warning">Control interno: registrar estos datos no genera ni valida un CFDI ante el SAT.</p><button id="save-sale-fiscal" class="ct-btn ct-btn-primary">Guardar control fiscal</button></div></aside>
 </main>
 <div id="toast" class="toast hidden"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script>
 <script src="../js/config.js"></script><script src="../js/supabase.js"></script><script src="../js/admin-auth.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
-<script src="../js/admin-accounting.js?v=20260909-reportfix3"></script><script src="../js/citago-shell.js"></script>
+<script src="../js/accounting-metrics.js?v=20260911-option2"></script>
+<script src="../js/admin-accounting.js?v=20260911-option2"></script><script src="../js/citago-shell.js"></script>
 <script>document.addEventListener('DOMContentLoaded',()=>CitagoShell.mount({mode:'tenant',activePage:'reportes'}));</script>
 </body></html>

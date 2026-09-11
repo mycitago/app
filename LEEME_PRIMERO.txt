@@ -1,25 +1,33 @@
-MYCITAGO · ACTIVACIÓN FINAL SIN D2
+MYCITAGO · CONTABILIDAD OPCIÓN 2
+Fecha: 2026-09-11
 
-SUBE/REEMPLAZA exactamente estas rutas en GitHub:
-- js/config.js
-- js/citago-final-bootstrap.js
-- js/public-promotion.js
-- js/admin-branding-banner.js
-- js/public-branding-banner.js
-- js/admin-services-canonical.js
-- js/admin-plans.js
-- js/referral-tracking.js
-- css/citago-final.css
+REEMPLAZA / AGREGA exactamente:
+1. admin/contabilidad.html
+2. css/admin-reports.css
+3. js/admin-accounting.js
+4. js/accounting-metrics.js   (NUEVO)
 
-No necesitas editar HTML.
-config.js carga automáticamente los módulos según la página.
+QUÉ HACE
+- Diseño financiero Opción 2.
+- Filtros por periodo, sucursal y profesional.
+- Ingresos por sucursal, profesional y servicio.
+- Comisión = price_charged × staff.commission_rate / 100.
+- Solo las citas completadas generan ingreso y comisión.
+- Citas confirmadas siguen separadas como ingreso proyectado.
+- Históricos sin sucursal/profesional aparecen como “Sin asignar”.
+- Gastos actuales son generales porque la tabla expenses no tiene branch_id.
+- Utilidad global = ingreso - gastos - comisiones.
+- Control fiscal se conserva.
+- IVA queda desactivado por defecto y el texto visual ya coincide.
+- Exportación CSV incluye sucursales y profesionales.
 
-QUEDA PENDIENTE SOLO D2:
-- MP_WEBHOOK_SECRET
-- registrar webhook Mercado Pago
-- prueba de confirmación automática de pago
+NO REQUIERE SQL NUEVO.
+NO TOCA D2 / MERCADO PAGO.
 
-Después de subir:
-1. Espera 1–2 minutos.
-2. Ctrl+F5.
-3. Prueba Servicios, Crecimiento, Mi página, Planes y una reserva con ?promo=CODIGO.
+VALIDACIÓN RECOMENDADA
+- Ctrl+F5 tras publicar.
+- Selecciona un mes con citas completadas.
+- Compara suma de ingresos por sucursal contra Ingresos totales.
+- Compara suma de comisiones por profesional contra Comisiones del periodo.
+- Cambia sucursal y profesional y verifica que todos los módulos reaccionen.
+- Abre Pagos y facturación y confirma que el detalle fiscal siga editable.
