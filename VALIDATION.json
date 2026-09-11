@@ -1,0 +1,4 @@
+{
+  "public-payments.js": "node --check PASS",
+  "admin-agenda.js": "node --check PASS"
+}
