@@ -1,14 +1,22 @@
 {
-  "js/admin-customers.js": {
+  "public-promotion.js": {
     "ok": true,
-    "stderr": ""
+    "error": ""
   },
-  "js/admin-reviews.js": {
+  "admin-branding-banner.js": {
     "ok": true,
-    "stderr": ""
+    "error": ""
   },
-  "js/admin-accounting.js": {
+  "referral-tracking.js": {
     "ok": true,
-    "stderr": ""
+    "error": ""
+  },
+  "admin-growth-real.js": {
+    "ok": true,
+    "error": ""
+  },
+  "public-branding-banner.js": {
+    "ok": true,
+    "error": ""
   }
 }

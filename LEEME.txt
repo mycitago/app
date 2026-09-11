@@ -1,0 +1,43 @@
+MYCITAGO — CIERRE DE BLOQUES SIN D2
+Fecha: 2026-09-11
+
+SUPABASE YA APLICADO DIRECTAMENTE:
+- E3/F1: business_promotions con RLS y gating por plan.
+- E3: create_appointment_v3 y get_public_promotion.
+- E2: banner_enabled/banner_text/banner_url en business_branding.
+- F1: referral_events + track_referral_event.
+- F1: precio Autónomo actualizado a $199/mes y $1,990/año.
+- Verificación: business_promotions/referral_events existen; 4 policies en promociones; funciones RPC creadas.
+- D2 NO SE TOCÓ: Mercado Pago webhook/secret sigue pendiente.
+
+ARCHIVOS DEL PAQUETE
+js/admin-growth-real.js
+js/public-promotion.js
+js/admin-branding-banner.js
+js/public-branding-banner.js
+js/referral-tracking.js
+css/citago-final.css
+
+IMPORTANTE:
+Estos archivos son complementos seguros. Para activarlos hay que añadir sus <script>/<link> a las páginas indicadas.
+No reemplazan los módulos existentes ni crean una UI v4.
+
+INYECCIONES:
+admin/crecimiento.html:
+<link rel="stylesheet" href="../css/citago-final.css">
+<script src="../js/admin-growth-real.js"></script>
+
+admin/mi-pagina.html:
+<link rel="stylesheet" href="../css/citago-final.css">
+<script src="../js/admin-branding-banner.js"></script>
+
+reservar.html:
+<link rel="stylesheet" href="css/citago-final.css">
+<script src="js/public-promotion.js"></script>
+<script src="js/public-branding-banner.js"></script>
+
+Página de alta/landing que reciba ?ref=:
+<script src="js/referral-tracking.js"></script>
+
+D2:
+Permanece pendiente hasta contar con MP_WEBHOOK_SECRET + webhook registrado y validado.
