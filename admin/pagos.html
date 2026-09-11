@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/citago-admin.css">
-<link rel="stylesheet" href="../css/admin-payments.css?v=20260910-p2">
+<link rel="stylesheet" href="../css/admin-payments.css?v=20260911-mp1">
 <link rel="stylesheet" href="../css/mycitago-themes.css">
 <script src="../js/ui-theme.js"></script>
 </head>
@@ -21,7 +21,7 @@
         <h1>Cobros sin complicaciones</h1>
         <p>Tu suscripción a MyCitaGo y los cobros de tus clientes son flujos separados.</p>
       </div>
-      <span class="sandbox-badge">SANDBOX · sin dinero real</span>
+      <span class="sandbox-badge">CONFIGURACIÓN DE PRUEBA</span>
     </header>
 
     <section class="payments-grid">
@@ -39,16 +39,16 @@
         </div>
 
         <div class="stripe-account-card">
-          <div class="stripe-symbol">S</div>
+          <div class="stripe-symbol">MP</div>
           <div>
             <small>CUENTA DE COBRO</small>
-            <strong>Stripe Connect</strong>
-            <span id="stripe-account-copy">Consultando estado…</span>
+            <strong>Mercado Pago</strong>
+            <span id="mercadopago-account-copy">Consultando estado…</span>
           </div>
-          <span id="stripe-account-status" class="status-pill neutral">Cargando</span>
+          <span id="mercadopago-account-status" class="status-pill neutral">Cargando</span>
           <div class="stripe-account-actions">
-            <button id="connect-stripe" class="ct-btn ct-btn-primary" type="button">Conectar cuenta</button>
-            <button id="refresh-stripe" class="ct-btn ct-btn-secondary" type="button">Actualizar estado</button>
+            <button id="connect-mercadopago" class="ct-btn ct-btn-primary" type="button">Conectar cuenta</button>
+            <button id="refresh-mercadopago" class="ct-btn ct-btn-secondary" type="button">Actualizar estado</button>
           </div>
         </div>
 
@@ -82,7 +82,7 @@
 
           <div class="methods-pref">
             <h3>Preferencias de métodos</h3>
-            <p>Stripe solo mostrará métodos realmente disponibles para tu cuenta y para cada pago.</p>
+            <p>Mercado Pago mostrará únicamente los métodos disponibles para la cuenta y el pago.</p>
             <label><input id="prefer-card" type="checkbox" checked> Tarjeta</label>
             <label><input id="prefer-spei" type="checkbox"> SPEI</label>
             <label><input id="prefer-oxxo" type="checkbox"> OXXO</label>
@@ -107,11 +107,11 @@
         <article class="payment-panel safety-panel">
           <span class="ct-eyebrow">SEGURIDAD</span>
           <h2>El dinero de tu negocio es tuyo</h2>
-          <p>Los cobros de clientes se procesan en tu cuenta conectada. MyCitaGo no almacena números de tarjeta ni claves secretas.</p>
+          <p>Los cobros de clientes se procesan usando la cuenta de Mercado Pago conectada por tu negocio. MyCitaGo no almacena números de tarjeta ni muestra tokens privados en el navegador.</p>
           <ul>
             <li>Pagos online apagados por defecto.</li>
             <li>Configuración independiente por negocio.</li>
-            <li>Estado Stripe validado desde servidor.</li>
+            <li>Conexión validada desde servidor.</li>
           </ul>
         </article>
       </aside>
@@ -124,7 +124,7 @@
 <script src="../js/config.js"></script>
 <script src="../js/supabase.js"></script>
 <script src="../js/admin-auth.js"></script>
-<script src="../js/admin-payments.js?v=20260910-p2"></script>
+<script src="../js/admin-payments.js?v=20260911-mp1"></script>
 <script src="../js/citago-shell.js?v=20260910-p2"></script>
 <script>document.addEventListener('DOMContentLoaded',()=>CitagoShell.mount({mode:'tenant',activePage:'pagos-negocio'}));</script>
 </body>
