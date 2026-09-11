@@ -1,44 +1,25 @@
-MYCITAGO — PAQUETE DE CONTINUACIÓN SIN CERRAR D2
-Fecha: 2026-09-11
+MYCITAGO · ACTIVACIÓN FINAL SIN D2
 
-D2 SE MANTIENE PENDIENTE:
-- Falta MP_WEBHOOK_SECRET.
-- Falta registrar el webhook de Mercado Pago.
-- No se considera cerrado hasta validar confirmación automática de pago.
+SUBE/REEMPLAZA exactamente estas rutas en GitHub:
+- js/config.js
+- js/citago-final-bootstrap.js
+- js/public-promotion.js
+- js/admin-branding-banner.js
+- js/public-branding-banner.js
+- js/admin-services-canonical.js
+- js/admin-plans.js
+- js/referral-tracking.js
+- css/citago-final.css
 
-ARCHIVOS QUE SÍ DEBES SUBIR A GITHUB
-Respeta exactamente estas rutas y reemplaza los archivos existentes:
+No necesitas editar HTML.
+config.js carga automáticamente los módulos según la página.
 
-1) admin/clientes.html
-2) js/admin-customers.js
-3) admin/resenas.html
-4) js/admin-reviews.js
-5) js/admin-accounting.js
+QUEDA PENDIENTE SOLO D2:
+- MP_WEBHOOK_SECRET
+- registrar webhook Mercado Pago
+- prueba de confirmación automática de pago
 
-QUÉ RESUELVE ESTE PAQUETE
-- E1 Clientes: muestra cancelaciones reales desde customer_crm.cancelled_visits.
-- E1 Reseñas: permite Ocultar / Publicar / Eliminar lógicamente reseñas internas.
-  El backend moderate_internal_review ya quedó creado en Supabase.
-- E4 Contabilidad: una venta SIN registro fiscal ya NO asume IVA.
-  El IVA queda apagado por defecto y solo se calcula cuando vat_applies=true.
-
-NO SUBAS SQL:
-El backend necesario de estos cambios ya fue aplicado directamente en Supabase.
-
-D3:
-El backend de service_templates ya quedó reforzado y con precios sugeridos.
-admin-services.js todavía contiene el catálogo histórico hardcodeado. No se incluye
-un reemplazo de ese archivo en este ZIP porque el conector no entregó el archivo
-completo de forma segura para reconstruirlo sin riesgo de romper funciones no visibles.
-No se marcará esa limpieza visual/frontend como cerrada hasta reemplazarlo con evidencia completa.
-
-D4:
-Ya estaba protegido desde servidor por triggers de límites de staff y sucursales.
-
-D5:
-Storage ya tiene bucket, límites y policies reales; no requiere cambios.
-
-DESPUÉS DE SUBIR
-- Espera 1–2 minutos a GitHub Pages.
-- Ctrl+F5.
-- Prueba Clientes, Reseñas y Contabilidad.
+Después de subir:
+1. Espera 1–2 minutos.
+2. Ctrl+F5.
+3. Prueba Servicios, Crecimiento, Mi página, Planes y una reserva con ?promo=CODIGO.
