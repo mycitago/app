@@ -1,1 +1,61 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Crecimiento · MyCitaGo</title><link rel="stylesheet" href="../css/citago-admin.css"><link rel="stylesheet" href="../css/growth.css?v=20260909-shareimg1"></head><body><div id="citago-shell"></div><main class="growth-page"><header class="ct-page-head"><div><span class="ct-eyebrow">CRECIMIENTO</span><h1>Convierte recomendaciones en nuevas reservas</h1><p>Comparte tu página con enlaces medibles por canal.</p></div></header><section class="growth-hero"><label>Tu enlace de reservas<div class="growth-copy"><input id="growth-url" readonly><button id="growth-copy" class="ct-btn ct-btn-primary">Copiar</button></div></label><div class="growth-channels"><a id="growth-whatsapp" target="_blank" rel="noopener">WhatsApp</a><a id="growth-facebook" target="_blank" rel="noopener">Facebook</a><button id="growth-instagram">Instagram</button><a id="growth-email">Correo</a></div><label>Texto sugerido<textarea id="growth-copytext" rows="5"></textarea></label><section class="growth-share-card"><div><span class="ct-eyebrow">IMAGEN PARA COMPARTIR</span><h2>Comparte tu establecimiento con la reserva</h2><p>Usamos automáticamente la portada publicada de tu negocio. Si no hay portada, usamos el logo.</p></div><div id="growth-share-preview" class="growth-share-preview"><img id="growth-share-image" alt="Imagen del establecimiento"><div class="growth-share-overlay"><strong id="growth-share-business">Tu negocio</strong><span>Reserva tu cita en línea</span></div></div><div class="growth-share-actions"><button id="growth-share-native" class="ct-btn ct-btn-primary">Compartir imagen + enlace</button><button id="growth-download-image" class="ct-btn">Descargar imagen</button></div><p id="growth-share-help" class="growth-share-help">En equipos compatibles se abrirá el menú para compartir la imagen y el enlace juntos.</p></section></section><section class="growth-stats"><article><span>Reservas compartidas</span><strong id="growth-bookings">0</strong></article><article><span>Canal principal</span><strong id="growth-top-source">—</strong></article></section></main><div id="toast" class="toast hidden"></div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script><script src="../js/config.js"></script><script src="../js/supabase.js"></script><script src="../js/admin-auth.js"></script><script src="../js/admin-growth.js?v=20260909-shareimg1"></script><script src="../js/citago-shell.js"></script><script>document.addEventListener('DOMContentLoaded',()=>CitagoShell.mount({mode:'tenant',activePage:'crecimiento'}));</script></body></html>
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Crecimiento · MyCitaGo</title>
+<link rel="stylesheet" href="../css/citago-admin.css">
+<link rel="stylesheet" href="../css/growth.css?v=20260914-growth2">
+</head>
+<body>
+<div id="citago-shell"></div>
+<main class="growth-page">
+<header class="ct-page-head"><div><span class="ct-eyebrow">CRECIMIENTO</span><h1>Convierte promociones en nuevas reservas</h1><p>Crea promociones reales, compártelas por canal y mide las reservas generadas.</p></div></header>
+
+<section class="growth-stats growth-stats-4">
+<article><span>Reservas con fuente</span><strong id="growth-bookings">0</strong></article>
+<article><span>Canal principal</span><strong id="growth-top-source">—</strong></article>
+<article><span>Promociones creadas</span><strong id="growth-promotions-total">0</strong></article>
+<article><span>Reservas con promoción</span><strong id="growth-promo-bookings">0</strong></article>
+</section>
+
+<section class="ct-card promo-builder">
+<div class="section-title"><div><span class="ct-eyebrow">PROMOCIONES REALES</span><h2>Crea una oferta sobre un servicio real</h2><p>El descuento se valida en Supabase al confirmar la cita.</p></div><span id="promo-plan-note" class="muted-note"></span></div>
+<div class="promo-form">
+<label>Servicio<select id="promo-service"><option value="">Cargando…</option></select></label>
+<label>Código<input id="promo-code" maxlength="24" placeholder="VERANO20"></label>
+<label>Tipo<select id="promo-type"><option value="percent">Porcentaje</option><option value="fixed">Monto fijo</option></select></label>
+<label>Descuento<input id="promo-value" type="number" min="1" step="1" placeholder="20"></label>
+<label>Vigencia hasta<input id="promo-end" type="date"></label>
+<button id="promo-create" class="ct-btn ct-btn-primary" type="button">Crear promoción</button>
+</div>
+<div id="promo-preview" class="promo-preview">Selecciona servicio y descuento para ver el precio final.</div>
+<div id="promo-list" class="promo-list"></div>
+</section>
+
+<section class="ct-card campaign-card">
+<div class="section-title"><div><span class="ct-eyebrow">CLIENTES</span><h2>Prepara una campaña sin perder control</h2><p>Solo se consideran clientes con consentimiento de marketing.</p></div><strong><span id="campaign-audience-count">0</span> destinatarios</strong></div>
+<div class="campaign-controls">
+<label>Promoción<select id="campaign-promo"><option value="">Selecciona promoción…</option></select></label>
+<label>Segmento<select id="campaign-segment"><option value="all">Todos con consentimiento</option></select></label>
+<button id="campaign-copy" class="ct-btn ct-btn-primary" type="button">Copiar mensaje</button>
+<button id="campaign-whatsapp" class="ct-btn ct-btn-secondary" type="button">Abrir primer WhatsApp</button>
+</div>
+<div id="campaign-audience-list" class="campaign-audience"></div>
+<p class="muted-note">MyCitaGo no envía mensajes masivos automáticamente en este bloque. El negocio conserva el control del envío y del consentimiento.</p>
+</section>
+
+<section class="growth-hero">
+<label>Tu enlace general de reservas<div class="growth-copy"><input id="growth-url" readonly><button id="growth-copy" class="ct-btn ct-btn-primary">Copiar</button></div></label>
+<div class="growth-channels"><a id="growth-whatsapp" target="_blank" rel="noopener">WhatsApp</a><a id="growth-facebook" target="_blank" rel="noopener">Facebook</a><button id="growth-instagram">Instagram</button><a id="growth-email">Correo</a></div>
+<label>Texto sugerido<textarea id="growth-copytext" rows="4"></textarea></label>
+<section class="growth-share-card"><div><span class="ct-eyebrow">IMAGEN PARA COMPARTIR</span><h2>Comparte tu establecimiento</h2><p>Usamos la portada publicada; si no existe, usamos el logo.</p></div><div id="growth-share-preview" class="growth-share-preview"><img id="growth-share-image" alt="Imagen del establecimiento"><div class="growth-share-overlay"><strong id="growth-share-business">Tu negocio</strong><span>Reserva tu cita en línea</span></div></div><div class="growth-share-actions"><button id="growth-share-native" class="ct-btn ct-btn-primary">Compartir imagen + enlace</button><button id="growth-download-image" class="ct-btn">Descargar imagen</button></div></section>
+</section>
+</main>
+<div id="toast" class="toast hidden"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script>
+<script src="../js/config.js"></script><script src="../js/supabase.js"></script><script src="../js/admin-auth.js"></script>
+<script src="../js/growth-promotion-utils.js?v=20260914-growth2"></script>
+<script src="../js/admin-growth.js?v=20260914-growth2"></script>
+<script src="../js/citago-shell.js"></script>
+<script>document.addEventListener('DOMContentLoaded',()=>CitagoShell.mount({mode:'tenant',activePage:'crecimiento'}));</script>
+</body></html>

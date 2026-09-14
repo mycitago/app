@@ -1,13 +1,35 @@
 {
-  "js/admin-reviews.js": {
+  "unit_tests": {
     "exit": 0,
+    "stdout": "growth-promotion-utils tests: PASS",
     "stderr": ""
   },
-  "static_assertions": {
-    "admin_loads_versioned_js": true,
-    "entitlements_checked": true,
-    "reviews_query_present": true,
-    "google_paths_preserved": true,
-    "shell_not_in_package": true
-  }
+  "admin_growth_syntax": {
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "public_promotion_syntax": {
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "utils_syntax": {
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "package_files": {
+    "admin/crecimiento.html": true,
+    "css/growth.css": true,
+    "js/admin-growth.js": true,
+    "js/growth-promotion-utils.js": true,
+    "js/public-promotion.js": true,
+    "PATCH_RESERVAR.txt": true,
+    "LEEME_PRIMERO.txt": true,
+    "docs/superpowers/specs/2026-09-14-growth-promotions-design.md": true,
+    "docs/superpowers/plans/2026-09-14-growth-promotions.md": true,
+    "tests/growth-promotion-utils.test.js": true
+  },
+  "all_checks_pass": true
 }

@@ -1,37 +1,30 @@
-MYCITAGO · PAQUETE COMPLETO FIX RESEÑAS
+MYCITAGO · CRECIMIENTO + PROMOCIONES
 Fecha: 2026-09-14
 
-CAUSA CONFIRMADA
-- Las 3 reseñas están en public.reviews.
-- La página pública las veía por un RPC SECURITY DEFINER.
-- El admin hacía SELECT directo y la policy RESTRICTIVE exigía internal_reviews=true.
-- pro_v2 tenía internal_reviews=false.
-- En producción ya se corrigió a true y has_feature(...) devuelve true.
+ARCHIVOS A SUBIR
+- admin/crecimiento.html
+- css/growth.css
+- js/admin-growth.js
+- js/growth-promotion-utils.js
+- js/public-promotion.js
 
-ARCHIVOS A SUBIR A GITHUB
-1) admin/resenas.html
-2) js/admin-reviews.js
+PASO ADICIONAL
+- Aplicar PATCH_RESERVAR.txt a reservar.html para cargar public-promotion.js y el CSS.
+- No hay migración SQL en este paquete: el backend necesario ya existe.
 
-QUÉ CAMBIA EL FRONTEND
-- Valida primero get_business_entitlements.
-- Si internal_reviews está apagado, ya no muestra un falso “0”; muestra bloqueo por plan.
-- Si la consulta reviews falla, ya no lo confunde con vacío real.
-- Si la consulta funciona y no hay reseñas, muestra vacío real.
-- Mantiene moderación interna (ocultar/publicar/eliminar).
-- NO toca Google Business Profile.
-- NO toca citago-shell.js.
-- NO cambia otras features ni otras páginas.
+QUÉ QUEDA FUNCIONANDO
+- Promociones sobre servicios reales.
+- Descuento fijo o porcentual.
+- Precio original/final en vista previa.
+- Activar/pausar promociones.
+- Enlace por promoción con src + promo.
+- WhatsApp, copiar enlace e imagen promocional.
+- Métricas por fuente y reservas con promoción.
+- Segmentación CRM usando customer_crm.segment.
+- Solo clientes con marketing_opt_in=true.
+- Aplicación del descuento en servidor mediante create_appointment_v3.
 
-SQL
-- sql/01_enable_internal_reviews_pro_v2.sql se incluye para reproducibilidad.
-- NO necesitas ejecutarlo ahora: ya fue aplicado en producción.
-- sql/99_rollback_internal_reviews_pro_v2.sql revierte únicamente este flag.
-
-VERIFICACIÓN
-1) Publica los 2 archivos frontend.
-2) Espera GitHub Pages y Ctrl+F5.
-3) Abre /app/admin/resenas.html.
-4) Esperado para clinica:
-   Calificación: 4.0 ★
-   Reseñas: 3
-   Clientes verificados: 3
+FUERA DE ALCANCE
+- D2 Mercado Pago.
+- Envíos masivos automáticos.
+- Google Business Profile.

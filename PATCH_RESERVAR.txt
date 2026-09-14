@@ -1,0 +1,7 @@
+En reservar.html, después de:
+<script src="js/app.js?v=20260911-d1"></script>
+agregar:
+<script src="js/public-promotion.js?v=20260914-growth2"></script>
+
+Además, en <head>, después de booking-adaptive.css agregar:
+<link rel="stylesheet" href="css/growth.css?v=20260914-growth2">
