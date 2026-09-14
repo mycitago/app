@@ -889,6 +889,7 @@ function bindUI() {
   $('bulk-activate')?.addEventListener('click',()=>bulkSetActive(true));
   $('bulk-hide')?.addEventListener('click',()=>bulkSetActive(false));
   $('bulk-copy-hours')?.addEventListener('click',bulkUseBusinessHours);
+  $('bulk-price-adjust')?.addEventListener('click',openBulkPriceAdjust);
   $('save-hours').addEventListener('click',saveHours);
   $('save-service').addEventListener('click',saveService);
   $('duplicate-service').addEventListener('click',duplicateService);
@@ -948,7 +949,7 @@ async function init() {
   restoreLocalDraft();calculateServiceIntelligence();syncScheduleMode();
   window.lucide?.createIcons();
 }
-document.addEventListener('DOMContentLoaded',init);
+window.CitagoServicesLegacyInit=init;
 
 // Unified Services workspace contracts
 function renderServiceCatalog(services){ if(typeof renderCatalog==='function') return renderCatalog(services); return services||[]; }

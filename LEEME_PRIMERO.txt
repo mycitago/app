@@ -1,30 +1,18 @@
-MYCITAGO · CRECIMIENTO + PROMOCIONES
-Fecha: 2026-09-14
+CITAGO D3 — ARCHIVOS LISTOS PARA SUBIR
 
-ARCHIVOS A SUBIR
-- admin/crecimiento.html
-- css/growth.css
-- js/admin-growth.js
-- js/growth-promotion-utils.js
-- js/public-promotion.js
+Sube/reemplaza estos archivos respetando exactamente sus carpetas:
 
-PASO ADICIONAL
-- Aplicar PATCH_RESERVAR.txt a reservar.html para cargar public-promotion.js y el CSS.
-- No hay migración SQL en este paquete: el backend necesario ya existe.
+admin/onboarding.html
+admin/servicios.html
+js/admin-services.js
+js/d3-onboarding-canonical.js
+js/d3-services-canonical.js
 
-QUÉ QUEDA FUNCIONANDO
-- Promociones sobre servicios reales.
-- Descuento fijo o porcentual.
-- Precio original/final en vista previa.
-- Activar/pausar promociones.
-- Enlace por promoción con src + promo.
-- WhatsApp, copiar enlace e imagen promocional.
-- Métricas por fuente y reservas con promoción.
-- Segmentación CRM usando customer_crm.segment.
-- Solo clientes con marketing_opt_in=true.
-- Aplicación del descuento en servidor mediante create_appointment_v3.
+IMPORTANTE:
+- NO elimines SERVICE_TEMPLATE_LIBRARY todavía.
+- NO elimines SERVICE_CATEGORY_RULES todavía.
+- Este paquete NO toca Mercado Pago, Google Business, planes, shell/sidebar ni navegación.
+- Los HTML ya incluyen los adaptadores D3.
+- admin-services.js ya incluye el listener de Ajustar precios por lote y deja el init legacy expuesto sin autoejecutarlo.
 
-FUERA DE ALCANCE
-- D2 Mercado Pago.
-- Envíos masivos automáticos.
-- Google Business Profile.
+Después de subir los 5 archivos a main, avísame con "listo" para verificar GitHub y luego hacemos la prueba real en navegador.
