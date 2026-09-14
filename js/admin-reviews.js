@@ -1,4 +1,4 @@
-let reviewBiz,reviewRows=[];
+let reviewBiz,reviewRows=[],reviewEntitlements=null;
 const GOOGLE_REVIEWS_CONFIGURED=window.MYCITAGO_GOOGLE_REVIEWS_ENABLED===true;
 const R=id=>document.getElementById(id);
 const safe=v=>String(v??'').replace(/[<>]/g,'');
@@ -8,6 +8,43 @@ async function connectGoogle(){if(!GOOGLE_REVIEWS_CONFIGURED)return msg('Integra
 function msg(m){const t=R('toast');if(!t)return;t.textContent=m;t.classList.remove('hidden');setTimeout(()=>t.classList.add('hidden'),2600)}
 function sourceLabel(x){return x.source==='google'?'Google':x.verified?'MyCitaGo · Cliente verificado':'MyCitaGo'}
 function normalizeInternal(x){return {...x,star_rating:x.rating,reply_comment:x.reply_text,review_id:x.id,source:x.source||'internal',create_time:x.external_created_at||x.created_at}}
+function setReviewAccessState(kind,message=''){
+  const box=R('review-access-alert'),title=R('review-access-title'),body=R('review-access-message');
+  if(!box||!title||!body)return;
+  if(kind==='ok'){box.classList.add('hidden');body.textContent='';return}
+  box.classList.remove('hidden');
+  if(kind==='locked'){title.textContent='Reseñas internas no incluidas en el plan';body.textContent=message||'Tu plan actual no tiene habilitada esta función.';return}
+  title.textContent='No pudimos cargar las reseñas';
+  body.textContent=message||'Actualiza la página. Si continúa, revisa permisos y suscripción.';
+}
+function setSummaryEmpty(){
+  if(R('review-total'))R('review-total').textContent='0';
+  if(R('review-rating'))R('review-rating').textContent='–';
+  if(R('verified-total'))R('verified-total').textContent='0';
+}
+function renderEmptyState(title,detail){
+  const host=R('reviews-list');if(!host)return;
+  host.innerHTML=`<div class="ct-empty reviews-empty"><strong>${safe(title)}</strong><span>${safe(detail)}</span></div>`;
+}
+async function loadEntitlements(){
+  const {data,error}=await supabaseClient.rpc('get_business_entitlements',{p_business_id:reviewBiz.id});
+  if(error){
+    console.error('[reviews:entitlements]',error);
+    reviewEntitlements=null;
+    setReviewAccessState('error','No fue posible validar las funciones incluidas en el plan.');
+    return {ok:false,error};
+  }
+  reviewEntitlements=data||null;
+  const enabled=reviewEntitlements?.features?.internal_reviews===true;
+  if(!enabled){
+    setSummaryEmpty();
+    setReviewAccessState('locked','Esta sección distingue ahora un bloqueo por plan de un negocio que realmente tiene 0 reseñas.');
+    renderEmptyState('Reseñas no disponibles en este plan','La función internal_reviews está deshabilitada para la suscripción actual.');
+    return {ok:true,enabled:false};
+  }
+  setReviewAccessState('ok');
+  return {ok:true,enabled:true};
+}
 function renderReviews(){
   const f=R('review-filter')?.value||'';
   let list=reviewRows;
@@ -21,8 +58,8 @@ function renderReviews(){
     else if(f==='low')list=list.filter(x=>Number(x.star_rating)<=3);
     else if(f)list=list.filter(x=>String(x.star_rating)===f);
   }
-  const host=R('reviews-list');host.replaceChildren();
-  if(!list.length){host.innerHTML='<div class="ct-empty reviews-empty"><strong>No hay reseñas con este filtro</strong><span>Las reseñas verificadas de MyCitaGo aparecerán aquí.</span></div>';return}
+  const host=R('reviews-list');if(!host)return;host.replaceChildren();
+  if(!list.length){renderEmptyState('No hay reseñas con este filtro','Las reseñas verificadas de MyCitaGo aparecerán aquí.');return}
   list.forEach(x=>{
     const a=document.createElement('article');a.className='review-card';
     const verified=x.source==='internal'&&x.verified?'<span class="verified-review-badge">✓ Cliente verificado</span>':'';
@@ -57,15 +94,24 @@ async function reply(x){
   await loadReviews();msg('Respuesta guardada');
 }
 async function loadReviews(){
+  const access=await loadEntitlements();
+  if(!access.ok||!access.enabled){reviewRows=[];return}
   const {data,error}=await supabaseClient.from('reviews')
     .select('id,appointment_id,verified,source,status,rating,comment,reviewer_name,reply_text,external_review_id,external_created_at,created_at')
     .eq('business_id',reviewBiz.id).neq('status','deleted').order('created_at',{ascending:false});
-  if(error){console.error(error);reviewRows=[]}else reviewRows=(data||[]).map(normalizeInternal);
+  if(error){
+    console.error('[reviews:query]',error);
+    reviewRows=[];setSummaryEmpty();setReviewAccessState('error','La consulta de reseñas fue rechazada. Esto ya no se mostrará como “0 reseñas”.');
+    renderEmptyState('No pudimos consultar tus reseñas','Revisa permisos de acceso del negocio y vuelve a cargar.');
+    return;
+  }
+  reviewRows=(data||[]).map(normalizeInternal);
   const published=reviewRows.filter(x=>x.status==='published'),total=published.length;
   R('review-total').textContent=total;
   R('review-rating').textContent=total?(published.reduce((a,x)=>a+Number(x.star_rating||0),0)/total).toFixed(1)+' ★':'–';
   const verifiedCount=published.filter(x=>x.source==='internal'&&x.verified).length;
   if(R('verified-total'))R('verified-total').textContent=verifiedCount;
+  setReviewAccessState('ok');
   renderReviews();
 }
 function setupGoogle(){

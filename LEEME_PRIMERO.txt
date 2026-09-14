@@ -1,33 +1,37 @@
-MYCITAGO · CONTABILIDAD OPCIÓN 2
-Fecha: 2026-09-11
+MYCITAGO · PAQUETE COMPLETO FIX RESEÑAS
+Fecha: 2026-09-14
 
-REEMPLAZA / AGREGA exactamente:
-1. admin/contabilidad.html
-2. css/admin-reports.css
-3. js/admin-accounting.js
-4. js/accounting-metrics.js   (NUEVO)
+CAUSA CONFIRMADA
+- Las 3 reseñas están en public.reviews.
+- La página pública las veía por un RPC SECURITY DEFINER.
+- El admin hacía SELECT directo y la policy RESTRICTIVE exigía internal_reviews=true.
+- pro_v2 tenía internal_reviews=false.
+- En producción ya se corrigió a true y has_feature(...) devuelve true.
 
-QUÉ HACE
-- Diseño financiero Opción 2.
-- Filtros por periodo, sucursal y profesional.
-- Ingresos por sucursal, profesional y servicio.
-- Comisión = price_charged × staff.commission_rate / 100.
-- Solo las citas completadas generan ingreso y comisión.
-- Citas confirmadas siguen separadas como ingreso proyectado.
-- Históricos sin sucursal/profesional aparecen como “Sin asignar”.
-- Gastos actuales son generales porque la tabla expenses no tiene branch_id.
-- Utilidad global = ingreso - gastos - comisiones.
-- Control fiscal se conserva.
-- IVA queda desactivado por defecto y el texto visual ya coincide.
-- Exportación CSV incluye sucursales y profesionales.
+ARCHIVOS A SUBIR A GITHUB
+1) admin/resenas.html
+2) js/admin-reviews.js
 
-NO REQUIERE SQL NUEVO.
-NO TOCA D2 / MERCADO PAGO.
+QUÉ CAMBIA EL FRONTEND
+- Valida primero get_business_entitlements.
+- Si internal_reviews está apagado, ya no muestra un falso “0”; muestra bloqueo por plan.
+- Si la consulta reviews falla, ya no lo confunde con vacío real.
+- Si la consulta funciona y no hay reseñas, muestra vacío real.
+- Mantiene moderación interna (ocultar/publicar/eliminar).
+- NO toca Google Business Profile.
+- NO toca citago-shell.js.
+- NO cambia otras features ni otras páginas.
 
-VALIDACIÓN RECOMENDADA
-- Ctrl+F5 tras publicar.
-- Selecciona un mes con citas completadas.
-- Compara suma de ingresos por sucursal contra Ingresos totales.
-- Compara suma de comisiones por profesional contra Comisiones del periodo.
-- Cambia sucursal y profesional y verifica que todos los módulos reaccionen.
-- Abre Pagos y facturación y confirma que el detalle fiscal siga editable.
+SQL
+- sql/01_enable_internal_reviews_pro_v2.sql se incluye para reproducibilidad.
+- NO necesitas ejecutarlo ahora: ya fue aplicado en producción.
+- sql/99_rollback_internal_reviews_pro_v2.sql revierte únicamente este flag.
+
+VERIFICACIÓN
+1) Publica los 2 archivos frontend.
+2) Espera GitHub Pages y Ctrl+F5.
+3) Abre /app/admin/resenas.html.
+4) Esperado para clinica:
+   Calificación: 4.0 ★
+   Reseñas: 3
+   Clientes verificados: 3

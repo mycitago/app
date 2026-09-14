@@ -1,15 +1,13 @@
 {
-  "accounting-metrics.js": {
+  "js/admin-reviews.js": {
     "exit": 0,
     "stderr": ""
   },
-  "admin-accounting.js": {
-    "exit": 0,
-    "stderr": ""
-  },
-  "unit_test": {
-    "exit": 0,
-    "stdout": "accounting-metrics tests passed",
-    "stderr": ""
+  "static_assertions": {
+    "admin_loads_versioned_js": true,
+    "entitlements_checked": true,
+    "reviews_query_present": true,
+    "google_paths_preserved": true,
+    "shell_not_in_package": true
   }
 }
