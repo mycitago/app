@@ -1,0 +1,4 @@
+/* MYCitaGo V2 — Fase 2 / Bloque 2: evita solape con navegación móvil */
+@media(max-width:1000px){
+  .settings-savebar{bottom:calc(var(--ct-mobile-nav-h,68px) + 20px + env(safe-area-inset-bottom,0px))}
+}
