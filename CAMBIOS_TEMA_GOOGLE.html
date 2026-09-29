@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>MyCitaGo — Tema claro/oscuro + Google Login | app</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="MyCitaGo — Tema claro/oscuro + Google Login" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="CITAS" />
+<meta property="og:description" content="CITAS" />
+<link rel="canonical" href="https://mycitago.github.io/app/CAMBIOS_TEMA_GOOGLE.html" />
+<meta property="og:url" content="https://mycitago.github.io/app/CAMBIOS_TEMA_GOOGLE.html" />
+<meta property="og:site_name" content="app" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="MyCitaGo — Tema claro/oscuro + Google Login" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","description":"CITAS","headline":"MyCitaGo — Tema claro/oscuro + Google Login","url":"https://mycitago.github.io/app/CAMBIOS_TEMA_GOOGLE.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/app/assets/css/style.css?v=b49e04b7df3c8314bb03944b0392696f51019dfa">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/app/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <div class="container-lg px-3 my-5 markdown-body">
+      
+      <h1><a href="https://mycitago.github.io/app/">app</a></h1>
+      
+
+      <h1 id="mycitago--tema-clarooscuro--google-login">MyCitaGo — Tema claro/oscuro + Google Login</h1>
+
+<h2 id="incluido">Incluido</h2>
+<ul>
+  <li>Tema visual claro y oscuro para Landing, Login y todas las pantallas administrativas.</li>
+  <li>Selector de tema en el topbar y persistencia con <code class="language-plaintext highlighter-rouge">localStorage</code> (<code class="language-plaintext highlighter-rouge">mycitago-ui-theme</code>).</li>
+  <li>Respeta la preferencia del sistema la primera vez.</li>
+  <li>Landing renovada en el lenguaje visual negro/violeta de MyCitaGo.</li>
+  <li>Google Login como opción principal, manteniendo correo/contraseña como respaldo.</li>
+  <li>Teléfono/WhatsApp con selector internacional; México inicia en <code class="language-plaintext highlighter-rouge">+52</code>.</li>
+  <li>No se envían SMS ni códigos de WhatsApp, por lo que este flujo no agrega costo por verificación telefónica.</li>
+  <li>Usuarios Google existentes entran al panel; usuarios Google nuevos completan nombre de negocio + teléfono y pasan al onboarding.</li>
+  <li>Edge Function <code class="language-plaintext highlighter-rouge">complete-onboarding</code> verifica el JWT y crea negocio/membresía desde servidor.</li>
+</ul>
+
+<h2 id="archivos-principales">Archivos principales</h2>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">js/ui-theme.js</code></li>
+  <li><code class="language-plaintext highlighter-rouge">css/mycitago-themes.css</code></li>
+  <li><code class="language-plaintext highlighter-rouge">admin/login.html</code></li>
+  <li><code class="language-plaintext highlighter-rouge">css/admin-login-mycitago.css</code></li>
+  <li><code class="language-plaintext highlighter-rouge">js/citago-shell.js</code></li>
+  <li><code class="language-plaintext highlighter-rouge">index.html</code></li>
+  <li><code class="language-plaintext highlighter-rouge">supabase/functions/complete-onboarding/index.ts</code></li>
+  <li><code class="language-plaintext highlighter-rouge">CONFIGURAR_GOOGLE_LOGIN.md</code></li>
+</ul>
+
+<h2 id="activación-google">Activación Google</h2>
+<p>Leer <code class="language-plaintext highlighter-rouge">CONFIGURAR_GOOGLE_LOGIN.md</code>. Google debe estar habilitado en Supabase Auth y la función <code class="language-plaintext highlighter-rouge">complete-onboarding</code> debe desplegarse.</p>
+
+
+      
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+  </body>
+</html>

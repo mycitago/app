@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>MyCitaGo V6 — orden de publicación | app</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="MyCitaGo V6 — orden de publicación" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="CITAS" />
+<meta property="og:description" content="CITAS" />
+<link rel="canonical" href="https://mycitago.github.io/app/DEPLOY_V6.html" />
+<meta property="og:url" content="https://mycitago.github.io/app/DEPLOY_V6.html" />
+<meta property="og:site_name" content="app" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="MyCitaGo V6 — orden de publicación" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","description":"CITAS","headline":"MyCitaGo V6 — orden de publicación","url":"https://mycitago.github.io/app/DEPLOY_V6.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/app/assets/css/style.css?v=b49e04b7df3c8314bb03944b0392696f51019dfa">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/app/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <div class="container-lg px-3 my-5 markdown-body">
+      
+      <h1><a href="https://mycitago.github.io/app/">app</a></h1>
+      
+
+      <h1 id="mycitago-v6--orden-de-publicación">MyCitaGo V6 — orden de publicación</h1>
+
+<h2 id="1-supabase">1. Supabase</h2>
+<p>La migración V6 ya fue validada dos veces en el proyecto real. El archivo oficial es <code class="language-plaintext highlighter-rouge">SUPABASE_V6_MASTER.sql</code>.</p>
+
+<p>No vuelvas a ejecutar migraciones históricas como <code class="language-plaintext highlighter-rouge">APLICAR_EN_SUPABASE.sql</code>.</p>
+
+<h2 id="2-github">2. GitHub</h2>
+<p>Sube <strong>el contenido</strong> del ZIP a la raíz del repositorio <code class="language-plaintext highlighter-rouge">mycitago/app</code> (no el ZIP como archivo).</p>
+
+<p>GitHub Pages debe permanecer en:</p>
+<ul>
+  <li>Source: <code class="language-plaintext highlighter-rouge">Deploy from a branch</code></li>
+  <li>Branch: <code class="language-plaintext highlighter-rouge">main</code></li>
+  <li>Folder: <code class="language-plaintext highlighter-rouge">/(root)</code></li>
+</ul>
+
+<p>El paquete V6 no incluye un workflow personalizado de Pages.</p>
+
+<p>Si el repositorio todavía conserva archivos viejos de versiones anteriores, elimina manualmente:</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">APLICAR_EN_SUPABASE.sql</code></li>
+  <li><code class="language-plaintext highlighter-rouge">js/oauth-login-flow.js</code></li>
+</ul>
+
+<p>El login V6 no depende del segundo archivo; su flujo Google está contenido en <code class="language-plaintext highlighter-rouge">admin/login.html</code>.</p>
+
+<h2 id="3-verificación-mínima-después-del-deploy">3. Verificación mínima después del deploy</h2>
+<p>Prueba en incógnito:</p>
+<ol>
+  <li><code class="language-plaintext highlighter-rouge">admin/login.html</code>: botón Google debe navegar inmediatamente.</li>
+  <li><code class="language-plaintext highlighter-rouge">admin/agenda.html</code>: debe cargar sin errores de <code class="language-plaintext highlighter-rouge">branch_id</code> ni <code class="language-plaintext highlighter-rouge">business_staff</code>.</li>
+  <li><code class="language-plaintext highlighter-rouge">admin/equipo.html</code>: alta/edición debe trabajar con <code class="language-plaintext highlighter-rouge">staff</code> y <code class="language-plaintext highlighter-rouge">service_staff</code>.</li>
+  <li><code class="language-plaintext highlighter-rouge">admin/sucursales.html</code>: debe leer <code class="language-plaintext highlighter-rouge">business_branches</code>.</li>
+  <li><code class="language-plaintext highlighter-rouge">admin/contabilidad.html</code>: debe cargar sin <code class="language-plaintext highlighter-rouge">#biz-name</code>/<code class="language-plaintext highlighter-rouge">#btn-logout</code> y usar <code class="language-plaintext highlighter-rouge">price_charged</code>.</li>
+  <li><code class="language-plaintext highlighter-rouge">admin/resenas.html</code>: mientras GBP no esté desplegado, debe mostrar “Integración no configurada” y no llamar Edge Functions.</li>
+  <li><code class="language-plaintext highlighter-rouge">reservar.html?n=&lt;slug&gt;</code>: reserva pública normal.</li>
+</ol>
+
+<h2 id="4-verificador-local-incluido">4. Verificador local incluido</h2>
+<p>Con Python instalado, desde la raíz del proyecto:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python tools/verify-v6.py
+</code></pre></div></div>
+
+<p>También puedes ejecutar las pruebas de contratos:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>node <span class="nt">--test</span> tests/<span class="k">*</span>.test.mjs
+</code></pre></div></div>
+
+
+      
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+  </body>
+</html>

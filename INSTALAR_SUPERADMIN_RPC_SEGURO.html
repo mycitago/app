@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Instalación — Super Admin con RPC seguro | app</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="Instalación — Super Admin con RPC seguro" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="CITAS" />
+<meta property="og:description" content="CITAS" />
+<link rel="canonical" href="https://mycitago.github.io/app/INSTALAR_SUPERADMIN_RPC_SEGURO.html" />
+<meta property="og:url" content="https://mycitago.github.io/app/INSTALAR_SUPERADMIN_RPC_SEGURO.html" />
+<meta property="og:site_name" content="app" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Instalación — Super Admin con RPC seguro" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","description":"CITAS","headline":"Instalación — Super Admin con RPC seguro","url":"https://mycitago.github.io/app/INSTALAR_SUPERADMIN_RPC_SEGURO.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/app/assets/css/style.css?v=b49e04b7df3c8314bb03944b0392696f51019dfa">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/app/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <div class="container-lg px-3 my-5 markdown-body">
+      
+      <h1><a href="https://mycitago.github.io/app/">app</a></h1>
+      
+
+      <h1 id="instalación--super-admin-con-rpc-seguro">Instalación — Super Admin con RPC seguro</h1>
+
+<p>Esta entrega elimina las seis lecturas administrativas sensibles que <code class="language-plaintext highlighter-rouge">admin/plataforma.html</code> hacía directamente desde el navegador.</p>
+
+<h2 id="1-aplicar-la-migración-aditiva">1. Aplicar la migración aditiva</h2>
+
+<p>En Supabase SQL Editor ejecuta únicamente:</p>
+
+<p><code class="language-plaintext highlighter-rouge">sql/platform_read_api.sql</code></p>
+
+<p>No vuelvas a ejecutar ni modifiques <code class="language-plaintext highlighter-rouge">SUPABASE_V6_MASTER.sql</code> para esta corrección.</p>
+
+<p>La migración crea exactamente seis RPC de lectura:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">platform_read_support()</code></li>
+  <li><code class="language-plaintext highlighter-rouge">platform_read_service_templates()</code></li>
+  <li><code class="language-plaintext highlighter-rouge">platform_read_business_categories()</code></li>
+  <li><code class="language-plaintext highlighter-rouge">platform_read_business_invites()</code></li>
+  <li><code class="language-plaintext highlighter-rouge">platform_read_category_change_requests()</code></li>
+  <li><code class="language-plaintext highlighter-rouge">platform_read_audit_logs()</code></li>
+</ul>
+
+<p>Cada RPC es <code class="language-plaintext highlighter-rouge">SECURITY DEFINER</code>, fija <code class="language-plaintext highlighter-rouge">search_path=public,pg_temp</code> y valida internamente <code class="language-plaintext highlighter-rouge">public.is_platform_admin(auth.uid())</code> antes de leer datos. No existe un RPC genérico que reciba nombres de tabla.</p>
+
+<h2 id="2-publicar-frontend">2. Publicar frontend</h2>
+
+<p>Sube el contenido del proyecto a GitHub Pages reemplazando los archivos existentes. Los cambios de frontend relevantes son:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">js/platform-api.js</code> (nuevo)</li>
+  <li><code class="language-plaintext highlighter-rouge">js/admin-platform.js</code></li>
+  <li><code class="language-plaintext highlighter-rouge">admin/plataforma.html</code></li>
+</ul>
+
+<p><code class="language-plaintext highlighter-rouge">platform-api.js</code> solo organiza llamadas. No autoriza usuarios; la autorización real está en PostgreSQL.</p>
+
+<h2 id="3-verificación-a4--super-admin-legítimo">3. Verificación A.4 — Super Admin legítimo</h2>
+
+<ol>
+  <li>Abre una ventana de incógnito.</li>
+  <li>Inicia sesión con el usuario que sí existe en <code class="language-plaintext highlighter-rouge">platform_admins</code>.</li>
+  <li>Abre <code class="language-plaintext highlighter-rouge">admin/plataforma.html</code>.</li>
+  <li>DevTools → Network → limpia la lista → Ctrl+F5.</li>
+  <li>Recorre las 9 secciones: Resumen, Negocios, Suscripciones, Soporte, Plantillas, Pagos, Incidencias, Integraciones y Auditoría.</li>
+  <li>No debe quedar ningún módulo en “Cargando…” ni “No se pudo cargar”.</li>
+  <li>Las llamadas <code class="language-plaintext highlighter-rouge">platform_read_*</code> deben responder 200 para el Super Admin.</li>
+</ol>
+
+<h2 id="4-prueba-negativa--usuario-no-administrador">4. Prueba negativa — usuario no administrador</h2>
+
+<p>Con una cuenta autenticada que NO esté en <code class="language-plaintext highlighter-rouge">platform_admins</code>, abre la consola del navegador en cualquier página que cargue <code class="language-plaintext highlighter-rouge">supabaseClient</code> y ejecuta, por ejemplo:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">await</span> <span class="nx">supabaseClient</span><span class="p">.</span><span class="nx">rpc</span><span class="p">(</span><span class="dl">'</span><span class="s1">platform_read_audit_logs</span><span class="dl">'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>El resultado debe contener un error <code class="language-plaintext highlighter-rouge">forbidden</code> / SQLSTATE <code class="language-plaintext highlighter-rouge">42501</code> y no debe devolver registros.</p>
+
+<p>Repite si deseas con cualquiera de los otros cinco RPC. La protección se ejecuta dentro de cada función aunque se invoque directamente y sin pasar por <code class="language-plaintext highlighter-rouge">platform-api.js</code>.</p>
+
+<h2 id="5-verificación-sql-de-firmas">5. Verificación SQL de firmas</h2>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">select</span>
+  <span class="n">to_regprocedure</span><span class="p">(</span><span class="s1">'public.platform_read_support()'</span><span class="p">)</span> <span class="k">as</span> <span class="n">support</span><span class="p">,</span>
+  <span class="n">to_regprocedure</span><span class="p">(</span><span class="s1">'public.platform_read_service_templates()'</span><span class="p">)</span> <span class="k">as</span> <span class="n">templates</span><span class="p">,</span>
+  <span class="n">to_regprocedure</span><span class="p">(</span><span class="s1">'public.platform_read_business_categories()'</span><span class="p">)</span> <span class="k">as</span> <span class="n">categories</span><span class="p">,</span>
+  <span class="n">to_regprocedure</span><span class="p">(</span><span class="s1">'public.platform_read_business_invites()'</span><span class="p">)</span> <span class="k">as</span> <span class="n">invites</span><span class="p">,</span>
+  <span class="n">to_regprocedure</span><span class="p">(</span><span class="s1">'public.platform_read_category_change_requests()'</span><span class="p">)</span> <span class="k">as</span> <span class="n">category_requests</span><span class="p">,</span>
+  <span class="n">to_regprocedure</span><span class="p">(</span><span class="s1">'public.platform_read_audit_logs()'</span><span class="p">)</span> <span class="k">as</span> <span class="n">audit</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>Las seis columnas deben devolver su firma y ninguna debe ser <code class="language-plaintext highlighter-rouge">null</code>.</p>
+
+
+      
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+  </body>
+</html>

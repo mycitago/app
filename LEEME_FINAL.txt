@@ -1,0 +1,21 @@
+MYCitaGo — paquete consolidado de nuevo diseño
+
+Este paquete parte del ZIP staging/responsive-v2 que proporcionaste y consolida:
+- diseño administrativo Teamwork;
+- reserva pública Luxe;
+- responsive;
+- navegación móvil / Más;
+- tema Claro/Oscuro/Sistema unificado;
+- modales móviles;
+- enlaces CSS activados en las páginas admin con shell canónico;
+- CSS Luxe activado en reservar.html.
+
+No se han cambiado tablas, RLS, RPC ni esquema Supabase.
+
+IMPORTANTE:
+1) Sustituye el contenido de staging/responsive-v2 con ESTE paquete, no main.
+2) Prueba login, Inicio, Agenda (5 vistas), Clientes, Servicios, Configuración, Nueva cita y reservar.html.
+3) Confirma persistencia de una cita de prueba.
+4) Solo después de esa validación se debe promover a main.
+
+AUDITORIA_FINAL.json contiene comprobaciones estructurales del paquete.

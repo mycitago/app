@@ -1,0 +1,14 @@
+{
+  "build": "2026-09-29",
+  "source_sha": "b49e04b7df3c8314bb03944b0392696f51019dfa",
+  "removed": [
+    "js/citago-mobile-shell.js",
+    "js/citago-shell-v3.block3.patch.js",
+    "js/ui-theme.block3.REPLACE.js"
+  ],
+  "notes": [
+    "Supabase schema/RLS/RPC untouched",
+    "Google OAuth redirect remains production-configured; email/password recommended for Codespaces preview",
+    "Browser/Supabase live E2E requires authenticated environment"
+  ]
+}

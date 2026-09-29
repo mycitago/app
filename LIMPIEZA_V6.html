@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Limpieza y consolidación V6 | app</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="Limpieza y consolidación V6" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="CITAS" />
+<meta property="og:description" content="CITAS" />
+<link rel="canonical" href="https://mycitago.github.io/app/LIMPIEZA_V6.html" />
+<meta property="og:url" content="https://mycitago.github.io/app/LIMPIEZA_V6.html" />
+<meta property="og:site_name" content="app" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Limpieza y consolidación V6" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","description":"CITAS","headline":"Limpieza y consolidación V6","url":"https://mycitago.github.io/app/LIMPIEZA_V6.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/app/assets/css/style.css?v=b49e04b7df3c8314bb03944b0392696f51019dfa">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/app/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <div class="container-lg px-3 my-5 markdown-body">
+      
+      <h1><a href="https://mycitago.github.io/app/">app</a></h1>
+      
+
+      <h1 id="limpieza-y-consolidación-v6">Limpieza y consolidación V6</h1>
+
+<ul>
+  <li>Agenda: <code class="language-plaintext highlighter-rouge">business_staff</code> sustituido por el modelo real <code class="language-plaintext highlighter-rouge">staff</code>.</li>
+  <li>Equipo: <code class="language-plaintext highlighter-rouge">business_staff</code> + <code class="language-plaintext highlighter-rouge">staff_services</code> eliminados del frontend; ahora usa <code class="language-plaintext highlighter-rouge">staff</code> + <code class="language-plaintext highlighter-rouge">service_staff</code>.</li>
+  <li>Sucursales: usa <code class="language-plaintext highlighter-rouge">business_branches</code> y la guía apunta al master V6.</li>
+  <li>Reportes/Finanzas: eliminadas referencias legacy <code class="language-plaintext highlighter-rouge">#biz-name</code> y <code class="language-plaintext highlighter-rouge">#btn-logout</code>; ingresos históricos calculados con <code class="language-plaintext highlighter-rouge">appointments.price_charged</code>.</li>
+  <li>Reseñas Google: integración opcional protegida por <code class="language-plaintext highlighter-rouge">window.MYCITAGO_GOOGLE_REVIEWS_ENABLED === true</code>; por defecto no invoca Edge Functions y muestra “Integración no configurada”.</li>
+  <li>Google Login: un único flujo activo, autocontenido en <code class="language-plaintext highlighter-rouge">admin/login.html</code>; se retiró del paquete el helper duplicado <code class="language-plaintext highlighter-rouge">js/oauth-login-flow.js</code>.</li>
+  <li>SQL: <code class="language-plaintext highlighter-rouge">SUPABASE_V6_MASTER.sql</code> es la única migración maestra de despliegue incluida en la raíz; se retiró <code class="language-plaintext highlighter-rouge">APLICAR_EN_SUPABASE.sql</code> del paquete para evitar ejecuciones cruzadas.</li>
+  <li>GitHub Pages: no se incluye <code class="language-plaintext highlighter-rouge">.github/workflows</code> de Pages; publicación prevista exclusivamente por <code class="language-plaintext highlighter-rouge">main → /(root)</code>.</li>
+  <li>Verificación: se añadió <code class="language-plaintext highlighter-rouge">tools/verify-v6.py</code> para revisar físicamente todas las referencias locales <code class="language-plaintext highlighter-rouge">&lt;script src&gt;</code> y <code class="language-plaintext highlighter-rouge">&lt;link href&gt;</code> con comparación case-sensitive.</li>
+</ul>
+
+
+      
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+  </body>
+</html>

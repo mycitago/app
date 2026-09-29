@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Activar Google Login en MyCitaGo | app</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="Activar Google Login en MyCitaGo" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="CITAS" />
+<meta property="og:description" content="CITAS" />
+<link rel="canonical" href="https://mycitago.github.io/app/CONFIGURAR_GOOGLE_LOGIN.html" />
+<meta property="og:url" content="https://mycitago.github.io/app/CONFIGURAR_GOOGLE_LOGIN.html" />
+<meta property="og:site_name" content="app" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Activar Google Login en MyCitaGo" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","description":"CITAS","headline":"Activar Google Login en MyCitaGo","url":"https://mycitago.github.io/app/CONFIGURAR_GOOGLE_LOGIN.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/app/assets/css/style.css?v=b49e04b7df3c8314bb03944b0392696f51019dfa">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/app/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <div class="container-lg px-3 my-5 markdown-body">
+      
+      <h1><a href="https://mycitago.github.io/app/">app</a></h1>
+      
+
+      <h1 id="activar-google-login-en-mycitago">Activar Google Login en MyCitaGo</h1>
+
+<p>El frontend ya incluye el botón <strong>Continuar con Google</strong> y el onboarding posterior para crear el negocio sin SMS.</p>
+
+<h2 id="1-google-cloud">1. Google Cloud</h2>
+<ol>
+  <li>Crea/usa un proyecto en Google Cloud Console.</li>
+  <li>Configura la pantalla de consentimiento OAuth.</li>
+  <li>Crea credenciales <strong>OAuth Client ID → Web application</strong>.</li>
+  <li>En <strong>Authorized redirect URIs</strong> agrega el callback que muestra Supabase en <code class="language-plaintext highlighter-rouge">Authentication → Providers → Google</code> (normalmente <code class="language-plaintext highlighter-rouge">https://TU-PROYECTO.supabase.co/auth/v1/callback</code>).</li>
+  <li>Copia Client ID y Client Secret.</li>
+</ol>
+
+<h2 id="2-supabase">2. Supabase</h2>
+<ol>
+  <li><code class="language-plaintext highlighter-rouge">Authentication → Providers → Google</code>.</li>
+  <li>Activa Google.</li>
+  <li>Pega Client ID y Client Secret.</li>
+  <li>En <code class="language-plaintext highlighter-rouge">Authentication → URL Configuration</code> establece Site URL: <code class="language-plaintext highlighter-rouge">https://mycitago.github.io/app/</code>.</li>
+  <li>Agrega a Redirect URLs: <code class="language-plaintext highlighter-rouge">https://mycitago.github.io/app/admin/login.html*</code>.</li>
+</ol>
+
+<h2 id="3-edge-function-para-usuarios-google-nuevos">3. Edge Function para usuarios Google nuevos</h2>
+<p>Despliega <code class="language-plaintext highlighter-rouge">supabase/functions/complete-onboarding/index.ts</code> como función <code class="language-plaintext highlighter-rouge">complete-onboarding</code>.
+La función usa las variables estándar de Supabase (<code class="language-plaintext highlighter-rouge">SUPABASE_URL</code>, <code class="language-plaintext highlighter-rouge">SUPABASE_ANON_KEY</code>, <code class="language-plaintext highlighter-rouge">SUPABASE_SERVICE_ROLE_KEY</code>) y verifica el JWT antes de crear un negocio.</p>
+
+<p>Ejemplo con Supabase CLI:
+<code class="language-plaintext highlighter-rouge">supabase functions deploy complete-onboarding</code></p>
+
+<h2 id="flujo-final">Flujo final</h2>
+<ul>
+  <li>Usuario pulsa <strong>Continuar con Google</strong>.</li>
+  <li>Google autentica al usuario.</li>
+  <li>Si ya pertenece a un negocio, entra al panel.</li>
+  <li>Si es nuevo, MyCitaGo pide nombre del negocio y teléfono internacional.</li>
+  <li>No se envía SMS; el teléfono se guarda como E.164, por ejemplo <code class="language-plaintext highlighter-rouge">+526655443322</code>.</li>
+  <li>Se crea el negocio, membresía OWNER y prueba inicial.</li>
+</ul>
+
+
+      
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+  </body>
+</html>

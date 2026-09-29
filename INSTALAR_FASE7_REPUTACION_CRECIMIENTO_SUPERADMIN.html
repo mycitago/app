@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>MyCitaGo · Fase 7 | app</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="MyCitaGo · Fase 7" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="CITAS" />
+<meta property="og:description" content="CITAS" />
+<link rel="canonical" href="https://mycitago.github.io/app/INSTALAR_FASE7_REPUTACION_CRECIMIENTO_SUPERADMIN.html" />
+<meta property="og:url" content="https://mycitago.github.io/app/INSTALAR_FASE7_REPUTACION_CRECIMIENTO_SUPERADMIN.html" />
+<meta property="og:site_name" content="app" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="MyCitaGo · Fase 7" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","description":"CITAS","headline":"MyCitaGo · Fase 7","url":"https://mycitago.github.io/app/INSTALAR_FASE7_REPUTACION_CRECIMIENTO_SUPERADMIN.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/app/assets/css/style.css?v=b49e04b7df3c8314bb03944b0392696f51019dfa">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/app/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <div class="container-lg px-3 my-5 markdown-body">
+      
+      <h1><a href="https://mycitago.github.io/app/">app</a></h1>
+      
+
+      <h1 id="mycitago--fase-7">MyCitaGo · Fase 7</h1>
+
+<h2 id="orden-de-instalación">Orden de instalación</h2>
+<ol>
+  <li>En Supabase &gt; SQL Editor, ejecuta completo <code class="language-plaintext highlighter-rouge">sql/phase7_reputation_growth_superadmin.sql</code>.</li>
+  <li>Confirma que finaliza sin error.</li>
+  <li>Sube el contenido completo de este ZIP a la raíz del repositorio <code class="language-plaintext highlighter-rouge">mycitago/app</code>, reemplazando archivos del mismo nombre.</li>
+  <li>Mantén GitHub Pages en <code class="language-plaintext highlighter-rouge">main</code> + <code class="language-plaintext highlighter-rouge">/(root)</code>.</li>
+  <li>Prueba <code class="language-plaintext highlighter-rouge">admin/plataforma.html</code>, <code class="language-plaintext highlighter-rouge">admin/resenas.html</code>, <code class="language-plaintext highlighter-rouge">admin/crecimiento.html</code>, <code class="language-plaintext highlighter-rouge">admin/contabilidad.html</code>, <code class="language-plaintext highlighter-rouge">reservar.html</code> y <code class="language-plaintext highlighter-rouge">resena.html</code>.</li>
+</ol>
+
+<h2 id="qué-añade">Qué añade</h2>
+<ul>
+  <li>Super Admin: cargas aisladas; estados error/vacío/carga; pagos, incidencias, integraciones y auditoría visibles con datos reales.</li>
+  <li>Crea solo los recursos de plataforma confirmados como faltantes: <code class="language-plaintext highlighter-rouge">business_invites</code> y <code class="language-plaintext highlighter-rouge">business_category_change_requests</code>.</li>
+  <li>Reseñas internas por cita completada con token de un solo uso.</li>
+  <li>Si Google tiene conexión activa y <code class="language-plaintext highlighter-rouge">review_url</code>, el cliente puede elegir MyCitaGo o Google.</li>
+  <li>Nueva página Crecimiento con enlaces por canal (<code class="language-plaintext highlighter-rouge">src</code>).</li>
+  <li>Atribución de reservas mediante <code class="language-plaintext highlighter-rouge">booking_source</code>, validada con <code class="language-plaintext highlighter-rouge">appointment_id + access_token</code>.</li>
+  <li>Reportes: nuevas reseñas, calificación y reservas compartidas.</li>
+  <li>Página pública: muestra reseñas publicadas de MyCitaGo y futuras reseñas Google unificadas.</li>
+</ul>
+
+<h2 id="seguridad">Seguridad</h2>
+<ul>
+  <li>No se usa <code class="language-plaintext highlighter-rouge">service_role</code> en navegador.</li>
+  <li>El Super Admin conserva <code class="language-plaintext highlighter-rouge">platform_admins</code> + <code class="language-plaintext highlighter-rouge">is_platform_admin()</code>.</li>
+  <li>El cliente no inserta directamente en <code class="language-plaintext highlighter-rouge">reviews</code>; usa RPC con token seguro.</li>
+  <li>La atribución de reserva no puede modificar una cita sin su <code class="language-plaintext highlighter-rouge">access_token</code>.</li>
+  <li>Google continúa bloqueado por el feature gate mientras no esté configurado/aprobado.</li>
+</ul>
+
+
+      
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+  </body>
+</html>

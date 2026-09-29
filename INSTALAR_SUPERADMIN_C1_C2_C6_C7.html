@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>MyCitaGo Super Admin · C1 + C2 + C6 + C7 | app</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="MyCitaGo Super Admin · C1 + C2 + C6 + C7" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="CITAS" />
+<meta property="og:description" content="CITAS" />
+<link rel="canonical" href="https://mycitago.github.io/app/INSTALAR_SUPERADMIN_C1_C2_C6_C7.html" />
+<meta property="og:url" content="https://mycitago.github.io/app/INSTALAR_SUPERADMIN_C1_C2_C6_C7.html" />
+<meta property="og:site_name" content="app" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="MyCitaGo Super Admin · C1 + C2 + C6 + C7" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","description":"CITAS","headline":"MyCitaGo Super Admin · C1 + C2 + C6 + C7","url":"https://mycitago.github.io/app/INSTALAR_SUPERADMIN_C1_C2_C6_C7.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/app/assets/css/style.css?v=b49e04b7df3c8314bb03944b0392696f51019dfa">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/app/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <div class="container-lg px-3 my-5 markdown-body">
+      
+      <h1><a href="https://mycitago.github.io/app/">app</a></h1>
+      
+
+      <h1 id="mycitago-super-admin--c1--c2--c6--c7">MyCitaGo Super Admin · C1 + C2 + C6 + C7</h1>
+
+<h2 id="qué-incluye">Qué incluye</h2>
+
+<ul>
+  <li>C1: búsqueda por nombre/correo/teléfono/slug + filtro de estado + orden por alta, vencimiento y nombre.</li>
+  <li>C2: selección múltiple y acciones <code class="language-plaintext highlighter-rouge">Suspender seleccionados</code> / <code class="language-plaintext highlighter-rouge">Reactivar seleccionados</code>.</li>
+  <li>C6: exportación CSV en Negocios, Pagos y Auditoría.</li>
+  <li>C7: estado explícito de categorías sin plantillas, cambios de giro accionables y detalle de negocio con pagos + soporte.</li>
+</ul>
+
+<h2 id="seguridad-de-c2">Seguridad de C2</h2>
+
+<p>La seguridad NO depende de <code class="language-plaintext highlighter-rouge">platform-api.js</code> ni de ocultar botones. Los nuevos RPC:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">platform_bulk_suspend(uuid[])</code></li>
+  <li><code class="language-plaintext highlighter-rouge">platform_bulk_reactivate(uuid[], integer)</code></li>
+</ul>
+
+<p>son <code class="language-plaintext highlighter-rouge">SECURITY DEFINER</code>, fijan <code class="language-plaintext highlighter-rouge">search_path = public, pg_temp</code>, validan <code class="language-plaintext highlighter-rouge">public.is_platform_admin(auth.uid())</code> internamente y revocan ejecución a <code class="language-plaintext highlighter-rouge">public</code>.</p>
+
+<p>Cada negocio procesado ejecuta su propio <code class="language-plaintext highlighter-rouge">INSERT</code> en <code class="language-plaintext highlighter-rouge">audit_logs</code>. Una acción sobre 5 negocios deja 5 filas de auditoría.</p>
+
+<h2 id="instalación">Instalación</h2>
+
+<ol>
+  <li>Sube/reemplaza el contenido completo del ZIP en GitHub Pages.</li>
+  <li>
+    <p>En Supabase &gt; SQL Editor ejecuta únicamente:</p>
+
+    <p><code class="language-plaintext highlighter-rouge">sql/platform_bulk_operations.sql</code></p>
+  </li>
+  <li>Recarga <code class="language-plaintext highlighter-rouge">admin/plataforma.html</code> con Ctrl+F5.</li>
+</ol>
+
+<p>No ejecutes de nuevo <code class="language-plaintext highlighter-rouge">SUPABASE_V6_MASTER.sql</code>. Esta entrega es aditiva y ese archivo no fue modificado.</p>
+
+<h2 id="prueba-obligatoria-antes-de-usar-acciones-en-lote-en-producción">Prueba obligatoria antes de usar acciones en lote en producción</h2>
+
+<h3 id="a-super-admin-legítimo">A. Super Admin legítimo</h3>
+
+<p>En la consola del navegador, autenticado como Super Admin:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">await</span> <span class="nx">supabaseClient</span><span class="p">.</span><span class="nx">rpc</span><span class="p">(</span><span class="dl">'</span><span class="s1">platform_bulk_suspend</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">p_business_ids</span><span class="p">:</span> <span class="p">[]</span> <span class="p">})</span>
+</code></pre></div></div>
+
+<p>Resultado esperado: <code class="language-plaintext highlighter-rouge">data.processed = 0</code> y <code class="language-plaintext highlighter-rouge">error = null</code>. La lista vacía no modifica nada.</p>
+
+<h3 id="b-usuario-no-super-admin">B. Usuario NO Super Admin</h3>
+
+<p>En una sesión normal (NO creador), ejecuta exactamente la misma llamada:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">await</span> <span class="nx">supabaseClient</span><span class="p">.</span><span class="nx">rpc</span><span class="p">(</span><span class="dl">'</span><span class="s1">platform_bulk_suspend</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span> <span class="na">p_business_ids</span><span class="p">:</span> <span class="p">[]</span> <span class="p">})</span>
+</code></pre></div></div>
+
+<p>Resultado esperado: sin datos y error PostgreSQL <code class="language-plaintext highlighter-rouge">42501</code> / <code class="language-plaintext highlighter-rouge">forbidden</code>. Si devolviera <code class="language-plaintext highlighter-rouge">processed: 0</code>, NO uses las acciones en lote y revisa la migración.</p>
+
+<h3 id="c-confirmar-también-el-candado-del-rpc-individual-sin-tocar-un-negocio-real">C. Confirmar también el candado del RPC individual sin tocar un negocio real</h3>
+
+<p>Con el usuario NO Super Admin:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">await</span> <span class="nx">supabaseClient</span><span class="p">.</span><span class="nx">rpc</span><span class="p">(</span><span class="dl">'</span><span class="s1">suspend_business</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+  <span class="na">p_business_id</span><span class="p">:</span> <span class="dl">'</span><span class="s1">00000000-0000-0000-0000-000000000000</span><span class="dl">'</span>
+<span class="p">})</span>
+</code></pre></div></div>
+
+<p>Resultado esperado: <code class="language-plaintext highlighter-rouge">forbidden</code>. Como la autorización se evalúa antes de buscar el negocio, no existe riesgo de suspender un negocio real.</p>
+
+<h2 id="auditoría-por-fila">Auditoría por fila</h2>
+
+<p>Después de probar una acción real de lote sobre, por ejemplo, 5 negocios, verifica:</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">select</span> <span class="n">business_id</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">entity_id</span><span class="p">,</span> <span class="n">created_at</span><span class="p">,</span> <span class="n">metadata</span>
+<span class="k">from</span> <span class="k">public</span><span class="p">.</span><span class="n">audit_logs</span>
+<span class="k">where</span> <span class="n">action</span> <span class="k">in</span> <span class="p">(</span><span class="s1">'business_suspended'</span><span class="p">,</span><span class="s1">'business_reactivated'</span><span class="p">)</span>
+<span class="k">order</span> <span class="k">by</span> <span class="n">created_at</span> <span class="k">desc</span>
+<span class="k">limit</span> <span class="mi">20</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>Deben existir filas independientes por <code class="language-plaintext highlighter-rouge">business_id</code>. La metadata de esta entrega usa <code class="language-plaintext highlighter-rouge">source = super_admin_bulk</code>.</p>
+
+<h2 id="archivos-principales-modificados">Archivos principales modificados</h2>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">admin/plataforma.html</code></li>
+  <li><code class="language-plaintext highlighter-rouge">js/admin-platform.js</code></li>
+  <li><code class="language-plaintext highlighter-rouge">js/platform-api.js</code></li>
+  <li><code class="language-plaintext highlighter-rouge">css/admin-platform.css</code></li>
+  <li><code class="language-plaintext highlighter-rouge">sql/platform_bulk_operations.sql</code></li>
+</ul>
+
+<p>Pruebas nuevas:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">tests/platform-bulk-security.test.mjs</code></li>
+  <li><code class="language-plaintext highlighter-rouge">tests/platform-business-operations.test.mjs</code></li>
+  <li><code class="language-plaintext highlighter-rouge">tests/platform-csv-export.test.mjs</code></li>
+  <li><code class="language-plaintext highlighter-rouge">tests/platform-c7-completeness.test.mjs</code></li>
+</ul>
+
+
+      
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+  </body>
+</html>

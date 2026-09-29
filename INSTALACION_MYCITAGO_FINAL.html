@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>MyCitaGo — Instalación de la actualización integral | app</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="MyCitaGo — Instalación de la actualización integral" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="CITAS" />
+<meta property="og:description" content="CITAS" />
+<link rel="canonical" href="https://mycitago.github.io/app/INSTALACION_MYCITAGO_FINAL.html" />
+<meta property="og:url" content="https://mycitago.github.io/app/INSTALACION_MYCITAGO_FINAL.html" />
+<meta property="og:site_name" content="app" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="MyCitaGo — Instalación de la actualización integral" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","description":"CITAS","headline":"MyCitaGo — Instalación de la actualización integral","url":"https://mycitago.github.io/app/INSTALACION_MYCITAGO_FINAL.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/app/assets/css/style.css?v=b49e04b7df3c8314bb03944b0392696f51019dfa">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/app/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <div class="container-lg px-3 my-5 markdown-body">
+      
+      <h1><a href="https://mycitago.github.io/app/">app</a></h1>
+      
+
+      <h1 id="mycitago--instalación-de-la-actualización-integral">MyCitaGo — Instalación de la actualización integral</h1>
+
+<h2 id="1-publicar-frontend">1. Publicar frontend</h2>
+<p>Sube/reemplaza <strong>todo el contenido de esta carpeta <code class="language-plaintext highlighter-rouge">app-main</code></strong> en la rama <code class="language-plaintext highlighter-rouge">main</code> de <code class="language-plaintext highlighter-rouge">mycitago/app</code>.
+No subas el ZIP como un archivo: sube su contenido respetando carpetas y rutas.</p>
+
+<p>Después espera a que GitHub Pages termine <code class="language-plaintext highlighter-rouge">build</code> y <code class="language-plaintext highlighter-rouge">deploy</code> y recarga con <code class="language-plaintext highlighter-rouge">Ctrl + F5</code>.</p>
+
+<h2 id="2-actualizar-supabase">2. Actualizar Supabase</h2>
+<p>En Supabase → SQL Editor ejecuta <strong>una sola vez</strong> el archivo:</p>
+
+<p><code class="language-plaintext highlighter-rouge">APLICAR_EN_SUPABASE.sql</code></p>
+
+<p>Además de los objetos anteriores, esta versión incorpora:</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">business_categories</code></li>
+  <li><code class="language-plaintext highlighter-rouge">service_templates</code></li>
+  <li><code class="language-plaintext highlighter-rouge">service_commercial_settings</code></li>
+  <li><code class="language-plaintext highlighter-rouge">service_exceptions</code></li>
+  <li><code class="language-plaintext highlighter-rouge">service_versions</code></li>
+  <li><code class="language-plaintext highlighter-rouge">support_tickets</code></li>
+  <li><code class="language-plaintext highlighter-rouge">support_messages</code></li>
+</ul>
+
+<p>El SQL mantiene RLS y aislamiento por <code class="language-plaintext highlighter-rouge">business_id</code>.</p>
+
+<h2 id="3-google-reviews">3. Google Reviews</h2>
+<p>La integración Google que ya forma parte del proyecto sigue requiriendo secretos únicamente en Supabase Edge Functions. No pongas secretos de Google en GitHub Pages.</p>
+
+<p>Configura en Supabase:</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">GOOGLE_CLIENT_ID</code></li>
+  <li><code class="language-plaintext highlighter-rouge">GOOGLE_CLIENT_SECRET</code></li>
+  <li><code class="language-plaintext highlighter-rouge">GOOGLE_STATE_SECRET</code></li>
+  <li><code class="language-plaintext highlighter-rouge">GOOGLE_REDIRECT_URI</code></li>
+  <li><code class="language-plaintext highlighter-rouge">PUBLIC_APP_URL=https://mycitago.github.io/app</code></li>
+</ul>
+
+<p>Y despliega las Edge Functions Google incluidas en <code class="language-plaintext highlighter-rouge">supabase/functions/</code>.</p>
+
+<h2 id="4-pantallas-principales-para-validar">4. Pantallas principales para validar</h2>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">/admin/index.html</code> — dashboard compacto</li>
+  <li><code class="language-plaintext highlighter-rouge">/admin/agenda.html</code> — agenda semanal</li>
+  <li><code class="language-plaintext highlighter-rouge">/admin/servicios.html</code> — servicios guiados + plantillas + inteligencia</li>
+  <li><code class="language-plaintext highlighter-rouge">/admin/clientes.html</code> — CRM</li>
+  <li><code class="language-plaintext highlighter-rouge">/admin/ayuda.html</code> — soporte al negocio</li>
+  <li><code class="language-plaintext highlighter-rouge">/admin/onboarding.html</code> — onboarding por giro</li>
+  <li><code class="language-plaintext highlighter-rouge">/admin/mi-pagina.html</code> — personalización pública</li>
+  <li><code class="language-plaintext highlighter-rouge">/admin/resenas.html</code> — Google Reviews</li>
+  <li><code class="language-plaintext highlighter-rouge">/admin/contabilidad.html</code> — reportes/finanzas</li>
+  <li><code class="language-plaintext highlighter-rouge">/admin/plataforma.html</code> — Centro de Operaciones Super Admin</li>
+  <li><code class="language-plaintext highlighter-rouge">/reservar.html?n=&lt;slug&gt;</code> — reserva pública</li>
+  <li><code class="language-plaintext highlighter-rouge">/index.html</code> — landing MyCitaGo</li>
+</ul>
+
+<h2 id="5-flujo-nuevo-de-servicios">5. Flujo nuevo de Servicios</h2>
+<p>El negocio puede:</p>
+<ol>
+  <li>elegir su giro;</li>
+  <li>seleccionar un servicio precargado;</li>
+  <li>poner precio y duración;</li>
+  <li>heredar horario del negocio o personalizarlo;</li>
+  <li>ver capacidad, ingreso potencial y margen;</li>
+  <li>guardar/publicar;</li>
+  <li>usar ajustes avanzados sólo cuando los necesite.</li>
+</ol>
+
+<h2 id="6-soporte">6. Soporte</h2>
+<p>Los negocios pueden crear tickets desde <code class="language-plaintext highlighter-rouge">Ayuda</code>. El Super Admin recibe los tickets en <code class="language-plaintext highlighter-rouge">plataforma.html</code>, puede responder y cambiar su estado.</p>
+
+<h2 id="7-imágenes-precargadas">7. Imágenes precargadas</h2>
+<p>Se incluyen recursos de marca, marketing y servicios en:</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">assets/brand/</code></li>
+  <li><code class="language-plaintext highlighter-rouge">assets/marketing/</code></li>
+  <li><code class="language-plaintext highlighter-rouge">assets/service-presets/</code></li>
+</ul>
+
+<h2 id="8-importante">8. Importante</h2>
+<p>No renombres variables internas antiguas como <code class="language-plaintext highlighter-rouge">CITAS_CONFIG</code> sólo por el cambio de marca: son identificadores técnicos y cambiarlos podría romper compatibilidad.</p>
+
+
+      
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+  </body>
+</html>
