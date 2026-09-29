@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>MyCitaGo Consolidation Implementation Plan | app</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="MyCitaGo Consolidation Implementation Plan" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="CITAS" />
+<meta property="og:description" content="CITAS" />
+<link rel="canonical" href="https://mycitago.github.io/app/docs/superpowers/plans/2026-09-01-mycitago-consolidation.html" />
+<meta property="og:url" content="https://mycitago.github.io/app/docs/superpowers/plans/2026-09-01-mycitago-consolidation.html" />
+<meta property="og:site_name" content="app" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="MyCitaGo Consolidation Implementation Plan" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","description":"CITAS","headline":"MyCitaGo Consolidation Implementation Plan","url":"https://mycitago.github.io/app/docs/superpowers/plans/2026-09-01-mycitago-consolidation.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/app/assets/css/style.css?v=b49e04b7df3c8314bb03944b0392696f51019dfa">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/app/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <div class="container-lg px-3 my-5 markdown-body">
+      
+      <h1><a href="https://mycitago.github.io/app/">app</a></h1>
+      
+
+      <h1 id="mycitago-consolidation-implementation-plan">MyCitaGo Consolidation Implementation Plan</h1>
+
+<blockquote>
+  <p><strong>For agentic workers:</strong> REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (<code class="language-plaintext highlighter-rouge">- [ ]</code>) syntax for tracking.</p>
+</blockquote>
+
+<p><strong>Goal:</strong> Deliver one complete MyCitaGo package with agenda views, public-page theme editor, branches/team, locked business category, robust Super Admin, and invitations.</p>
+
+<p><strong>Architecture:</strong> Extend the existing static GitHub Pages frontend and Supabase backend. Keep shared shell and existing auth/RLS patterns; add additive SQL migrations and small focused JS modules while preserving existing public booking and support flows.</p>
+
+<p><strong>Tech Stack:</strong> HTML/CSS/JavaScript, Supabase Auth/Postgres/RLS/Edge Functions, Node contract tests.</p>
+
+<p><strong>Spec:</strong> <code class="language-plaintext highlighter-rouge">docs/superpowers/specs/2026-09-01-mycitago-consolidation.md</code></p>
+
+<h2 id="global-constraints">Global Constraints</h2>
+<ul>
+  <li>Do not expose service_role or Google client secrets in frontend.</li>
+  <li>Preserve multi-tenant isolation by business_id.</li>
+  <li>Tenant admin stays light with dark sidebar.</li>
+  <li>Public page supports Light, Dark, Custom.</li>
+  <li>Business category is immutable after onboarding except through support/Super Admin approval.</li>
+  <li>All new SQL must be idempotent.</li>
+</ul>
+
+<hr />
+
+<h3 id="task-1-complete-operational-schema">Task 1: Complete operational schema</h3>
+<p><strong>Files:</strong></p>
+<ul class="task-list">
+  <li>Create: <code class="language-plaintext highlighter-rouge">sql/consolidation_schema.sql</code></li>
+  <li>Modify: <code class="language-plaintext highlighter-rouge">APLICAR_EN_SUPABASE.sql</code></li>
+  <li>
+    <p>Test: <code class="language-plaintext highlighter-rouge">tests/consolidation-schema.test.mjs</code></p>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Write failing contract assertions for branches, staff, invitations, incidents, and category approval RPC.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Run test and confirm failure.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Add idempotent tables, indexes, RLS, grants and RPCs.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Append migration to master SQL.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Run test and confirm pass.</li>
+</ul>
+
+<h3 id="task-2-rebuild-agenda-views">Task 2: Rebuild Agenda views</h3>
+<p><strong>Files:</strong></p>
+<ul class="task-list">
+  <li>Modify: <code class="language-plaintext highlighter-rouge">admin/agenda.html</code></li>
+  <li>Modify: <code class="language-plaintext highlighter-rouge">js/admin-agenda.js</code></li>
+  <li>Modify: <code class="language-plaintext highlighter-rouge">css/admin-agenda.css</code></li>
+  <li>
+    <p>Test: <code class="language-plaintext highlighter-rouge">tests/agenda-views.test.mjs</code></p>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Assert Day/3-day/Week/Month/List controls and no duplicate top-shell action.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Implement persisted view selector and client-side renderers from one normalized appointment dataset.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Add branch/staff/service filters with graceful empty states.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Verify test pass and JS syntax.</li>
+</ul>
+
+<h3 id="task-3-rebuild-public-page-designer">Task 3: Rebuild public page designer</h3>
+<p><strong>Files:</strong></p>
+<ul class="task-list">
+  <li>Modify: <code class="language-plaintext highlighter-rouge">admin/mi-pagina.html</code></li>
+  <li>Modify: <code class="language-plaintext highlighter-rouge">js/admin-branding.js</code></li>
+  <li>Modify: <code class="language-plaintext highlighter-rouge">css/admin-branding.css</code></li>
+  <li>Modify: <code class="language-plaintext highlighter-rouge">js/public-branding.js</code></li>
+  <li>Modify: <code class="language-plaintext highlighter-rouge">reservar.html</code></li>
+  <li>
+    <p>Test: <code class="language-plaintext highlighter-rouge">tests/public-page-designer.test.mjs</code></p>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Assert Light/Dark/Custom controls, share actions, QR container, no preset-image gallery, real-service preview hooks.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Implement immediate preview and draft persistence.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Publish theme mode in published_config and apply it publicly.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Add share actions: copy, WhatsApp, mailto, open, QR.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Verify tests and syntax.</li>
+</ul>
+
+<h3 id="task-4-native-team-and-branches">Task 4: Native Team and Branches</h3>
+<p><strong>Files:</strong></p>
+<ul class="task-list">
+  <li>Modify: <code class="language-plaintext highlighter-rouge">admin/equipo.html</code></li>
+  <li>Modify: <code class="language-plaintext highlighter-rouge">js/admin-team.js</code></li>
+  <li>Create: <code class="language-plaintext highlighter-rouge">admin/sucursales.html</code></li>
+  <li>Create: <code class="language-plaintext highlighter-rouge">js/admin-branches.js</code></li>
+  <li>Create: <code class="language-plaintext highlighter-rouge">css/admin-team.css</code></li>
+  <li>Modify: <code class="language-plaintext highlighter-rouge">js/citago-shell.js</code></li>
+  <li>
+    <p>Test: <code class="language-plaintext highlighter-rouge">tests/team-branches.test.mjs</code></p>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Assert no legacy backend message and presence of Supabase-backed team/branch actions.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Implement team CRUD from business_staff, assignments and service links.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Implement branch CRUD with one-primary-branch default behavior.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Add Sucursales navigation item.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Verify tests and syntax.</li>
+</ul>
+
+<h3 id="task-5-lock-business-category">Task 5: Lock business category</h3>
+<p><strong>Files:</strong></p>
+<ul class="task-list">
+  <li>Modify: <code class="language-plaintext highlighter-rouge">admin/configuracion.html</code></li>
+  <li>Modify: <code class="language-plaintext highlighter-rouge">js/admin-settings.js</code></li>
+  <li>Modify: <code class="language-plaintext highlighter-rouge">admin/onboarding.html</code></li>
+  <li>Modify: <code class="language-plaintext highlighter-rouge">js/admin-onboarding.js</code></li>
+  <li>
+    <p>Test: <code class="language-plaintext highlighter-rouge">tests/category-lock.test.mjs</code></p>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Assert locked-category UI and support-request action.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Persist category once at onboarding and render read-only afterwards.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Create category-change support request through RPC/table.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Verify tests and syntax.</li>
+</ul>
+
+<h3 id="task-6-super-admin-resilience-and-invitations">Task 6: Super Admin resilience and invitations</h3>
+<p><strong>Files:</strong></p>
+<ul class="task-list">
+  <li>Modify: <code class="language-plaintext highlighter-rouge">admin/plataforma.html</code></li>
+  <li>Modify: <code class="language-plaintext highlighter-rouge">js/admin-platform.js</code></li>
+  <li>Modify: <code class="language-plaintext highlighter-rouge">css/admin-platform.css</code></li>
+  <li>Modify: <code class="language-plaintext highlighter-rouge">sql/platform_dashboard_rpc.sql</code></li>
+  <li>
+    <p>Test: <code class="language-plaintext highlighter-rouge">tests/platform-operations.test.mjs</code></p>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Assert invite-business UI, 0-value KPI fallbacks, logout and category-request controls.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Make snapshot resilient to empty optional data and include incidents/invites/category requests.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Implement invite creation + copy/WhatsApp/email.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Implement approval/rejection for category requests.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Verify tests and syntax.</li>
+</ul>
+
+<h3 id="task-7-shell-cleanup-and-final-verification">Task 7: Shell cleanup and final verification</h3>
+<p><strong>Files:</strong></p>
+<ul class="task-list">
+  <li>Modify: <code class="language-plaintext highlighter-rouge">js/citago-shell.js</code></li>
+  <li>Modify: <code class="language-plaintext highlighter-rouge">css/citago-admin.css</code></li>
+  <li>
+    <p>Test: all test files + <code class="language-plaintext highlighter-rouge">tools/verify-admin-pages.py</code></p>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Remove tenant moon toggle and stray legacy navigation fragments.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Ensure a single New Appointment action per context.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Run all Node tests.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Run all JS syntax checks.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Run admin-page verifier.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Package full repo ZIP with installation guide.</li>
+</ul>
+
+
+      
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+  </body>
+</html>

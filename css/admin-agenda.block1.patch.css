@@ -1,0 +1,24 @@
+/* MYCitaGo V2 — Phase 2 / Block 1: Agenda responsive containment */
+.agenda-page,.agenda-page>*{min-width:0;max-width:100%}
+.calendar-shell{max-width:100%;overscroll-behavior-inline:contain;-webkit-overflow-scrolling:touch}
+@media(max-width:900px){
+  .agenda-date-actions{max-width:100%;flex-wrap:wrap}
+  .agenda-toolbar{min-width:0}
+  .agenda-view-switch,.agenda-filters{width:100%;max-width:100%;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-inline:contain}
+  .agenda-view-switch{justify-content:flex-start}
+  .agenda-view-switch button{flex:0 0 auto;white-space:nowrap}
+  .agenda-filters select{flex:0 0 auto;min-width:150px;max-width:82vw}
+  .agenda-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .agenda-summary>div{min-width:0}
+  .agenda-summary strong{overflow-wrap:anywhere}
+}
+@media(max-width:420px){
+  .agenda-page{gap:14px}
+  .agenda-summary{grid-template-columns:1fr}
+  .agenda-summary>div{padding:14px}
+  .calendar-head{grid-template-columns:56px repeat(var(--agenda-cols,7),minmax(112px,1fr));min-width:760px}
+  .calendar-body{grid-template-columns:56px 1fr;min-width:760px}
+  .calendar-grid{grid-template-columns:repeat(var(--agenda-cols,7),minmax(112px,1fr))}
+  .month-weekdays,.month-grid{min-width:700px}
+  .agenda-month{overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-inline:contain}
+}

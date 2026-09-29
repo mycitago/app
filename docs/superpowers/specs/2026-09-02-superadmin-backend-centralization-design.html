@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>MyCitaGo Super Admin Backend Centralization Design | app</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="MyCitaGo Super Admin Backend Centralization Design" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="CITAS" />
+<meta property="og:description" content="CITAS" />
+<link rel="canonical" href="https://mycitago.github.io/app/docs/superpowers/specs/2026-09-02-superadmin-backend-centralization-design.html" />
+<meta property="og:url" content="https://mycitago.github.io/app/docs/superpowers/specs/2026-09-02-superadmin-backend-centralization-design.html" />
+<meta property="og:site_name" content="app" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="MyCitaGo Super Admin Backend Centralization Design" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","description":"CITAS","headline":"MyCitaGo Super Admin Backend Centralization Design","url":"https://mycitago.github.io/app/docs/superpowers/specs/2026-09-02-superadmin-backend-centralization-design.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/app/assets/css/style.css?v=b49e04b7df3c8314bb03944b0392696f51019dfa">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/app/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <div class="container-lg px-3 my-5 markdown-body">
+      
+      <h1><a href="https://mycitago.github.io/app/">app</a></h1>
+      
+
+      <h1 id="mycitago-super-admin-backend-centralization-design">MyCitaGo Super Admin Backend Centralization Design</h1>
+
+<h2 id="goal">Goal</h2>
+<p>Eliminate the Super Admin’s six sensitive direct browser reads and replace them with six explicit, allow-listed Supabase RPCs while keeping existing V6 and Blocks 1-3 behavior intact.</p>
+
+<h2 id="security-boundary">Security boundary</h2>
+<p><code class="language-plaintext highlighter-rouge">js/platform-api.js</code> is only an organization boundary in the browser. It is not trusted for authorization. Every new RPC is <code class="language-plaintext highlighter-rouge">security definer</code>, fixes <code class="language-plaintext highlighter-rouge">search_path</code> to <code class="language-plaintext highlighter-rouge">public, pg_temp</code>, and checks <code class="language-plaintext highlighter-rouge">public.is_platform_admin(auth.uid())</code> before reading any platform data. Direct invocation from the browser console by a non-admin must fail with <code class="language-plaintext highlighter-rouge">forbidden</code>.</p>
+
+<h2 id="rpc-surface">RPC surface</h2>
+<p>Exactly six new read RPCs are added; there is no generic table-name or dynamic-SQL reader:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">platform_read_support()</code></li>
+  <li><code class="language-plaintext highlighter-rouge">platform_read_service_templates()</code></li>
+  <li><code class="language-plaintext highlighter-rouge">platform_read_business_categories()</code></li>
+  <li><code class="language-plaintext highlighter-rouge">platform_read_business_invites()</code></li>
+  <li><code class="language-plaintext highlighter-rouge">platform_read_category_change_requests()</code></li>
+  <li><code class="language-plaintext highlighter-rouge">platform_read_audit_logs()</code></li>
+</ul>
+
+<p>Each function returns only the data needed by <code class="language-plaintext highlighter-rouge">admin/plataforma.html</code>, as JSONB arrays. Existing mutation RPCs and the existing <code class="language-plaintext highlighter-rouge">platform_dashboard_snapshot()</code> remain unchanged.</p>
+
+<h2 id="frontend">Frontend</h2>
+<p>Create <code class="language-plaintext highlighter-rouge">js/platform-api.js</code> as a thin adapter over the six RPCs. <code class="language-plaintext highlighter-rouge">js/admin-platform.js</code> consumes that adapter and no longer performs direct <code class="language-plaintext highlighter-rouge">.from(...).select(...)</code> reads against the six sensitive tables. Per-module error handling remains independent using <code class="language-plaintext highlighter-rouge">Promise.allSettled</code>.</p>
+
+<h2 id="migration">Migration</h2>
+<p>Create a new additive migration <code class="language-plaintext highlighter-rouge">sql/platform_read_api.sql</code>. Do not modify <code class="language-plaintext highlighter-rouge">SUPABASE_V6_MASTER.sql</code>. The migration adds the UUID overload <code class="language-plaintext highlighter-rouge">public.is_platform_admin(uuid)</code> only to make authorization explicit at every RPC boundary, then defines/replaces the six named read RPCs. It revokes public execution and grants execute only to <code class="language-plaintext highlighter-rouge">authenticated</code>.</p>
+
+<h2 id="verification">Verification</h2>
+<p>Automated contracts must prove:</p>
+
+<ol>
+  <li>Six and only six named read RPCs exist in the new migration.</li>
+  <li>Each RPC is <code class="language-plaintext highlighter-rouge">security definer</code>, has a fixed <code class="language-plaintext highlighter-rouge">search_path</code>, and calls <code class="language-plaintext highlighter-rouge">public.is_platform_admin(auth.uid())</code>.</li>
+  <li>No generic table-name parameter/dynamic SQL reader exists.</li>
+  <li><code class="language-plaintext highlighter-rouge">admin-platform.js</code> contains no direct select reads for the six sensitive tables.</li>
+  <li><code class="language-plaintext highlighter-rouge">platform-api.js</code> calls each named RPC.</li>
+  <li><code class="language-plaintext highlighter-rouge">SUPABASE_V6_MASTER.sql</code> remains byte-for-byte unchanged during this change.</li>
+  <li>Full existing tests, V6 verifier, JS syntax checks, and ZIP integrity pass.</li>
+</ol>
+
+<p>Live Supabase verification remains required after deployment: legitimate Super Admin loads all nine sections with no app-generated 403; a non-admin calling any of the six RPCs directly receives <code class="language-plaintext highlighter-rouge">forbidden</code>.</p>
+
+
+      
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+  </body>
+</html>

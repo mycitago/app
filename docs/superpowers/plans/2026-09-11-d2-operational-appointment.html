@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>D2 Modelo Operativo de Cita Implementation Plan | app</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="D2 Modelo Operativo de Cita Implementation Plan" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="CITAS" />
+<meta property="og:description" content="CITAS" />
+<link rel="canonical" href="https://mycitago.github.io/app/docs/superpowers/plans/2026-09-11-d2-operational-appointment.html" />
+<meta property="og:url" content="https://mycitago.github.io/app/docs/superpowers/plans/2026-09-11-d2-operational-appointment.html" />
+<meta property="og:site_name" content="app" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="D2 Modelo Operativo de Cita Implementation Plan" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","description":"CITAS","headline":"D2 Modelo Operativo de Cita Implementation Plan","url":"https://mycitago.github.io/app/docs/superpowers/plans/2026-09-11-d2-operational-appointment.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/app/assets/css/style.css?v=b49e04b7df3c8314bb03944b0392696f51019dfa">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/app/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <div class="container-lg px-3 my-5 markdown-body">
+      
+      <h1><a href="https://mycitago.github.io/app/">app</a></h1>
+      
+
+      <h1 id="d2-modelo-operativo-de-cita-implementation-plan">D2 Modelo Operativo de Cita Implementation Plan</h1>
+
+<blockquote>
+  <p><strong>For agentic workers:</strong> REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task.</p>
+</blockquote>
+
+<p><strong>Goal:</strong> Completar pagos/anticipos, estado de reseña y Checkout Pro Mercado Pago para citas.</p>
+
+<p><strong>Architecture:</strong> Mantener <code class="language-plaintext highlighter-rouge">appointments</code> como cabecera, <code class="language-plaintext highlighter-rouge">customer_payments</code> como fuente de pagos y <code class="language-plaintext highlighter-rouge">review_requests</code> como fuente de solicitudes. Edge Functions ejecutan checkout/webhook; Agenda consume tablas aisladas por <code class="language-plaintext highlighter-rouge">business_id</code>.</p>
+
+<p><strong>Tech Stack:</strong> Supabase/PostgreSQL, Edge Functions Deno/TypeScript, Supabase JS v2, GitHub Pages vanilla JS.</p>
+
+<p><strong>Spec:</strong> <code class="language-plaintext highlighter-rouge">docs/superpowers/specs/2026-09-11-d2-operational-appointment-design.md</code></p>
+
+<h2 id="global-constraints">Global Constraints</h2>
+<ul>
+  <li>No D3-D5.</li>
+  <li>No borrar historial Stripe.</li>
+  <li>RLS por <code class="language-plaintext highlighter-rouge">business_id</code>.</li>
+  <li>Sin tokens Mercado Pago en navegador.</li>
+  <li>Webhook con firma verificada.</li>
+</ul>
+
+
+      
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+  </body>
+</html>

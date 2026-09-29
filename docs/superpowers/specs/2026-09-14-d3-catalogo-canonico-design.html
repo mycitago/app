@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>D3 · Catálogo canónico de servicios (R2) | app</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="D3 · Catálogo canónico de servicios (R2)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="CITAS" />
+<meta property="og:description" content="CITAS" />
+<link rel="canonical" href="https://mycitago.github.io/app/docs/superpowers/specs/2026-09-14-d3-catalogo-canonico-design.html" />
+<meta property="og:url" content="https://mycitago.github.io/app/docs/superpowers/specs/2026-09-14-d3-catalogo-canonico-design.html" />
+<meta property="og:site_name" content="app" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="D3 · Catálogo canónico de servicios (R2)" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","description":"CITAS","headline":"D3 · Catálogo canónico de servicios (R2)","url":"https://mycitago.github.io/app/docs/superpowers/specs/2026-09-14-d3-catalogo-canonico-design.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/app/assets/css/style.css?v=b49e04b7df3c8314bb03944b0392696f51019dfa">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/app/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <div class="container-lg px-3 my-5 markdown-body">
+      
+      <h1><a href="https://mycitago.github.io/app/">app</a></h1>
+      
+
+      <h1 id="d3--catálogo-canónico-de-servicios-r2">D3 · Catálogo canónico de servicios (R2)</h1>
+
+<p><strong>Fecha:</strong> 2026-09-14<br />
+<strong>Estado:</strong> Especificación aprobada en diseño; pendiente de revisión final del usuario antes de plan de implementación.</p>
+
+<h2 id="1-objetivo">1. Objetivo</h2>
+
+<p>Eliminar la duplicidad de fuentes de plantillas de servicios y convertir <code class="language-plaintext highlighter-rouge">public.service_templates</code> en la única fuente funcional de verdad para:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">admin/onboarding.html</code> / <code class="language-plaintext highlighter-rouge">js/admin-onboarding.js</code></li>
+  <li><code class="language-plaintext highlighter-rouge">admin/servicios.html</code> / <code class="language-plaintext highlighter-rouge">js/admin-services.js</code></li>
+</ul>
+
+<p>El bloque D3 debe resolver únicamente R2: catálogo duplicado/no canónico.</p>
+
+<h2 id="2-fuera-de-alcance">2. Fuera de alcance</h2>
+
+<p>D3 no debe absorber otros frentes:</p>
+
+<ul>
+  <li><strong>R5 / F3:</strong> no se cambia el shell, sidebar, navegación, ni se hace consolidación visual completa.</li>
+  <li><strong>D4:</strong> no se agregan ni modifican límites por plan; no se introduce <code class="language-plaintext highlighter-rouge">max_services</code>.</li>
+  <li><strong>D2:</strong> no se toca Mercado Pago ni pagos.</li>
+  <li>No se toca Reseñas.</li>
+  <li>No se toca Crecimiento.</li>
+  <li>No se toca Google Business Profile.</li>
+  <li>No se cambia todavía la política RLS global de lectura de <code class="language-plaintext highlighter-rouge">service_templates</code>.</li>
+</ul>
+
+<h2 id="3-estado-actual-confirmado">3. Estado actual confirmado</h2>
+
+<h3 id="31-onboarding">3.1 Onboarding</h3>
+
+<p><code class="language-plaintext highlighter-rouge">js/admin-onboarding.js</code> ya consulta <code class="language-plaintext highlighter-rouge">service_templates</code> por <code class="language-plaintext highlighter-rouge">business_category_id</code> y <code class="language-plaintext highlighter-rouge">active=true</code>.</p>
+
+<p>También:</p>
+
+<ul>
+  <li>usa <code class="language-plaintext highlighter-rouge">business_category_id</code> del negocio;</li>
+  <li>respeta <code class="language-plaintext highlighter-rouge">business_category_locked</code>;</li>
+  <li>carga servicios existentes del negocio;</li>
+  <li>compara servicios existentes por nombre normalizado;</li>
+  <li>actualiza el servicio existente si coincide, en lugar de duplicarlo.</li>
+</ul>
+
+<h3 id="32-servicios">3.2 Servicios</h3>
+
+<p><code class="language-plaintext highlighter-rouge">js/admin-services.js</code> mantiene actualmente un <code class="language-plaintext highlighter-rouge">SERVICE_TEMPLATE_LIBRARY</code> hardcodeado que duplica el catálogo.</p>
+
+<p>Este catálogo también se usa para:</p>
+
+<ul>
+  <li>resolver el giro actual;</li>
+  <li>decidir categorías válidas;</li>
+  <li>renderizar plantillas;</li>
+  <li>validar que una plantilla corresponde al giro.</li>
+</ul>
+
+<p>D3 elimina este objeto como <strong>fuente funcional</strong> una vez que esas rutas dependan del catálogo canónico.</p>
+
+<h3 id="33-persistencia-de-servicios-existentes">3.3 Persistencia de servicios existentes</h3>
+
+<p><code class="language-plaintext highlighter-rouge">public.services</code> no tiene una dependencia obligatoria con <code class="language-plaintext highlighter-rouge">service_templates</code>:</p>
+
+<ul>
+  <li>no existe <code class="language-plaintext highlighter-rouge">template_id</code>;</li>
+  <li>cada servicio conserva nombre, precio, duración, categoría, imagen, buffer, anticipo, estado y demás datos de manera independiente.</li>
+</ul>
+
+<p>Por lo tanto, el cambio de fuente de plantillas no modifica ni elimina servicios existentes.</p>
+
+<h2 id="4-diseño-de-seguridad">4. Diseño de seguridad</h2>
+
+<p>Se agregará un RPC:</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span><span class="p">.</span><span class="n">get_business_service_templates</span><span class="p">(</span><span class="n">p_business_id</span> <span class="n">uuid</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h3 id="41-tipo-de-función">4.1 Tipo de función</h3>
+
+<p>Será <code class="language-plaintext highlighter-rouge">SECURITY DEFINER</code>.</p>
+
+<p>No confiará en el RLS de <code class="language-plaintext highlighter-rouge">businesses</code> como única barrera de acceso.</p>
+
+<p>La función deberá validar explícitamente la identidad y membresía del llamador antes de devolver filas.</p>
+
+<h3 id="42-regla-de-autorización">4.2 Regla de autorización</h3>
+
+<p>Flujo obligatorio:</p>
+
+<ol>
+  <li>obtener <code class="language-plaintext highlighter-rouge">auth.uid()</code>;</li>
+  <li>rechazar si no existe usuario autenticado;</li>
+  <li>validar que el usuario sea miembro activo de <code class="language-plaintext highlighter-rouge">p_business_id</code> usando el patrón multi-tenant ya existente (<code class="language-plaintext highlighter-rouge">is_member_of(p_business_id)</code> o una comprobación equivalente);</li>
+  <li>opcionalmente permitir <code class="language-plaintext highlighter-rouge">is_platform_admin()</code> si el patrón actual del sistema lo requiere;</li>
+  <li>leer <code class="language-plaintext highlighter-rouge">businesses.business_category_id</code> del negocio solicitado;</li>
+  <li>devolver solo plantillas donde:
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">business_category_id</code> coincide con el giro real del negocio;</li>
+      <li><code class="language-plaintext highlighter-rouge">active = true</code>;</li>
+    </ul>
+  </li>
+  <li>no aceptar un giro enviado desde frontend como fuente de autorización.</li>
+</ol>
+
+<h3 id="43-permisos-de-ejecución">4.3 Permisos de ejecución</h3>
+
+<p>Después de crear la función:</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">REVOKE</span> <span class="k">ALL</span> <span class="k">ON</span> <span class="k">FUNCTION</span> <span class="k">public</span><span class="p">.</span><span class="n">get_business_service_templates</span><span class="p">(</span><span class="n">uuid</span><span class="p">)</span> <span class="k">FROM</span> <span class="k">PUBLIC</span><span class="p">;</span>
+<span class="k">REVOKE</span> <span class="k">ALL</span> <span class="k">ON</span> <span class="k">FUNCTION</span> <span class="k">public</span><span class="p">.</span><span class="n">get_business_service_templates</span><span class="p">(</span><span class="n">uuid</span><span class="p">)</span> <span class="k">FROM</span> <span class="n">anon</span><span class="p">;</span>
+<span class="k">GRANT</span> <span class="k">EXECUTE</span> <span class="k">ON</span> <span class="k">FUNCTION</span> <span class="k">public</span><span class="p">.</span><span class="n">get_business_service_templates</span><span class="p">(</span><span class="n">uuid</span><span class="p">)</span> <span class="k">TO</span> <span class="n">authenticated</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>Resultado esperado:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">anon</code>: no puede ejecutar.</li>
+  <li><code class="language-plaintext highlighter-rouge">authenticated</code> sin membresía: <code class="language-plaintext highlighter-rouge">forbidden</code>.</li>
+  <li>miembro del negocio: recibe únicamente plantillas activas de su giro.</li>
+  <li>pasar el <code class="language-plaintext highlighter-rouge">business_id</code> de otro tenant no debe revelar plantillas de ese negocio.</li>
+</ul>
+
+<h3 id="44-search_path">4.4 <code class="language-plaintext highlighter-rouge">search_path</code></h3>
+
+<p>Al ser <code class="language-plaintext highlighter-rouge">SECURITY DEFINER</code>, la función deberá fijar explícitamente un <code class="language-plaintext highlighter-rouge">search_path</code> seguro, por ejemplo:</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">SET</span> <span class="n">search_path</span> <span class="o">=</span> <span class="k">public</span><span class="p">,</span> <span class="n">pg_temp</span>
+</code></pre></div></div>
+
+<p>y referenciar objetos críticos con esquema explícito cuando corresponda.</p>
+
+<h2 id="5-fuente-canónica">5. Fuente canónica</h2>
+
+<p>Después de D3, el flujo será:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>businesses.business_category_id
+            ↓
+get_business_service_templates(p_business_id)
+            ↓
+      service_templates
+        ↙           ↘
+ Onboarding       Servicios
+</code></pre></div></div>
+
+<p>Ningún frontend debe decidir qué catálogo consultar pasando un <code class="language-plaintext highlighter-rouge">business_category_id</code> como parámetro de confianza.</p>
+
+<h2 id="6-cambios-en-onboarding">6. Cambios en Onboarding</h2>
+
+<p><code class="language-plaintext highlighter-rouge">js/admin-onboarding.js</code> dejará de consultar directamente:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">supabaseClient</span>
+  <span class="p">.</span><span class="k">from</span><span class="p">(</span><span class="dl">'</span><span class="s1">service_templates</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="dl">'</span><span class="s1">*</span><span class="dl">'</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">eq</span><span class="p">(</span><span class="dl">'</span><span class="s1">business_category_id</span><span class="dl">'</span><span class="p">,</span> <span class="nx">category</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>y usará:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">supabaseClient</span><span class="p">.</span><span class="nx">rpc</span><span class="p">(</span><span class="dl">'</span><span class="s1">get_business_service_templates</span><span class="dl">'</span><span class="p">,</span> <span class="p">{</span>
+  <span class="na">p_business_id</span><span class="p">:</span> <span class="nx">onboardingBiz</span><span class="p">.</span><span class="nx">id</span>
+<span class="p">})</span>
+</code></pre></div></div>
+
+<h3 id="compatibilidad">Compatibilidad</h3>
+
+<p>Si el negocio:</p>
+
+<ul>
+  <li>ya tiene <code class="language-plaintext highlighter-rouge">business_category_id</code>, se usa ese valor;</li>
+  <li>ya tiene el giro bloqueado, no se modifica;</li>
+  <li>ya tiene servicios, se conservan;</li>
+  <li>tiene servicios cuyo nombre coincide con una plantilla, se sigue evitando duplicación;</li>
+  <li>está a mitad del onboarding, continúa desde su estado actual sin migración forzada.</li>
+</ul>
+
+<p>No se añade persistencia nueva para selecciones de plantilla aún no guardadas en el navegador.</p>
+
+<h2 id="7-cambios-en-servicios">7. Cambios en Servicios</h2>
+
+<p><code class="language-plaintext highlighter-rouge">js/admin-services.js</code> deberá migrar las rutas que actualmente dependen de <code class="language-plaintext highlighter-rouge">SERVICE_TEMPLATE_LIBRARY</code> a datos obtenidos por el RPC.</p>
+
+<h3 id="debe-conservarse">Debe conservarse</h3>
+
+<ul>
+  <li>edición de servicios existentes;</li>
+  <li>precio;</li>
+  <li>duración;</li>
+  <li>buffer;</li>
+  <li>anticipo;</li>
+  <li>imagen;</li>
+  <li>disponibilidad;</li>
+  <li>personal asignado;</li>
+  <li>costos y campos avanzados;</li>
+  <li>visibilidad/activo;</li>
+  <li>duplicación y acciones existentes que no dependan del catálogo duplicado.</li>
+</ul>
+
+<h3 id="experiencia-inicial">Experiencia inicial</h3>
+
+<p>La configuración rápida se simplifica a:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Plantilla → Precio → Guardar
+</code></pre></div></div>
+
+<p>Las opciones avanzadas permanecen disponibles debajo; no se eliminan.</p>
+
+<h3 id="giro">Giro</h3>
+
+<p>El selector de giro continúa bloqueado conforme a <code class="language-plaintext highlighter-rouge">business_category_id</code> / <code class="language-plaintext highlighter-rouge">business_category_locked</code>.</p>
+
+<p>D3 no cambia la navegación ni la estructura general del shell actual.</p>
+
+<h2 id="8-eliminación-de-service_template_library">8. Eliminación de <code class="language-plaintext highlighter-rouge">SERVICE_TEMPLATE_LIBRARY</code></h2>
+
+<p>La constante hardcodeada no se elimina hasta que las pruebas confirmen que:</p>
+
+<ul>
+  <li>renderizado de plantillas;</li>
+  <li>selección de plantillas;</li>
+  <li>validación de giro;</li>
+  <li>precios sugeridos;</li>
+  <li>imágenes sugeridas;</li>
+  <li>categorías derivadas;</li>
+</ul>
+
+<p>ya funcionan con la respuesta del RPC o con datos derivados de ella.</p>
+
+<p>Una vez cumplido, <code class="language-plaintext highlighter-rouge">SERVICE_TEMPLATE_LIBRARY</code> deja de ser fuente funcional y se retira junto con helpers que solo existan para ese catálogo hardcodeado.</p>
+
+<p>No se conservará como fallback silencioso, porque eso volvería a crear dos fuentes de verdad.</p>
+
+<h2 id="9-plan-de-compatibilidad-para-negocios-existentes">9. Plan de compatibilidad para negocios existentes</h2>
+
+<p>No habrá migración masiva de <code class="language-plaintext highlighter-rouge">services</code>.</p>
+
+<p>D3 no modifica servicios existentes salvo cuando el usuario explícitamente edite/guarde un servicio desde la UI.</p>
+
+<p>Para negocios con onboarding incompleto:</p>
+
+<ol>
+  <li>cargar negocio;</li>
+  <li>respetar <code class="language-plaintext highlighter-rouge">business_category_id</code> si existe;</li>
+  <li>cargar plantillas canónicas mediante RPC;</li>
+  <li>cargar <code class="language-plaintext highlighter-rouge">services</code> existentes;</li>
+  <li>marcar coincidencias por nombre normalizado;</li>
+  <li>continuar el flujo normal.</li>
+</ol>
+
+<h2 id="10-rls-de-service_templates">10. RLS de <code class="language-plaintext highlighter-rouge">service_templates</code></h2>
+
+<p>La política actual de lectura directa permite a <code class="language-plaintext highlighter-rouge">anon</code> y <code class="language-plaintext highlighter-rouge">authenticated</code> leer plantillas activas.</p>
+
+<p><strong>D3 no la cambia.</strong></p>
+
+<p>Razón: antes de cerrar ese SELECT se debe confirmar el inventario completo de consumidores de <code class="language-plaintext highlighter-rouge">service_templates</code>.</p>
+
+<h3 id="pendiente-futuro-registrado">Pendiente futuro registrado</h3>
+
+<p>Crear un bloque de seguridad posterior para:</p>
+
+<ol>
+  <li>inventariar todos los consumidores directos de <code class="language-plaintext highlighter-rouge">service_templates</code>;</li>
+  <li>migrarlos a interfaces seguras/canónicas;</li>
+  <li>cerrar o restringir <code class="language-plaintext highlighter-rouge">service_templates_read</code>;</li>
+  <li>verificar que no se rompe ninguna ruta pública o administrativa.</li>
+</ol>
+
+<p>Este pendiente no debe perderse al cerrar D3.</p>
+
+<h2 id="11-pruebas-obligatorias">11. Pruebas obligatorias</h2>
+
+<h3 id="backend--rpc">Backend / RPC</h3>
+
+<ul>
+  <li>usuario autenticado miembro obtiene plantillas de su negocio;</li>
+  <li>miembro de Barbería no obtiene Dental/Spa;</li>
+  <li>usuario autenticado sin membresía recibe <code class="language-plaintext highlighter-rouge">forbidden</code>;</li>
+  <li><code class="language-plaintext highlighter-rouge">anon</code> no puede ejecutar el RPC;</li>
+  <li>negocio sin <code class="language-plaintext highlighter-rouge">business_category_id</code> devuelve conjunto vacío o error controlado definido por implementación;</li>
+  <li>solo devuelve <code class="language-plaintext highlighter-rouge">active=true</code>.</li>
+</ul>
+
+<h3 id="onboarding">Onboarding</h3>
+
+<ul>
+  <li>carga plantillas del RPC;</li>
+  <li>conserva los 4 pasos actuales;</li>
+  <li>negocio a mitad de onboarding continúa;</li>
+  <li>servicios existentes no se duplican;</li>
+  <li>selección y guardado siguen funcionando.</li>
+</ul>
+
+<h3 id="servicios">Servicios</h3>
+
+<ul>
+  <li>carga plantillas del RPC;</li>
+  <li>no depende de <code class="language-plaintext highlighter-rouge">SERVICE_TEMPLATE_LIBRARY</code>;</li>
+  <li>giro bloqueado se mantiene;</li>
+  <li>servicios existentes siguen visibles y editables;</li>
+  <li><code class="language-plaintext highlighter-rouge">Plantilla → Precio → Guardar</code> funciona;</li>
+  <li>opciones avanzadas siguen disponibles.</li>
+</ul>
+
+<h3 id="regresión">Regresión</h3>
+
+<ul>
+  <li>no hay cambios a shell/sidebar;</li>
+  <li>no hay cambios a D4;</li>
+  <li>no hay cambios a pagos;</li>
+  <li>no hay cambios a Reseñas/Crecimiento/Google Business;</li>
+  <li><code class="language-plaintext highlighter-rouge">services</code> existentes permanecen intactos.</li>
+</ul>
+
+<h2 id="12-criterio-de-cierre-de-d3">12. Criterio de cierre de D3</h2>
+
+<p>D3 se considera completo únicamente cuando:</p>
+
+<ul>
+  <li>Onboarding y Servicios consumen la misma fuente canónica;</li>
+  <li>el RPC aplica aislamiento por membresía;</li>
+  <li><code class="language-plaintext highlighter-rouge">anon</code> no puede ejecutar el RPC;</li>
+  <li><code class="language-plaintext highlighter-rouge">SERVICE_TEMPLATE_LIBRARY</code> ya no es fuente funcional;</li>
+  <li>negocios existentes conservan sus servicios;</li>
+  <li>negocios a medio onboarding pueden continuar;</li>
+  <li>las pruebas de regresión anteriores pasan;</li>
+  <li>no se han introducido cambios de R5, D4 o D2.</li>
+</ul>
+
+
+      
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+  </body>
+</html>

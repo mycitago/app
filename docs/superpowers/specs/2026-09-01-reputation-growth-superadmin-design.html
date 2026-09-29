@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>MyCitaGo Reputation, Growth and Super Admin Stabilization Design | app</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="MyCitaGo Reputation, Growth and Super Admin Stabilization Design" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="CITAS" />
+<meta property="og:description" content="CITAS" />
+<link rel="canonical" href="https://mycitago.github.io/app/docs/superpowers/specs/2026-09-01-reputation-growth-superadmin-design.html" />
+<meta property="og:url" content="https://mycitago.github.io/app/docs/superpowers/specs/2026-09-01-reputation-growth-superadmin-design.html" />
+<meta property="og:site_name" content="app" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="MyCitaGo Reputation, Growth and Super Admin Stabilization Design" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","description":"CITAS","headline":"MyCitaGo Reputation, Growth and Super Admin Stabilization Design","url":"https://mycitago.github.io/app/docs/superpowers/specs/2026-09-01-reputation-growth-superadmin-design.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/app/assets/css/style.css?v=b49e04b7df3c8314bb03944b0392696f51019dfa">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/app/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <div class="container-lg px-3 my-5 markdown-body">
+      
+      <h1><a href="https://mycitago.github.io/app/">app</a></h1>
+      
+
+      <h1 id="mycitago-reputation-growth-and-super-admin-stabilization-design">MyCitaGo Reputation, Growth and Super Admin Stabilization Design</h1>
+
+<h2 id="approved-scope">Approved scope</h2>
+<ul>
+  <li>Preserve V6 Agenda, Team, Branches and Google Login behavior.</li>
+  <li>Stabilize Super Admin widgets with independent loading/error/empty states.</li>
+  <li>Use existing <code class="language-plaintext highlighter-rouge">platform_admins</code> / <code class="language-plaintext highlighter-rouge">is_platform_admin()</code> model; never browser <code class="language-plaintext highlighter-rouge">service_role</code>.</li>
+  <li>Add missing <code class="language-plaintext highlighter-rouge">business_invites</code> and <code class="language-plaintext highlighter-rouge">business_category_change_requests</code> idempotently with RLS.</li>
+  <li>Internal reviews work without Google approval.</li>
+  <li>When Google is usable, customer may choose MyCitaGo or Google at review time.</li>
+  <li>One internal review per completed appointment via single-use token.</li>
+  <li>Add Growth sharing links with <code class="language-plaintext highlighter-rouge">src</code> and booking source attribution.</li>
+  <li>Add review/source metrics to reports.</li>
+</ul>
+
+
+      
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+  </body>
+</html>

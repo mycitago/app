@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Super Admin Backend Centralization Implementation Plan | app</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="Super Admin Backend Centralization Implementation Plan" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="CITAS" />
+<meta property="og:description" content="CITAS" />
+<link rel="canonical" href="https://mycitago.github.io/app/docs/superpowers/plans/2026-09-02-superadmin-backend-centralization.html" />
+<meta property="og:url" content="https://mycitago.github.io/app/docs/superpowers/plans/2026-09-02-superadmin-backend-centralization.html" />
+<meta property="og:site_name" content="app" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Super Admin Backend Centralization Implementation Plan" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","description":"CITAS","headline":"Super Admin Backend Centralization Implementation Plan","url":"https://mycitago.github.io/app/docs/superpowers/plans/2026-09-02-superadmin-backend-centralization.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/app/assets/css/style.css?v=b49e04b7df3c8314bb03944b0392696f51019dfa">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/app/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <div class="container-lg px-3 my-5 markdown-body">
+      
+      <h1><a href="https://mycitago.github.io/app/">app</a></h1>
+      
+
+      <h1 id="super-admin-backend-centralization-implementation-plan">Super Admin Backend Centralization Implementation Plan</h1>
+
+<blockquote>
+  <p><strong>For agentic workers:</strong> REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (<code class="language-plaintext highlighter-rouge">- [ ]</code>) syntax for tracking.</p>
+</blockquote>
+
+<p><strong>Goal:</strong> Replace six sensitive direct Super Admin reads with six explicit server-authorized RPCs and a thin browser adapter, without changing V6 or existing mutation contracts.</p>
+
+<p><strong>Architecture:</strong> Authorization is enforced inside each PostgreSQL RPC, never in browser code. <code class="language-plaintext highlighter-rouge">platform-api.js</code> only maps frontend module reads to six allow-listed RPCs; <code class="language-plaintext highlighter-rouge">admin-platform.js</code> keeps independent module rendering/error handling.</p>
+
+<p><strong>Tech Stack:</strong> Supabase/PostgreSQL, vanilla JavaScript, Node.js contract tests, Python repository verifier.</p>
+
+<p><strong>Spec:</strong> <code class="language-plaintext highlighter-rouge">docs/superpowers/specs/2026-09-02-superadmin-backend-centralization-design.md</code></p>
+
+<h2 id="global-constraints">Global Constraints</h2>
+<ul>
+  <li>Exactly six new read RPCs, one per current sensitive direct read.</li>
+  <li>Every RPC checks <code class="language-plaintext highlighter-rouge">public.is_platform_admin(auth.uid())</code> internally.</li>
+  <li>No generic table-name argument and no dynamic SQL.</li>
+  <li>Migration is additive in <code class="language-plaintext highlighter-rouge">sql/platform_read_api.sql</code>.</li>
+  <li>Do not modify <code class="language-plaintext highlighter-rouge">SUPABASE_V6_MASTER.sql</code>.</li>
+  <li>Preserve existing mutations, snapshot RPC, UI rendering, and per-module retry behavior.</li>
+</ul>
+
+<hr />
+
+<h3 id="task-1-add-securityread-api-regression-contract">Task 1: Add security/read API regression contract</h3>
+
+<p><strong>Files:</strong></p>
+<ul>
+  <li>Create: <code class="language-plaintext highlighter-rouge">tests/platform-read-api.test.mjs</code></li>
+  <li>Test: <code class="language-plaintext highlighter-rouge">tests/platform-read-api.test.mjs</code></li>
+</ul>
+
+<p><strong>Interfaces:</strong></p>
+<ul class="task-list">
+  <li>Consumes: current <code class="language-plaintext highlighter-rouge">js/admin-platform.js</code> and new migration path.</li>
+  <li>
+    <p>Produces: contract enforcing six RPCs, explicit internal authorization, no generic reader, and no sensitive direct selects.</p>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 1: Write failing assertions for the migration, frontend adapter, HTML script order, and removal of six direct reads.</strong></li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 2: Run <code class="language-plaintext highlighter-rouge">node tests/platform-read-api.test.mjs</code> and confirm failure because files/RPCs are missing.</strong></li>
+</ul>
+
+<h3 id="task-2-add-additive-sql-read-api">Task 2: Add additive SQL read API</h3>
+
+<p><strong>Files:</strong></p>
+<ul>
+  <li>Create: <code class="language-plaintext highlighter-rouge">sql/platform_read_api.sql</code></li>
+</ul>
+
+<p><strong>Interfaces:</strong></p>
+<ul class="task-list">
+  <li>
+    <p>Produces: <code class="language-plaintext highlighter-rouge">platform_read_support()</code>, <code class="language-plaintext highlighter-rouge">platform_read_service_templates()</code>, <code class="language-plaintext highlighter-rouge">platform_read_business_categories()</code>, <code class="language-plaintext highlighter-rouge">platform_read_business_invites()</code>, <code class="language-plaintext highlighter-rouge">platform_read_category_change_requests()</code>, <code class="language-plaintext highlighter-rouge">platform_read_audit_logs()</code> returning JSONB arrays.</p>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 1: Add <code class="language-plaintext highlighter-rouge">public.is_platform_admin(uuid)</code> overload backed only by <code class="language-plaintext highlighter-rouge">platform_admins.id</code>.</strong></li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 2: Define each RPC as <code class="language-plaintext highlighter-rouge">security definer set search_path=public,pg_temp</code> with <code class="language-plaintext highlighter-rouge">if auth.uid() is null or not public.is_platform_admin(auth.uid()) then raise exception 'forbidden'; end if;</code>.</strong></li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 3: Revoke public execution and grant only <code class="language-plaintext highlighter-rouge">authenticated</code> for all six functions.</strong></li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 4: Run the regression contract; expect frontend portions still failing.</strong></li>
+</ul>
+
+<h3 id="task-3-add-thin-browser-adapter-and-switch-module-reads">Task 3: Add thin browser adapter and switch module reads</h3>
+
+<p><strong>Files:</strong></p>
+<ul>
+  <li>Create: <code class="language-plaintext highlighter-rouge">js/platform-api.js</code></li>
+  <li>Modify: <code class="language-plaintext highlighter-rouge">js/admin-platform.js</code></li>
+  <li>Modify: <code class="language-plaintext highlighter-rouge">admin/plataforma.html</code></li>
+</ul>
+
+<p><strong>Interfaces:</strong></p>
+<ul class="task-list">
+  <li>Produces global <code class="language-plaintext highlighter-rouge">window.PlatformAPI</code> with <code class="language-plaintext highlighter-rouge">readSupport</code>, <code class="language-plaintext highlighter-rouge">readServiceTemplates</code>, <code class="language-plaintext highlighter-rouge">readBusinessCategories</code>, <code class="language-plaintext highlighter-rouge">readBusinessInvites</code>, <code class="language-plaintext highlighter-rouge">readCategoryChangeRequests</code>, <code class="language-plaintext highlighter-rouge">readAuditLogs</code>.</li>
+  <li>
+    <p>Each method returns the Supabase <code class="language-plaintext highlighter-rouge">{data,error}</code> RPC result.</p>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 1: Load <code class="language-plaintext highlighter-rouge">platform-api.js</code> before <code class="language-plaintext highlighter-rouge">admin-platform.js</code>.</strong></li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 2: Replace the six <code class="language-plaintext highlighter-rouge">.from(...).select(...)</code> operations in <code class="language-plaintext highlighter-rouge">loadOperationsModules()</code> with the six adapter methods.</strong></li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 3: Preserve <code class="language-plaintext highlighter-rouge">Promise.allSettled</code>, module-specific empty/error states, and retry buttons.</strong></li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 4: Run <code class="language-plaintext highlighter-rouge">node tests/platform-read-api.test.mjs</code>; expect PASS.</strong></li>
+</ul>
+
+<h3 id="task-4-regression-and-packaging-verification">Task 4: Regression and packaging verification</h3>
+
+<p><strong>Files:</strong></p>
+<ul>
+  <li>Modify only if a regression test identifies a compatibility issue outside the six-read change.</li>
+  <li>Package: <code class="language-plaintext highlighter-rouge">MYCITAGO_SUPERADMIN_RPC_SEGURO.zip</code></li>
+</ul>
+
+<p><strong>Interfaces:</strong></p>
+<ul class="task-list">
+  <li>
+    <p>Produces deployable cumulative frontend plus additive SQL migration.</p>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 1: Run every <code class="language-plaintext highlighter-rouge">tests/*.test.mjs</code>.</strong></li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 2: Run <code class="language-plaintext highlighter-rouge">python tools/verify-v6.py</code>.</strong></li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 3: Run <code class="language-plaintext highlighter-rouge">node --check</code> for every <code class="language-plaintext highlighter-rouge">js/*.js</code>.</strong></li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 4: Confirm <code class="language-plaintext highlighter-rouge">SUPABASE_V6_MASTER.sql</code> hash is unchanged from the pre-change hash captured before implementation.</strong></li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 5: Build ZIP and validate <code class="language-plaintext highlighter-rouge">unzip -t</code>.</strong></li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 6: Document live A.4 checks: admin no app-generated 403 and non-admin direct RPC rejected.</strong></li>
+</ul>
+
+
+      
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+  </body>
+</html>

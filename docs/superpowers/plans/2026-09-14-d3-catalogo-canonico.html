@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>D3 Canonical Service Catalog Implementation Plan | app</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="D3 Canonical Service Catalog Implementation Plan" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="CITAS" />
+<meta property="og:description" content="CITAS" />
+<link rel="canonical" href="https://mycitago.github.io/app/docs/superpowers/plans/2026-09-14-d3-catalogo-canonico.html" />
+<meta property="og:url" content="https://mycitago.github.io/app/docs/superpowers/plans/2026-09-14-d3-catalogo-canonico.html" />
+<meta property="og:site_name" content="app" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="D3 Canonical Service Catalog Implementation Plan" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","description":"CITAS","headline":"D3 Canonical Service Catalog Implementation Plan","url":"https://mycitago.github.io/app/docs/superpowers/plans/2026-09-14-d3-catalogo-canonico.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/app/assets/css/style.css?v=b49e04b7df3c8314bb03944b0392696f51019dfa">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/app/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <div class="container-lg px-3 my-5 markdown-body">
+      
+      <h1><a href="https://mycitago.github.io/app/">app</a></h1>
+      
+
+      <h1 id="d3-canonical-service-catalog-implementation-plan">D3 Canonical Service Catalog Implementation Plan</h1>
+
+<blockquote>
+  <p><strong>For agentic workers:</strong> REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (<code class="language-plaintext highlighter-rouge">- [ ]</code>) syntax for tracking.</p>
+</blockquote>
+
+<p><strong>Goal:</strong> Make <code class="language-plaintext highlighter-rouge">public.service_templates</code> the single functional source of service templates for both Onboarding and Services, using a tenant-safe authenticated RPC without changing shell/navigation, plan limits, payments, Reviews, Growth, or Google Business.</p>
+
+<p><strong>Architecture:</strong> Add one <code class="language-plaintext highlighter-rouge">SECURITY DEFINER</code> RPC, <code class="language-plaintext highlighter-rouge">public.get_business_service_templates(p_business_id uuid)</code>, that authorizes the caller against the requested business and derives the business category server-side before returning active templates. Migrate <code class="language-plaintext highlighter-rouge">js/admin-onboarding.js</code> and <code class="language-plaintext highlighter-rouge">js/admin-services.js</code> to consume that RPC, preserve all existing <code class="language-plaintext highlighter-rouge">services</code> rows unchanged, and remove the hardcoded <code class="language-plaintext highlighter-rouge">SERVICE_TEMPLATE_LIBRARY</code> only after tests prove no functional path depends on it.</p>
+
+<p><strong>Tech Stack:</strong> PostgreSQL / Supabase RPC + RLS-compatible authorization, Supabase JS v2, vanilla JavaScript, Node.js repository tests.</p>
+
+<p><strong>Spec:</strong> <code class="language-plaintext highlighter-rouge">docs/superpowers/specs/2026-09-14-d3-catalogo-canonico-design.md</code></p>
+
+<h2 id="global-constraints">Global Constraints</h2>
+
+<ul>
+  <li>D3 implements only R2: catalog duplication / non-canonical templates.</li>
+  <li>Do not modify R5/F3 shell, sidebar, navigation, or full visual consolidation.</li>
+  <li>Do not add or modify D4 plan limits; do not invent <code class="language-plaintext highlighter-rouge">max_services</code>.</li>
+  <li>Do not touch D2 / Mercado Pago or any payment flow.</li>
+  <li>Do not touch Reviews, Growth, or Google Business Profile.</li>
+  <li>Do not change the current global <code class="language-plaintext highlighter-rouge">service_templates_read</code> policy in D3.</li>
+  <li><code class="language-plaintext highlighter-rouge">anon</code> must not be able to execute <code class="language-plaintext highlighter-rouge">get_business_service_templates(uuid)</code>.</li>
+  <li>The RPC must derive the category from <code class="language-plaintext highlighter-rouge">businesses.business_category_id</code>; the frontend must not supply a category as an authorization input.</li>
+  <li>Existing <code class="language-plaintext highlighter-rouge">services</code> rows must not be migrated, rewritten, or deleted as part of deployment.</li>
+  <li>Mid-onboarding businesses must continue from their current persisted state.</li>
+  <li>Do not keep the hardcoded template library as a silent runtime fallback after the canonical path is verified.</li>
+  <li>Use TDD: every behavior-changing task starts with a failing test and verifies RED before implementation.</li>
+</ul>
+
+<hr />
+
+<h2 id="file-map">File Map</h2>
+
+<p><strong>Create</strong></p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">supabase/migrations/20260914_d3_service_templates_rpc.sql</code> — tenant-safe RPC and explicit function grants.</li>
+  <li><code class="language-plaintext highlighter-rouge">tests/d3-service-templates-rpc.sql</code> — SQL contract checks for auth/membership/category/active-only behavior.</li>
+  <li><code class="language-plaintext highlighter-rouge">tests/d3-onboarding-canonical-templates.test.mjs</code> — static/behavioral contract for Onboarding using the RPC and preserving deduplication.</li>
+  <li><code class="language-plaintext highlighter-rouge">tests/d3-services-canonical-templates.test.mjs</code> — contract for Services using the RPC and no functional dependency on <code class="language-plaintext highlighter-rouge">SERVICE_TEMPLATE_LIBRARY</code>.</li>
+  <li><code class="language-plaintext highlighter-rouge">tests/d3-scope-regression.test.mjs</code> — guardrails proving D3 did not alter excluded areas.</li>
+</ul>
+
+<p><strong>Modify</strong></p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">js/admin-onboarding.js</code> — replace direct <code class="language-plaintext highlighter-rouge">service_templates</code> query with <code class="language-plaintext highlighter-rouge">get_business_service_templates</code>.</li>
+  <li><code class="language-plaintext highlighter-rouge">js/admin-services.js</code> — load templates through the RPC, derive categories/templates from returned rows, and retire the hardcoded runtime library.</li>
+  <li><code class="language-plaintext highlighter-rouge">admin/servicios.html</code> — only if required to wire a small loading/error state for the canonical template source; do not alter shell/sidebar/navigation.</li>
+  <li><code class="language-plaintext highlighter-rouge">docs/superpowers/specs/2026-09-14-d3-catalogo-canonico-design.md</code> — no functional edits expected; keep as design source.</li>
+  <li><code class="language-plaintext highlighter-rouge">docs/superpowers/plans/2026-09-14-d3-catalogo-canonico.md</code> — this implementation plan.</li>
+</ul>
+
+<hr />
+
+<h3 id="task-1-add-the-tenant-safe-service-template-rpc">Task 1: Add the tenant-safe service-template RPC</h3>
+
+<p><strong>Files:</strong></p>
+<ul>
+  <li>Create: <code class="language-plaintext highlighter-rouge">supabase/migrations/20260914_d3_service_templates_rpc.sql</code></li>
+  <li>Create: <code class="language-plaintext highlighter-rouge">tests/d3-service-templates-rpc.sql</code></li>
+</ul>
+
+<p><strong>Interfaces:</strong></p>
+<ul class="task-list">
+  <li>Consumes: <code class="language-plaintext highlighter-rouge">auth.uid()</code>, <code class="language-plaintext highlighter-rouge">public.is_member_of(uuid)</code>, <code class="language-plaintext highlighter-rouge">public.is_platform_admin()</code>, <code class="language-plaintext highlighter-rouge">public.businesses.business_category_id</code>, <code class="language-plaintext highlighter-rouge">public.service_templates</code>.</li>
+  <li>
+    <p>Produces: <code class="language-plaintext highlighter-rouge">public.get_business_service_templates(p_business_id uuid)</code> returning template rows with <code class="language-plaintext highlighter-rouge">id</code>, <code class="language-plaintext highlighter-rouge">business_category_id</code>, <code class="language-plaintext highlighter-rouge">name</code>, <code class="language-plaintext highlighter-rouge">category</code>, <code class="language-plaintext highlighter-rouge">description</code>, <code class="language-plaintext highlighter-rouge">duration_minutes</code>, <code class="language-plaintext highlighter-rouge">suggested_price</code>, <code class="language-plaintext highlighter-rouge">image_url</code>, <code class="language-plaintext highlighter-rouge">tags</code>, <code class="language-plaintext highlighter-rouge">sort_order</code>, <code class="language-plaintext highlighter-rouge">active</code>.</p>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 1: Write the failing SQL contract test</strong></li>
+</ul>
+
+<p>Create <code class="language-plaintext highlighter-rouge">tests/d3-service-templates-rpc.sql</code> with checks that fail before the migration exists:</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">begin</span><span class="p">;</span>
+
+<span class="c1">-- Function must exist.</span>
+<span class="k">do</span> <span class="err">$$</span>
+<span class="k">begin</span>
+  <span class="n">if</span> <span class="n">to_regprocedure</span><span class="p">(</span><span class="s1">'public.get_business_service_templates(uuid)'</span><span class="p">)</span> <span class="k">is</span> <span class="k">null</span> <span class="k">then</span>
+    <span class="n">raise</span> <span class="n">exception</span> <span class="s1">'D3 RPC missing'</span><span class="p">;</span>
+  <span class="k">end</span> <span class="n">if</span><span class="p">;</span>
+<span class="k">end</span> <span class="err">$$</span><span class="p">;</span>
+
+<span class="c1">-- It must be SECURITY DEFINER.</span>
+<span class="k">do</span> <span class="err">$$</span>
+<span class="k">declare</span>
+  <span class="n">v_prosecdef</span> <span class="nb">boolean</span><span class="p">;</span>
+<span class="k">begin</span>
+  <span class="k">select</span> <span class="n">p</span><span class="p">.</span><span class="n">prosecdef</span>
+    <span class="k">into</span> <span class="n">v_prosecdef</span>
+  <span class="k">from</span> <span class="n">pg_proc</span> <span class="n">p</span>
+  <span class="k">join</span> <span class="n">pg_namespace</span> <span class="n">n</span> <span class="k">on</span> <span class="n">n</span><span class="p">.</span><span class="n">oid</span> <span class="o">=</span> <span class="n">p</span><span class="p">.</span><span class="n">pronamespace</span>
+  <span class="k">where</span> <span class="n">n</span><span class="p">.</span><span class="n">nspname</span> <span class="o">=</span> <span class="s1">'public'</span>
+    <span class="k">and</span> <span class="n">p</span><span class="p">.</span><span class="n">proname</span> <span class="o">=</span> <span class="s1">'get_business_service_templates'</span>
+    <span class="k">and</span> <span class="n">pg_get_function_identity_arguments</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">oid</span><span class="p">)</span> <span class="o">=</span> <span class="s1">'p_business_id uuid'</span><span class="p">;</span>
+
+  <span class="n">if</span> <span class="n">coalesce</span><span class="p">(</span><span class="n">v_prosecdef</span><span class="p">,</span> <span class="k">false</span><span class="p">)</span> <span class="k">is</span> <span class="k">not</span> <span class="k">true</span> <span class="k">then</span>
+    <span class="n">raise</span> <span class="n">exception</span> <span class="s1">'D3 RPC must be SECURITY DEFINER'</span><span class="p">;</span>
+  <span class="k">end</span> <span class="n">if</span><span class="p">;</span>
+<span class="k">end</span> <span class="err">$$</span><span class="p">;</span>
+
+<span class="c1">-- anon must not have EXECUTE.</span>
+<span class="k">do</span> <span class="err">$$</span>
+<span class="k">begin</span>
+  <span class="n">if</span> <span class="n">has_function_privilege</span><span class="p">(</span>
+    <span class="s1">'anon'</span><span class="p">,</span>
+    <span class="s1">'public.get_business_service_templates(uuid)'</span><span class="p">,</span>
+    <span class="s1">'EXECUTE'</span>
+  <span class="p">)</span> <span class="k">then</span>
+    <span class="n">raise</span> <span class="n">exception</span> <span class="s1">'anon must not execute D3 RPC'</span><span class="p">;</span>
+  <span class="k">end</span> <span class="n">if</span><span class="p">;</span>
+<span class="k">end</span> <span class="err">$$</span><span class="p">;</span>
+
+<span class="c1">-- authenticated must have EXECUTE.</span>
+<span class="k">do</span> <span class="err">$$</span>
+<span class="k">begin</span>
+  <span class="n">if</span> <span class="k">not</span> <span class="n">has_function_privilege</span><span class="p">(</span>
+    <span class="s1">'authenticated'</span><span class="p">,</span>
+    <span class="s1">'public.get_business_service_templates(uuid)'</span><span class="p">,</span>
+    <span class="s1">'EXECUTE'</span>
+  <span class="p">)</span> <span class="k">then</span>
+    <span class="n">raise</span> <span class="n">exception</span> <span class="s1">'authenticated must execute D3 RPC'</span><span class="p">;</span>
+  <span class="k">end</span> <span class="n">if</span><span class="p">;</span>
+<span class="k">end</span> <span class="err">$$</span><span class="p">;</span>
+
+<span class="k">rollback</span><span class="p">;</span>
+</code></pre></div></div>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 2: Run the SQL contract test and verify RED</strong></li>
+</ul>
+
+<p>Run against the development/test database:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>psql <span class="s2">"</span><span class="nv">$DATABASE_URL</span><span class="s2">"</span> <span class="nt">-v</span> <span class="nv">ON_ERROR_STOP</span><span class="o">=</span>1 <span class="nt">-f</span> tests/d3-service-templates-rpc.sql
+</code></pre></div></div>
+
+<p>Expected: FAIL with <code class="language-plaintext highlighter-rouge">D3 RPC missing</code>.</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 3: Write the minimal migration</strong></li>
+</ul>
+
+<p>Create <code class="language-plaintext highlighter-rouge">supabase/migrations/20260914_d3_service_templates_rpc.sql</code>:</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">create</span> <span class="k">or</span> <span class="k">replace</span> <span class="k">function</span> <span class="k">public</span><span class="p">.</span><span class="n">get_business_service_templates</span><span class="p">(</span>
+  <span class="n">p_business_id</span> <span class="n">uuid</span>
+<span class="p">)</span>
+<span class="k">returns</span> <span class="k">table</span> <span class="p">(</span>
+  <span class="n">id</span> <span class="n">uuid</span><span class="p">,</span>
+  <span class="n">business_category_id</span> <span class="nb">text</span><span class="p">,</span>
+  <span class="n">name</span> <span class="nb">text</span><span class="p">,</span>
+  <span class="n">category</span> <span class="nb">text</span><span class="p">,</span>
+  <span class="n">description</span> <span class="nb">text</span><span class="p">,</span>
+  <span class="n">duration_minutes</span> <span class="nb">integer</span><span class="p">,</span>
+  <span class="n">suggested_price</span> <span class="nb">numeric</span><span class="p">,</span>
+  <span class="n">image_url</span> <span class="nb">text</span><span class="p">,</span>
+  <span class="n">tags</span> <span class="n">jsonb</span><span class="p">,</span>
+  <span class="n">sort_order</span> <span class="nb">integer</span><span class="p">,</span>
+  <span class="n">active</span> <span class="nb">boolean</span>
+<span class="p">)</span>
+<span class="k">language</span> <span class="n">plpgsql</span>
+<span class="k">security</span> <span class="k">definer</span>
+<span class="k">set</span> <span class="n">search_path</span> <span class="o">=</span> <span class="k">public</span><span class="p">,</span> <span class="n">pg_temp</span>
+<span class="k">as</span> <span class="err">$$</span>
+<span class="k">declare</span>
+  <span class="n">v_uid</span> <span class="n">uuid</span> <span class="p">:</span><span class="o">=</span> <span class="n">auth</span><span class="p">.</span><span class="n">uid</span><span class="p">();</span>
+  <span class="n">v_category</span> <span class="nb">text</span><span class="p">;</span>
+<span class="k">begin</span>
+  <span class="n">if</span> <span class="n">v_uid</span> <span class="k">is</span> <span class="k">null</span> <span class="k">then</span>
+    <span class="n">raise</span> <span class="n">exception</span> <span class="s1">'unauthenticated'</span>
+      <span class="k">using</span> <span class="n">errcode</span> <span class="o">=</span> <span class="s1">'42501'</span><span class="p">;</span>
+  <span class="k">end</span> <span class="n">if</span><span class="p">;</span>
+
+  <span class="n">if</span> <span class="k">not</span> <span class="p">(</span>
+    <span class="k">public</span><span class="p">.</span><span class="n">is_member_of</span><span class="p">(</span><span class="n">p_business_id</span><span class="p">)</span>
+    <span class="k">or</span> <span class="k">public</span><span class="p">.</span><span class="n">is_platform_admin</span><span class="p">()</span>
+  <span class="p">)</span> <span class="k">then</span>
+    <span class="n">raise</span> <span class="n">exception</span> <span class="s1">'forbidden'</span>
+      <span class="k">using</span> <span class="n">errcode</span> <span class="o">=</span> <span class="s1">'42501'</span><span class="p">;</span>
+  <span class="k">end</span> <span class="n">if</span><span class="p">;</span>
+
+  <span class="k">select</span> <span class="n">b</span><span class="p">.</span><span class="n">business_category_id</span>
+    <span class="k">into</span> <span class="n">v_category</span>
+  <span class="k">from</span> <span class="k">public</span><span class="p">.</span><span class="n">businesses</span> <span class="n">b</span>
+  <span class="k">where</span> <span class="n">b</span><span class="p">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">p_business_id</span><span class="p">;</span>
+
+  <span class="n">if</span> <span class="n">v_category</span> <span class="k">is</span> <span class="k">null</span> <span class="k">then</span>
+    <span class="k">return</span><span class="p">;</span>
+  <span class="k">end</span> <span class="n">if</span><span class="p">;</span>
+
+  <span class="k">return</span> <span class="n">query</span>
+  <span class="k">select</span>
+    <span class="n">st</span><span class="p">.</span><span class="n">id</span><span class="p">,</span>
+    <span class="n">st</span><span class="p">.</span><span class="n">business_category_id</span><span class="p">,</span>
+    <span class="n">st</span><span class="p">.</span><span class="n">name</span><span class="p">,</span>
+    <span class="n">st</span><span class="p">.</span><span class="n">category</span><span class="p">,</span>
+    <span class="n">st</span><span class="p">.</span><span class="n">description</span><span class="p">,</span>
+    <span class="n">st</span><span class="p">.</span><span class="n">duration_minutes</span><span class="p">,</span>
+    <span class="n">st</span><span class="p">.</span><span class="n">suggested_price</span><span class="p">,</span>
+    <span class="n">st</span><span class="p">.</span><span class="n">image_url</span><span class="p">,</span>
+    <span class="n">st</span><span class="p">.</span><span class="n">tags</span><span class="p">,</span>
+    <span class="n">st</span><span class="p">.</span><span class="n">sort_order</span><span class="p">,</span>
+    <span class="n">st</span><span class="p">.</span><span class="n">active</span>
+  <span class="k">from</span> <span class="k">public</span><span class="p">.</span><span class="n">service_templates</span> <span class="n">st</span>
+  <span class="k">where</span> <span class="n">st</span><span class="p">.</span><span class="n">business_category_id</span> <span class="o">=</span> <span class="n">v_category</span>
+    <span class="k">and</span> <span class="n">st</span><span class="p">.</span><span class="n">active</span> <span class="o">=</span> <span class="k">true</span>
+  <span class="k">order</span> <span class="k">by</span> <span class="n">st</span><span class="p">.</span><span class="n">sort_order</span><span class="p">,</span> <span class="n">st</span><span class="p">.</span><span class="n">name</span><span class="p">;</span>
+<span class="k">end</span><span class="p">;</span>
+<span class="err">$$</span><span class="p">;</span>
+
+<span class="k">revoke</span> <span class="k">all</span> <span class="k">on</span> <span class="k">function</span> <span class="k">public</span><span class="p">.</span><span class="n">get_business_service_templates</span><span class="p">(</span><span class="n">uuid</span><span class="p">)</span> <span class="k">from</span> <span class="k">public</span><span class="p">;</span>
+<span class="k">revoke</span> <span class="k">all</span> <span class="k">on</span> <span class="k">function</span> <span class="k">public</span><span class="p">.</span><span class="n">get_business_service_templates</span><span class="p">(</span><span class="n">uuid</span><span class="p">)</span> <span class="k">from</span> <span class="n">anon</span><span class="p">;</span>
+<span class="k">grant</span> <span class="k">execute</span> <span class="k">on</span> <span class="k">function</span> <span class="k">public</span><span class="p">.</span><span class="n">get_business_service_templates</span><span class="p">(</span><span class="n">uuid</span><span class="p">)</span> <span class="k">to</span> <span class="n">authenticated</span><span class="p">;</span>
+</code></pre></div></div>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 4: Extend the SQL test with behavior checks</strong></li>
+</ul>
+
+<p>Add test fixtures inside a transaction using two businesses with different categories and two authenticated test users. Use <code class="language-plaintext highlighter-rouge">set local request.jwt.claim.sub = '&lt;uuid&gt;'</code> or the repository’s established auth-test helper so that <code class="language-plaintext highlighter-rouge">auth.uid()</code> resolves per test session. Verify:</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">-- Member of business A gets only A-category active templates.</span>
+<span class="k">select</span> <span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">from</span> <span class="k">public</span><span class="p">.</span><span class="n">get_business_service_templates</span><span class="p">(:</span><span class="n">business_a</span><span class="p">)</span>
+<span class="k">where</span> <span class="n">business_category_id</span> <span class="o">&lt;&gt;</span> <span class="p">:</span><span class="n">category_a</span><span class="p">;</span>
+
+<span class="c1">-- Inactive rows never appear.</span>
+<span class="k">select</span> <span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">from</span> <span class="k">public</span><span class="p">.</span><span class="n">get_business_service_templates</span><span class="p">(:</span><span class="n">business_a</span><span class="p">)</span>
+<span class="k">where</span> <span class="n">active</span> <span class="k">is</span> <span class="k">not</span> <span class="k">true</span><span class="p">;</span>
+
+<span class="c1">-- Same authenticated user cannot read business B without membership.</span>
+<span class="c1">-- Expected SQLSTATE 42501 / message 'forbidden'.</span>
+</code></pre></div></div>
+
+<p>Use fixture inserts only inside <code class="language-plaintext highlighter-rouge">begin ... rollback</code> so production rows are not changed.</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 5: Apply the migration in the test environment and verify GREEN</strong></li>
+</ul>
+
+<p>Run:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>psql <span class="s2">"</span><span class="nv">$DATABASE_URL</span><span class="s2">"</span> <span class="nt">-v</span> <span class="nv">ON_ERROR_STOP</span><span class="o">=</span>1 <span class="nt">-f</span> supabase/migrations/20260914_d3_service_templates_rpc.sql
+psql <span class="s2">"</span><span class="nv">$DATABASE_URL</span><span class="s2">"</span> <span class="nt">-v</span> <span class="nv">ON_ERROR_STOP</span><span class="o">=</span>1 <span class="nt">-f</span> tests/d3-service-templates-rpc.sql
+</code></pre></div></div>
+
+<p>Expected: PASS with no exception.</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 6: Commit</strong></li>
+</ul>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git add supabase/migrations/20260914_d3_service_templates_rpc.sql tests/d3-service-templates-rpc.sql
+git commit <span class="nt">-m</span> <span class="s2">"feat: add tenant-safe service template rpc"</span>
+</code></pre></div></div>
+
+<hr />
+
+<h3 id="task-2-migrate-onboarding-to-the-canonical-rpc">Task 2: Migrate Onboarding to the canonical RPC</h3>
+
+<p><strong>Files:</strong></p>
+<ul>
+  <li>Modify: <code class="language-plaintext highlighter-rouge">js/admin-onboarding.js</code></li>
+  <li>Create: <code class="language-plaintext highlighter-rouge">tests/d3-onboarding-canonical-templates.test.mjs</code></li>
+</ul>
+
+<p><strong>Interfaces:</strong></p>
+<ul class="task-list">
+  <li>Consumes: <code class="language-plaintext highlighter-rouge">supabaseClient.rpc('get_business_service_templates', { p_business_id })</code>.</li>
+  <li>
+    <p>Produces: <code class="language-plaintext highlighter-rouge">loadTemplates()</code> that loads canonical templates for <code class="language-plaintext highlighter-rouge">onboardingBiz.id</code>, preserves existing-service matching, and no longer selects <code class="language-plaintext highlighter-rouge">service_templates</code> directly.</p>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 1: Write the failing Onboarding contract test</strong></li>
+</ul>
+
+<p>Create <code class="language-plaintext highlighter-rouge">tests/d3-onboarding-canonical-templates.test.mjs</code>:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nx">fs</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">node:fs</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="nx">assert</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">node:assert/strict</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">src</span> <span class="o">=</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span><span class="p">(</span><span class="dl">'</span><span class="s1">js/admin-onboarding.js</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">utf8</span><span class="dl">'</span><span class="p">);</span>
+
+<span class="nx">assert</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span>
+  <span class="nx">src</span><span class="p">,</span>
+  <span class="sr">/</span><span class="se">\.</span><span class="sr">rpc</span><span class="se">\(\s</span><span class="sr">*</span><span class="se">[</span><span class="sr">'"</span><span class="se">]</span><span class="sr">get_business_service_templates</span><span class="se">[</span><span class="sr">'"</span><span class="se">]</span><span class="sr">/</span><span class="p">,</span>
+  <span class="dl">'</span><span class="s1">Onboarding must load templates through canonical RPC</span><span class="dl">'</span>
+<span class="p">);</span>
+
+<span class="nx">assert</span><span class="p">.</span><span class="nx">doesNotMatch</span><span class="p">(</span>
+  <span class="nx">src</span><span class="p">,</span>
+  <span class="sr">/</span><span class="se">\.</span><span class="sr">from</span><span class="se">\(\s</span><span class="sr">*</span><span class="se">[</span><span class="sr">'"</span><span class="se">]</span><span class="sr">service_templates</span><span class="se">[</span><span class="sr">'"</span><span class="se">]\s</span><span class="sr">*</span><span class="se">\)</span><span class="sr">/</span><span class="p">,</span>
+  <span class="dl">'</span><span class="s1">Onboarding must not read service_templates directly</span><span class="dl">'</span>
+<span class="p">);</span>
+
+<span class="nx">assert</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span>
+  <span class="nx">src</span><span class="p">,</span>
+  <span class="sr">/normalizeName/</span><span class="p">,</span>
+  <span class="dl">'</span><span class="s1">Existing service deduplication must remain</span><span class="dl">'</span>
+<span class="p">);</span>
+
+<span class="nx">assert</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span>
+  <span class="nx">src</span><span class="p">,</span>
+  <span class="sr">/onboardingExistingServices/</span><span class="p">,</span>
+  <span class="dl">'</span><span class="s1">Existing services must still participate in matching</span><span class="dl">'</span>
+<span class="p">);</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">d3 onboarding canonical templates: PASS</span><span class="dl">'</span><span class="p">);</span>
+</code></pre></div></div>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 2: Run it and verify RED</strong></li>
+</ul>
+
+<p>Run:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>node tests/d3-onboarding-canonical-templates.test.mjs
+</code></pre></div></div>
+
+<p>Expected: FAIL because <code class="language-plaintext highlighter-rouge">admin-onboarding.js</code> still queries <code class="language-plaintext highlighter-rouge">service_templates</code> directly.</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 3: Replace the direct template query</strong></li>
+</ul>
+
+<p>In <code class="language-plaintext highlighter-rouge">js/admin-onboarding.js</code>, replace the direct category query inside <code class="language-plaintext highlighter-rouge">loadTemplates</code> with:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">async</span> <span class="kd">function</span> <span class="nx">loadTemplates</span><span class="p">(){</span>
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">onboardingBiz</span><span class="p">?.</span><span class="nx">id</span><span class="p">){</span>
+    <span class="nx">onboardingTemplates</span><span class="o">=</span><span class="p">[];</span>
+    <span class="nx">selectedTemplateIds</span><span class="o">=</span><span class="k">new</span> <span class="nb">Set</span><span class="p">();</span>
+    <span class="k">return</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="kd">const</span> <span class="p">{</span><span class="nx">data</span><span class="p">,</span><span class="nx">error</span><span class="p">}</span><span class="o">=</span><span class="k">await</span> <span class="nx">supabaseClient</span><span class="p">.</span><span class="nx">rpc</span><span class="p">(</span>
+    <span class="dl">'</span><span class="s1">get_business_service_templates</span><span class="dl">'</span><span class="p">,</span>
+    <span class="p">{</span><span class="na">p_business_id</span><span class="p">:</span><span class="nx">onboardingBiz</span><span class="p">.</span><span class="nx">id</span><span class="p">}</span>
+  <span class="p">);</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="nx">error</span><span class="p">){</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">[Onboarding] No se pudieron cargar plantillas canónicas:</span><span class="dl">'</span><span class="p">,</span> <span class="nx">error</span><span class="p">);</span>
+    <span class="nx">onboardingTemplates</span><span class="o">=</span><span class="p">[];</span>
+    <span class="nx">selectedTemplateIds</span><span class="o">=</span><span class="k">new</span> <span class="nb">Set</span><span class="p">();</span>
+    <span class="nx">obToast</span><span class="p">(</span><span class="dl">'</span><span class="s1">No se pudieron cargar las recomendaciones de servicios. Intenta de nuevo.</span><span class="dl">'</span><span class="p">,</span><span class="dl">'</span><span class="s1">error</span><span class="dl">'</span><span class="p">);</span>
+    <span class="k">return</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="nx">onboardingTemplates</span><span class="o">=</span><span class="nx">data</span><span class="o">||</span><span class="p">[];</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">onboardingTemplates</span><span class="p">.</span><span class="nx">length</span><span class="p">){</span>
+    <span class="nx">selectedTemplateIds</span><span class="o">=</span><span class="k">new</span> <span class="nb">Set</span><span class="p">();</span>
+    <span class="k">return</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="kd">const</span> <span class="nx">existingNames</span><span class="o">=</span><span class="k">new</span> <span class="nb">Set</span><span class="p">(</span>
+    <span class="nx">onboardingExistingServices</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">s</span><span class="o">=&gt;</span><span class="nx">normalizeName</span><span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">name</span><span class="p">))</span>
+  <span class="p">);</span>
+
+  <span class="kd">const</span> <span class="nx">preselected</span><span class="o">=</span><span class="nx">onboardingTemplates</span>
+    <span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">t</span><span class="o">=&gt;</span><span class="nx">existingNames</span><span class="p">.</span><span class="nx">has</span><span class="p">(</span><span class="nx">normalizeName</span><span class="p">(</span><span class="nx">t</span><span class="p">.</span><span class="nx">name</span><span class="p">)))</span>
+    <span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">t</span><span class="o">=&gt;</span><span class="nx">t</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
+
+  <span class="nx">selectedTemplateIds</span><span class="o">=</span><span class="k">new</span> <span class="nb">Set</span><span class="p">(</span>
+    <span class="nx">preselected</span><span class="p">.</span><span class="nx">length</span>
+      <span class="p">?</span> <span class="nx">preselected</span>
+      <span class="p">:</span> <span class="nx">onboardingTemplates</span>
+          <span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">Math</span><span class="p">.</span><span class="nx">min</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="nx">onboardingTemplates</span><span class="p">.</span><span class="nx">length</span><span class="p">))</span>
+          <span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">x</span><span class="o">=&gt;</span><span class="nx">x</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span>
+  <span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Do not retain the old synthetic <code class="language-plaintext highlighter-rouge">id:'custom'</code> fallback as a second source of truth. If a category has no templates, present an empty controlled state and let the user continue to Services later rather than inventing a runtime catalog row.</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 4: Update callers to the new signature</strong></li>
+</ul>
+
+<p>Change calls such as:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">await</span> <span class="nx">loadTemplates</span><span class="p">(</span><span class="nx">onboardingCategory</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>to:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">await</span> <span class="nx">loadTemplates</span><span class="p">();</span>
+</code></pre></div></div>
+
+<p>The RPC derives category from <code class="language-plaintext highlighter-rouge">onboardingBiz.id</code>; the frontend category value is no longer an authorization input.</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 5: Add the empty-state rendering</strong></li>
+</ul>
+
+<p>In <code class="language-plaintext highlighter-rouge">renderTemplates()</code> and/or the Step 3 container, if <code class="language-plaintext highlighter-rouge">onboardingTemplates.length === 0</code>, render an informational card:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">empty</span><span class="o">=</span><span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="dl">'</span><span class="s1">div</span><span class="dl">'</span><span class="p">);</span>
+<span class="nx">empty</span><span class="p">.</span><span class="nx">className</span><span class="o">=</span><span class="dl">'</span><span class="s1">onboarding-empty</span><span class="dl">'</span><span class="p">;</span>
+<span class="nx">empty</span><span class="p">.</span><span class="nx">textContent</span><span class="o">=</span><span class="dl">'</span><span class="s1">Aún no hay plantillas recomendadas para este giro. Puedes continuar y crear tus servicios después desde Servicios.</span><span class="dl">'</span><span class="p">;</span>
+<span class="nx">root</span><span class="p">.</span><span class="nx">replaceChildren</span><span class="p">(</span><span class="nx">empty</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>Keep the existing “select at least one service” validation only when templates exist. If no canonical templates exist, allow the user to continue without inserting a fake service.</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 6: Run the Onboarding test and syntax check</strong></li>
+</ul>
+
+<p>Run:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>node tests/d3-onboarding-canonical-templates.test.mjs
+node <span class="nt">--check</span> js/admin-onboarding.js
+</code></pre></div></div>
+
+<p>Expected: both PASS.</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 7: Commit</strong></li>
+</ul>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git add js/admin-onboarding.js tests/d3-onboarding-canonical-templates.test.mjs
+git commit <span class="nt">-m</span> <span class="s2">"refactor: use canonical templates in onboarding"</span>
+</code></pre></div></div>
+
+<hr />
+
+<h3 id="task-3-migrate-services-to-canonical-templates">Task 3: Migrate Services to canonical templates</h3>
+
+<p><strong>Files:</strong></p>
+<ul>
+  <li>Modify: <code class="language-plaintext highlighter-rouge">js/admin-services.js</code></li>
+  <li>Create: <code class="language-plaintext highlighter-rouge">tests/d3-services-canonical-templates.test.mjs</code></li>
+</ul>
+
+<p><strong>Interfaces:</strong></p>
+<ul class="task-list">
+  <li>Consumes: same RPC as Task 2.</li>
+  <li>Produces:
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">canonicalServiceTemplates</code> array loaded from Supabase.</li>
+      <li><code class="language-plaintext highlighter-rouge">loadCanonicalServiceTemplates()</code> function.</li>
+      <li>template rendering and selection based only on canonical rows.</li>
+      <li>no runtime dependency on <code class="language-plaintext highlighter-rouge">SERVICE_TEMPLATE_LIBRARY</code>.</li>
+    </ul>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 1: Write the failing Services contract test</strong></li>
+</ul>
+
+<p>Create <code class="language-plaintext highlighter-rouge">tests/d3-services-canonical-templates.test.mjs</code>:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nx">fs</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">node:fs</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="nx">assert</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">node:assert/strict</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">src</span> <span class="o">=</span> <span class="nx">fs</span><span class="p">.</span><span class="nx">readFileSync</span><span class="p">(</span><span class="dl">'</span><span class="s1">js/admin-services.js</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">utf8</span><span class="dl">'</span><span class="p">);</span>
+
+<span class="nx">assert</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span>
+  <span class="nx">src</span><span class="p">,</span>
+  <span class="sr">/</span><span class="se">\.</span><span class="sr">rpc</span><span class="se">\(\s</span><span class="sr">*</span><span class="se">[</span><span class="sr">'"</span><span class="se">]</span><span class="sr">get_business_service_templates</span><span class="se">[</span><span class="sr">'"</span><span class="se">]</span><span class="sr">/</span><span class="p">,</span>
+  <span class="dl">'</span><span class="s1">Services must load templates through canonical RPC</span><span class="dl">'</span>
+<span class="p">);</span>
+
+<span class="nx">assert</span><span class="p">.</span><span class="nx">doesNotMatch</span><span class="p">(</span>
+  <span class="nx">src</span><span class="p">,</span>
+  <span class="sr">/const</span><span class="se">\s</span><span class="sr">+SERVICE_TEMPLATE_LIBRARY</span><span class="se">\s</span><span class="sr">*=/</span><span class="p">,</span>
+  <span class="dl">'</span><span class="s1">Hardcoded template library must no longer be a runtime source</span><span class="dl">'</span>
+<span class="p">);</span>
+
+<span class="nx">assert</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span>
+  <span class="nx">src</span><span class="p">,</span>
+  <span class="sr">/canonicalServiceTemplates/</span><span class="p">,</span>
+  <span class="dl">'</span><span class="s1">Services must keep canonical template state</span><span class="dl">'</span>
+<span class="p">);</span>
+
+<span class="nx">assert</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span>
+  <span class="nx">src</span><span class="p">,</span>
+  <span class="sr">/business_category_locked/</span><span class="p">,</span>
+  <span class="dl">'</span><span class="s1">Business category lock behavior must remain</span><span class="dl">'</span>
+<span class="p">);</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">d3 services canonical templates: PASS</span><span class="dl">'</span><span class="p">);</span>
+</code></pre></div></div>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 2: Run it and verify RED</strong></li>
+</ul>
+
+<p>Run:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>node tests/d3-services-canonical-templates.test.mjs
+</code></pre></div></div>
+
+<p>Expected: FAIL because the hardcoded library still exists and no RPC is used.</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 3: Add canonical template state and loader</strong></li>
+</ul>
+
+<p>Near the current top-level state in <code class="language-plaintext highlighter-rouge">js/admin-services.js</code>, add:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">canonicalServiceTemplates</span><span class="o">=</span><span class="p">[];</span>
+
+<span class="k">async</span> <span class="kd">function</span> <span class="nx">loadCanonicalServiceTemplates</span><span class="p">(){</span>
+  <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">biz</span><span class="p">?.</span><span class="nx">id</span><span class="p">){</span>
+    <span class="nx">canonicalServiceTemplates</span><span class="o">=</span><span class="p">[];</span>
+    <span class="k">return</span> <span class="p">[];</span>
+  <span class="p">}</span>
+
+  <span class="kd">const</span> <span class="p">{</span><span class="nx">data</span><span class="p">,</span><span class="nx">error</span><span class="p">}</span><span class="o">=</span><span class="k">await</span> <span class="nx">supabaseClient</span><span class="p">.</span><span class="nx">rpc</span><span class="p">(</span>
+    <span class="dl">'</span><span class="s1">get_business_service_templates</span><span class="dl">'</span><span class="p">,</span>
+    <span class="p">{</span><span class="na">p_business_id</span><span class="p">:</span><span class="nx">biz</span><span class="p">.</span><span class="nx">id</span><span class="p">}</span>
+  <span class="p">);</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="nx">error</span><span class="p">){</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="dl">'</span><span class="s1">[services] No se pudieron cargar plantillas canónicas:</span><span class="dl">'</span><span class="p">,</span><span class="nx">error</span><span class="p">);</span>
+    <span class="nx">canonicalServiceTemplates</span><span class="o">=</span><span class="p">[];</span>
+    <span class="nx">toast</span><span class="p">(</span><span class="dl">'</span><span class="s1">No se pudieron cargar las plantillas de tu giro.</span><span class="dl">'</span><span class="p">);</span>
+    <span class="k">return</span> <span class="p">[];</span>
+  <span class="p">}</span>
+
+  <span class="nx">canonicalServiceTemplates</span><span class="o">=</span><span class="p">(</span><span class="nx">data</span><span class="o">||</span><span class="p">[]).</span><span class="nx">map</span><span class="p">(</span><span class="nx">row</span><span class="o">=&gt;</span><span class="p">({</span>
+    <span class="na">id</span><span class="p">:</span><span class="nx">row</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span>
+    <span class="na">name</span><span class="p">:</span><span class="nx">row</span><span class="p">.</span><span class="nx">name</span><span class="p">,</span>
+    <span class="na">category</span><span class="p">:</span><span class="nx">row</span><span class="p">.</span><span class="nx">category</span><span class="o">||</span><span class="dl">'</span><span class="s1">Servicios</span><span class="dl">'</span><span class="p">,</span>
+    <span class="na">description</span><span class="p">:</span><span class="nx">row</span><span class="p">.</span><span class="nx">description</span><span class="o">||</span><span class="dl">''</span><span class="p">,</span>
+    <span class="na">duration</span><span class="p">:</span><span class="nb">Number</span><span class="p">(</span><span class="nx">row</span><span class="p">.</span><span class="nx">duration_minutes</span><span class="o">||</span><span class="mi">60</span><span class="p">),</span>
+    <span class="na">suggestedPrice</span><span class="p">:</span><span class="nx">row</span><span class="p">.</span><span class="nx">suggested_price</span><span class="o">==</span><span class="kc">null</span>
+      <span class="p">?</span> <span class="mi">0</span>
+      <span class="p">:</span> <span class="nb">Number</span><span class="p">(</span><span class="nx">row</span><span class="p">.</span><span class="nx">suggested_price</span><span class="p">),</span>
+    <span class="na">imageUrl</span><span class="p">:</span><span class="nx">row</span><span class="p">.</span><span class="nx">image_url</span><span class="o">||</span><span class="dl">''</span><span class="p">,</span>
+    <span class="na">tags</span><span class="p">:</span><span class="nb">Array</span><span class="p">.</span><span class="nx">isArray</span><span class="p">(</span><span class="nx">row</span><span class="p">.</span><span class="nx">tags</span><span class="p">)?</span><span class="nx">row</span><span class="p">.</span><span class="nx">tags</span><span class="p">:[]</span>
+  <span class="p">}));</span>
+
+  <span class="k">return</span> <span class="nx">canonicalServiceTemplates</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 4: Replace category/template helpers</strong></li>
+</ul>
+
+<p>Replace helpers that read <code class="language-plaintext highlighter-rouge">SERVICE_TEMPLATE_LIBRARY</code> with canonical-data versions:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">currentBusinessCategoryKey</span><span class="p">(){</span>
+  <span class="k">return</span> <span class="nb">String</span><span class="p">(</span><span class="nx">biz</span><span class="p">?.</span><span class="nx">business_category_id</span><span class="o">||</span><span class="dl">''</span><span class="p">).</span><span class="nx">trim</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">allowedServiceCategories</span><span class="p">(){</span>
+  <span class="kd">const</span> <span class="nx">values</span><span class="o">=</span><span class="nx">canonicalServiceTemplates</span>
+    <span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">t</span><span class="o">=&gt;</span><span class="nb">String</span><span class="p">(</span><span class="nx">t</span><span class="p">.</span><span class="nx">category</span><span class="o">||</span><span class="dl">''</span><span class="p">).</span><span class="nx">trim</span><span class="p">())</span>
+    <span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nb">Boolean</span><span class="p">);</span>
+  <span class="k">return</span> <span class="p">[...</span><span class="k">new</span> <span class="nb">Set</span><span class="p">(</span><span class="nx">values</span><span class="p">)];</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">isAllowedServiceCategory</span><span class="p">(</span><span class="nx">category</span><span class="p">){</span>
+  <span class="kd">const</span> <span class="nx">value</span><span class="o">=</span><span class="nb">String</span><span class="p">(</span><span class="nx">category</span><span class="o">||</span><span class="dl">''</span><span class="p">).</span><span class="nx">trim</span><span class="p">().</span><span class="nx">toLocaleLowerCase</span><span class="p">(</span><span class="dl">'</span><span class="s1">es-MX</span><span class="dl">'</span><span class="p">);</span>
+  <span class="k">return</span> <span class="nx">allowedServiceCategories</span><span class="p">().</span><span class="nx">some</span><span class="p">(</span>
+    <span class="nx">item</span><span class="o">=&gt;</span><span class="nx">item</span><span class="p">.</span><span class="nx">toLocaleLowerCase</span><span class="p">(</span><span class="dl">'</span><span class="s1">es-MX</span><span class="dl">'</span><span class="p">)</span><span class="o">===</span><span class="nx">value</span>
+  <span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">templateBelongsToBusiness</span><span class="p">(</span><span class="nx">template</span><span class="p">){</span>
+  <span class="k">return</span> <span class="nx">canonicalServiceTemplates</span><span class="p">.</span><span class="nx">some</span><span class="p">(</span>
+    <span class="nx">item</span><span class="o">=&gt;</span><span class="nb">String</span><span class="p">(</span><span class="nx">item</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span><span class="o">===</span><span class="nb">String</span><span class="p">(</span><span class="nx">template</span><span class="p">?.</span><span class="nx">id</span><span class="p">)</span>
+  <span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Do not use a hardcoded category map as a replacement source of truth.</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 5: Replace template rendering</strong></li>
+</ul>
+
+<p>Update <code class="language-plaintext highlighter-rouge">renderServiceTemplates()</code> so its list comes from:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">list</span><span class="o">=</span><span class="nx">canonicalServiceTemplates</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>Use canonical fields:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">img</span><span class="p">.</span><span class="nx">src</span> <span class="o">=</span>
+  <span class="nx">platformAssetForTemplate</span><span class="p">(</span><span class="nx">t</span><span class="p">)</span>
+  <span class="o">||</span> <span class="nx">t</span><span class="p">.</span><span class="nx">imageUrl</span>
+  <span class="o">||</span> <span class="nx">assetUrl</span><span class="p">(</span><span class="dl">'</span><span class="s1">consulting.svg</span><span class="dl">'</span><span class="p">);</span>
+
+<span class="nx">small</span><span class="p">.</span><span class="nx">textContent</span> <span class="o">=</span>
+  <span class="s2">`</span><span class="p">${</span><span class="nx">t</span><span class="p">.</span><span class="nx">duration</span><span class="p">}</span><span class="s2"> min · </span><span class="p">${</span><span class="nx">suggestedPriceForTemplate</span><span class="p">(</span><span class="nx">t</span><span class="p">)</span>
+    <span class="p">?</span> <span class="nx">money</span><span class="p">(</span><span class="nx">suggestedPriceForTemplate</span><span class="p">(</span><span class="nx">t</span><span class="p">))</span><span class="o">+</span><span class="dl">'</span><span class="s1"> sugerido</span><span class="dl">'</span>
+    <span class="p">:</span> <span class="dl">'</span><span class="s1">precio por definir</span><span class="dl">'</span><span class="p">}</span><span class="s2">`</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>If <code class="language-plaintext highlighter-rouge">list.length===0</code>, render a controlled empty state rather than falling back to <code class="language-plaintext highlighter-rouge">other</code>.</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 6: Update template asset keys</strong></li>
+</ul>
+
+<p>Because the canonical RPC no longer depends on the old category key map, make asset lookup stable using the real business category plus canonical template name:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">templateAssetKey</span><span class="p">(</span><span class="nx">t</span><span class="p">){</span>
+  <span class="kd">const</span> <span class="nx">category</span><span class="o">=</span><span class="nx">currentBusinessCategoryKey</span><span class="p">()</span><span class="o">||</span><span class="dl">'</span><span class="s1">other</span><span class="dl">'</span><span class="p">;</span>
+  <span class="kd">const</span> <span class="nx">slug</span><span class="o">=</span><span class="nb">String</span><span class="p">(</span><span class="nx">t</span><span class="p">.</span><span class="nx">name</span><span class="o">||</span><span class="dl">''</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">toLowerCase</span><span class="p">()</span>
+    <span class="p">.</span><span class="nx">normalize</span><span class="p">(</span><span class="dl">'</span><span class="s1">NFD</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/</span><span class="se">[\u</span><span class="sr">0300-</span><span class="se">\u</span><span class="sr">036f</span><span class="se">]</span><span class="sr">/g</span><span class="p">,</span><span class="dl">''</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/</span><span class="se">[^</span><span class="sr">a-z0-9</span><span class="se">]</span><span class="sr">+/g</span><span class="p">,</span><span class="dl">'</span><span class="s1">-</span><span class="dl">'</span><span class="p">)</span>
+    <span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/^-|-$/g</span><span class="p">,</span><span class="dl">''</span><span class="p">);</span>
+  <span class="k">return</span> <span class="s2">`</span><span class="p">${</span><span class="nx">category</span><span class="p">}</span><span class="s2">:</span><span class="p">${</span><span class="nx">slug</span><span class="p">}</span><span class="s2">`</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 7: Load canonical templates during Services initialization</strong></li>
+</ul>
+
+<p>In the existing initialization sequence, after <code class="language-plaintext highlighter-rouge">biz</code> has been resolved and before <code class="language-plaintext highlighter-rouge">renderServiceTemplates()</code>, call:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">await</span> <span class="nx">loadCanonicalServiceTemplates</span><span class="p">();</span>
+<span class="nx">renderServiceTemplates</span><span class="p">();</span>
+</code></pre></div></div>
+
+<p>Do not call the RPC before <code class="language-plaintext highlighter-rouge">biz.id</code> exists.</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 8: Retire the hardcoded library</strong></li>
+</ul>
+
+<p>Remove:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">SERVICE_TEMPLATE_LIBRARY</span> <span class="o">=</span> <span class="p">{</span> <span class="p">...</span> <span class="p">};</span>
+<span class="kd">const</span> <span class="nx">SERVICE_CATEGORY_RULES</span> <span class="o">=</span> <span class="p">{</span> <span class="p">...</span> <span class="p">};</span>
+</code></pre></div></div>
+
+<p>Remove or rewrite any helper that only exists to query those objects.</p>
+
+<p>Keep <code class="language-plaintext highlighter-rouge">BUSINESS_CATEGORY_LABELS</code> only if it remains purely presentational for the locked-giro label; it must not act as the template source.</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 9: Verify the simplified flow still preserves advanced fields</strong></li>
+</ul>
+
+<p>Ensure <code class="language-plaintext highlighter-rouge">applyServiceTemplate(t)</code> fills only the quick-start defaults:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">$</span><span class="p">(</span><span class="dl">'</span><span class="s1">sname</span><span class="dl">'</span><span class="p">).</span><span class="nx">value</span><span class="o">=</span><span class="nx">t</span><span class="p">.</span><span class="nx">name</span><span class="o">||</span><span class="dl">''</span><span class="p">;</span>
+<span class="nx">$</span><span class="p">(</span><span class="dl">'</span><span class="s1">category</span><span class="dl">'</span><span class="p">).</span><span class="nx">value</span><span class="o">=</span><span class="nx">t</span><span class="p">.</span><span class="nx">category</span><span class="o">||</span><span class="dl">'</span><span class="s1">Servicios</span><span class="dl">'</span><span class="p">;</span>
+<span class="nx">$</span><span class="p">(</span><span class="dl">'</span><span class="s1">duration</span><span class="dl">'</span><span class="p">).</span><span class="nx">value</span><span class="o">=</span><span class="nx">t</span><span class="p">.</span><span class="nx">duration</span><span class="o">||</span><span class="mi">60</span><span class="p">;</span>
+<span class="nx">$</span><span class="p">(</span><span class="dl">'</span><span class="s1">price</span><span class="dl">'</span><span class="p">).</span><span class="nx">value</span><span class="o">=</span><span class="nx">suggestedPriceForTemplate</span><span class="p">(</span><span class="nx">t</span><span class="p">)</span><span class="o">||</span><span class="dl">''</span><span class="p">;</span>
+<span class="nx">$</span><span class="p">(</span><span class="dl">'</span><span class="s1">sdesc</span><span class="dl">'</span><span class="p">).</span><span class="nx">value</span><span class="o">=</span><span class="nx">t</span><span class="p">.</span><span class="nx">description</span><span class="o">||</span><span class="dl">''</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>Do not clear or remove staff, buffer, deposit, images, internal cost, taxes, scheduling, or visibility controls.</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 10: Run tests and syntax checks</strong></li>
+</ul>
+
+<p>Run:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>node tests/d3-services-canonical-templates.test.mjs
+node <span class="nt">--check</span> js/admin-services.js
+</code></pre></div></div>
+
+<p>Expected: both PASS.</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 11: Commit</strong></li>
+</ul>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git add js/admin-services.js tests/d3-services-canonical-templates.test.mjs
+git commit <span class="nt">-m</span> <span class="s2">"refactor: use canonical templates in services"</span>
+</code></pre></div></div>
+
+<hr />
+
+<h3 id="task-4-preserve-mid-onboarding-and-existing-service-compatibility">Task 4: Preserve mid-onboarding and existing-service compatibility</h3>
+
+<p><strong>Files:</strong></p>
+<ul>
+  <li>Modify: <code class="language-plaintext highlighter-rouge">tests/d3-onboarding-canonical-templates.test.mjs</code></li>
+  <li>Modify: <code class="language-plaintext highlighter-rouge">tests/d3-services-canonical-templates.test.mjs</code></li>
+</ul>
+
+<p><strong>Interfaces:</strong></p>
+<ul class="task-list">
+  <li>Consumes: existing <code class="language-plaintext highlighter-rouge">normalizeName</code>, <code class="language-plaintext highlighter-rouge">onboardingExistingServices</code>, persisted <code class="language-plaintext highlighter-rouge">business_category_id</code>, independent <code class="language-plaintext highlighter-rouge">services</code> rows.</li>
+  <li>
+    <p>Produces: regression tests proving no forced service migration and no category reset.</p>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 1: Add failing compatibility assertions</strong></li>
+</ul>
+
+<p>Extend <code class="language-plaintext highlighter-rouge">tests/d3-onboarding-canonical-templates.test.mjs</code>:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">assert</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span>
+  <span class="nx">src</span><span class="p">,</span>
+  <span class="sr">/business_category_locked/</span><span class="p">,</span>
+  <span class="dl">'</span><span class="s1">Existing locked category behavior must remain</span><span class="dl">'</span>
+<span class="p">);</span>
+
+<span class="nx">assert</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span>
+  <span class="nx">src</span><span class="p">,</span>
+  <span class="sr">/existingNames/</span><span class="p">,</span>
+  <span class="dl">'</span><span class="s1">Existing service names must still be compared</span><span class="dl">'</span>
+<span class="p">);</span>
+
+<span class="nx">assert</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span>
+  <span class="nx">src</span><span class="p">,</span>
+  <span class="sr">/</span><span class="se">\.</span><span class="sr">update</span><span class="se">\(</span><span class="sr">payload</span><span class="se">\)</span><span class="sr">/</span><span class="p">,</span>
+  <span class="dl">'</span><span class="s1">Existing matching services must still be updated instead of duplicated</span><span class="dl">'</span>
+<span class="p">);</span>
+</code></pre></div></div>
+
+<p>Extend <code class="language-plaintext highlighter-rouge">tests/d3-services-canonical-templates.test.mjs</code>:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">assert</span><span class="p">.</span><span class="nx">doesNotMatch</span><span class="p">(</span>
+  <span class="nx">src</span><span class="p">,</span>
+  <span class="sr">/</span><span class="se">\.</span><span class="sr">delete</span><span class="se">\(\)</span><span class="sr">.*services/</span><span class="nx">s</span><span class="p">,</span>
+  <span class="dl">'</span><span class="s1">D3 must not introduce service deletion during catalog switch</span><span class="dl">'</span>
+<span class="p">);</span>
+</code></pre></div></div>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 2: Run the compatibility tests</strong></li>
+</ul>
+
+<p>Run:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>node tests/d3-onboarding-canonical-templates.test.mjs
+node tests/d3-services-canonical-templates.test.mjs
+</code></pre></div></div>
+
+<p>Expected: any regression introduced in Tasks 2–3 fails here.</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 3: Fix only compatibility regressions</strong></li>
+</ul>
+
+<p>If any assertion fails because a required compatibility path was accidentally removed, restore the existing behavior without introducing a migration.</p>
+
+<p>No data migration should be added.</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 4: Re-run tests</strong></li>
+</ul>
+
+<p>Run the same two commands.</p>
+
+<p>Expected: PASS.</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 5: Commit</strong></li>
+</ul>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git add tests/d3-onboarding-canonical-templates.test.mjs tests/d3-services-canonical-templates.test.mjs js/admin-onboarding.js js/admin-services.js
+git commit <span class="nt">-m</span> <span class="s2">"test: protect d3 catalog compatibility"</span>
+</code></pre></div></div>
+
+<hr />
+
+<h3 id="task-5-add-scope-guardrails-for-r5-d4-d2-reviews-growth-and-google">Task 5: Add scope guardrails for R5, D4, D2, Reviews, Growth, and Google</h3>
+
+<p><strong>Files:</strong></p>
+<ul>
+  <li>Create: <code class="language-plaintext highlighter-rouge">tests/d3-scope-regression.test.mjs</code></li>
+</ul>
+
+<p><strong>Interfaces:</strong></p>
+<ul class="task-list">
+  <li>Consumes: Git diff against the pre-D3 baseline.</li>
+  <li>
+    <p>Produces: explicit allowed-file guard.</p>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 1: Write the scope regression test</strong></li>
+</ul>
+
+<p>Create <code class="language-plaintext highlighter-rouge">tests/d3-scope-regression.test.mjs</code>:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span><span class="nx">execSync</span><span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">node:child_process</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="nx">assert</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">node:assert/strict</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">base</span><span class="o">=</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">D3_BASE_REF</span><span class="o">||</span><span class="dl">'</span><span class="s1">HEAD~4</span><span class="dl">'</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">changed</span><span class="o">=</span><span class="nx">execSync</span><span class="p">(</span>
+  <span class="s2">`git diff --name-only </span><span class="p">${</span><span class="nx">base</span><span class="p">}</span><span class="s2">...HEAD`</span><span class="p">,</span>
+  <span class="p">{</span><span class="na">encoding</span><span class="p">:</span><span class="dl">'</span><span class="s1">utf8</span><span class="dl">'</span><span class="p">}</span>
+<span class="p">)</span>
+  <span class="p">.</span><span class="nx">trim</span><span class="p">()</span>
+  <span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="sr">/</span><span class="se">\r?\n</span><span class="sr">/</span><span class="p">)</span>
+  <span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nb">Boolean</span><span class="p">);</span>
+
+<span class="kd">const</span> <span class="nx">allowed</span><span class="o">=</span><span class="p">[</span>
+  <span class="dl">'</span><span class="s1">js/admin-onboarding.js</span><span class="dl">'</span><span class="p">,</span>
+  <span class="dl">'</span><span class="s1">js/admin-services.js</span><span class="dl">'</span><span class="p">,</span>
+  <span class="dl">'</span><span class="s1">admin/servicios.html</span><span class="dl">'</span><span class="p">,</span>
+  <span class="dl">'</span><span class="s1">supabase/migrations/20260914_d3_service_templates_rpc.sql</span><span class="dl">'</span><span class="p">,</span>
+  <span class="dl">'</span><span class="s1">tests/d3-service-templates-rpc.sql</span><span class="dl">'</span><span class="p">,</span>
+  <span class="dl">'</span><span class="s1">tests/d3-onboarding-canonical-templates.test.mjs</span><span class="dl">'</span><span class="p">,</span>
+  <span class="dl">'</span><span class="s1">tests/d3-services-canonical-templates.test.mjs</span><span class="dl">'</span><span class="p">,</span>
+  <span class="dl">'</span><span class="s1">tests/d3-scope-regression.test.mjs</span><span class="dl">'</span><span class="p">,</span>
+  <span class="dl">'</span><span class="s1">docs/superpowers/specs/2026-09-14-d3-catalogo-canonico-design.md</span><span class="dl">'</span><span class="p">,</span>
+  <span class="dl">'</span><span class="s1">docs/superpowers/plans/2026-09-14-d3-catalogo-canonico.md</span><span class="dl">'</span>
+<span class="p">];</span>
+
+<span class="kd">const</span> <span class="nx">unexpected</span><span class="o">=</span><span class="nx">changed</span><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">path</span><span class="o">=&gt;!</span><span class="nx">allowed</span><span class="p">.</span><span class="nx">includes</span><span class="p">(</span><span class="nx">path</span><span class="p">));</span>
+<span class="nx">assert</span><span class="p">.</span><span class="nx">deepEqual</span><span class="p">(</span>
+  <span class="nx">unexpected</span><span class="p">,</span>
+  <span class="p">[],</span>
+  <span class="s2">`D3 touched out-of-scope files: </span><span class="p">${</span><span class="nx">unexpected</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="dl">'</span><span class="s1">, </span><span class="dl">'</span><span class="p">)}</span><span class="s2">`</span>
+<span class="p">);</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">d3 scope regression: PASS</span><span class="dl">'</span><span class="p">);</span>
+</code></pre></div></div>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 2: Run it with the correct baseline ref</strong></li>
+</ul>
+
+<p>Before implementation, record the baseline commit:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git rev-parse HEAD
+</code></pre></div></div>
+
+<p>Then run:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">D3_BASE_REF</span><span class="o">=</span>&lt;baseline-sha&gt; node tests/d3-scope-regression.test.mjs
+</code></pre></div></div>
+
+<p>Expected: PASS if only D3 files changed.</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 3: Remove any accidental out-of-scope edits</strong></li>
+</ul>
+
+<p>If the test reports files related to shell/navigation, plans/entitlements, Mercado Pago, Reviews, Growth, or Google Business, revert those changes from D3.</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 4: Re-run scope guard</strong></li>
+</ul>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">D3_BASE_REF</span><span class="o">=</span>&lt;baseline-sha&gt; node tests/d3-scope-regression.test.mjs
+</code></pre></div></div>
+
+<p>Expected: PASS.</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 5: Commit</strong></li>
+</ul>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git add tests/d3-scope-regression.test.mjs
+git commit <span class="nt">-m</span> <span class="s2">"test: enforce d3 scope boundaries"</span>
+</code></pre></div></div>
+
+<hr />
+
+<h3 id="task-6-full-verification-before-completion">Task 6: Full verification before completion</h3>
+
+<p><strong>Files:</strong></p>
+<ul>
+  <li>No new production files.</li>
+  <li>Validate all files changed by Tasks 1–5.</li>
+</ul>
+
+<p><strong>Interfaces:</strong></p>
+<ul class="task-list">
+  <li>Consumes: entire D3 implementation.</li>
+  <li>
+    <p>Produces: evidence that D3 is complete without collateral changes.</p>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 1: Run JavaScript syntax checks</strong></li>
+</ul>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>node <span class="nt">--check</span> js/admin-onboarding.js
+node <span class="nt">--check</span> js/admin-services.js
+</code></pre></div></div>
+
+<p>Expected: both exit 0.</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 2: Run D3 JavaScript tests</strong></li>
+</ul>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>node tests/d3-onboarding-canonical-templates.test.mjs
+node tests/d3-services-canonical-templates.test.mjs
+<span class="nv">D3_BASE_REF</span><span class="o">=</span>&lt;baseline-sha&gt; node tests/d3-scope-regression.test.mjs
+</code></pre></div></div>
+
+<p>Expected: all PASS.</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 3: Run the SQL contract test</strong></li>
+</ul>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>psql <span class="s2">"</span><span class="nv">$DATABASE_URL</span><span class="s2">"</span> <span class="nt">-v</span> <span class="nv">ON_ERROR_STOP</span><span class="o">=</span>1 <span class="nt">-f</span> tests/d3-service-templates-rpc.sql
+</code></pre></div></div>
+
+<p>Expected: PASS.</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 4: Perform authenticated tenant-isolation verification</strong></li>
+</ul>
+
+<p>Using two real or isolated test users/businesses:</p>
+
+<ol>
+  <li>Authenticate as a member of Business A.</li>
+  <li>Call:</li>
+</ol>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">await</span> <span class="nx">supabase</span><span class="p">.</span><span class="nx">rpc</span><span class="p">(</span><span class="dl">'</span><span class="s1">get_business_service_templates</span><span class="dl">'</span><span class="p">,{</span>
+  <span class="na">p_business_id</span><span class="p">:</span> <span class="nx">BUSINESS_A_ID</span>
+<span class="p">});</span>
+</code></pre></div></div>
+
+<p>Expected: only active templates from Business A’s category.</p>
+
+<ol>
+  <li>With the same session call the RPC for Business B where the user is not a member.</li>
+</ol>
+
+<p>Expected: error with <code class="language-plaintext highlighter-rouge">forbidden</code> / SQLSTATE <code class="language-plaintext highlighter-rouge">42501</code>.</p>
+
+<ol>
+  <li>Call the RPC with an anon client.</li>
+</ol>
+
+<p>Expected: permission denied because <code class="language-plaintext highlighter-rouge">anon</code> has no <code class="language-plaintext highlighter-rouge">EXECUTE</code>.</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 5: Verify Onboarding in browser</strong></li>
+</ul>
+
+<p>For a business with persisted category and incomplete setup:</p>
+
+<ol>
+  <li>Open <code class="language-plaintext highlighter-rouge">admin/onboarding.html</code>.</li>
+  <li>Confirm previously saved name/category/hours remain.</li>
+  <li>Open Step 3.</li>
+  <li>Confirm templates correspond to the persisted business category.</li>
+  <li>Confirm an existing service with the same normalized name appears as existing and does not duplicate on save.</li>
+  <li>Finish the flow and confirm no unrelated data was reset.</li>
+</ol>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 6: Verify Services in browser</strong></li>
+</ul>
+
+<ol>
+  <li>Open <code class="language-plaintext highlighter-rouge">admin/servicios.html</code>.</li>
+  <li>Confirm existing services still render.</li>
+  <li>Confirm quick-start templates correspond to the business category.</li>
+  <li>Pick a template.</li>
+  <li>Confirm name/category/duration/price suggestion populate.</li>
+  <li>Save the service.</li>
+  <li>Confirm staff, buffer, deposit, image, advanced settings, and active/featured controls still exist.</li>
+  <li>Confirm sidebar/shell/navigation look exactly as before D3.</li>
+</ol>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 7: Verify database non-migration guarantee</strong></li>
+</ul>
+
+<p>Run a before/after count and checksum-style snapshot for existing <code class="language-plaintext highlighter-rouge">services</code> rows around deployment:</p>
+
+<div class="language-sql highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">select</span>
+  <span class="n">business_id</span><span class="p">,</span>
+  <span class="k">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="k">as</span> <span class="n">service_count</span><span class="p">,</span>
+  <span class="k">sum</span><span class="p">(</span><span class="n">coalesce</span><span class="p">(</span><span class="n">price</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span> <span class="k">as</span> <span class="n">price_sum</span>
+<span class="k">from</span> <span class="k">public</span><span class="p">.</span><span class="n">services</span>
+<span class="k">group</span> <span class="k">by</span> <span class="n">business_id</span>
+<span class="k">order</span> <span class="k">by</span> <span class="n">business_id</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>Expected: applying the D3 migration alone changes no <code class="language-plaintext highlighter-rouge">services</code> row counts or prices.</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 8: Record the deferred RLS follow-up</strong></li>
+</ul>
+
+<p>Add a project note/issue titled:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Post-D3 security: close direct service_templates read policy
+</code></pre></div></div>
+
+<p>with acceptance criteria:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- inventory every direct consumer of public.service_templates
+- migrate remaining consumers to safe interfaces
+- restrict or remove service_templates_read for anon/authenticated
+- verify public/admin regressions before closing
+</code></pre></div></div>
+
+<p>This is documentation only; do not change the RLS policy in D3.</p>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><strong>Step 9: Final verification commit</strong></li>
+</ul>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git add <span class="nb">.</span>
+git status <span class="nt">--short</span>
+git commit <span class="nt">-m</span> <span class="s2">"chore: verify d3 canonical service catalog"</span>
+</code></pre></div></div>
+
+<p>Only commit if <code class="language-plaintext highlighter-rouge">git status</code> shows no accidental generated/binary/out-of-scope files.</p>
+
+<hr />
+
+<h2 id="completion-evidence-required">Completion Evidence Required</h2>
+
+<p>Do not claim D3 complete until all of the following are captured from fresh runs:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[ ] SQL RPC contract PASS
+[ ] anon EXECUTE denied
+[ ] authenticated non-member denied
+[ ] authenticated member receives only active templates for own business category
+[ ] admin-onboarding.js syntax PASS
+[ ] admin-services.js syntax PASS
+[ ] onboarding canonical-template test PASS
+[ ] services canonical-template test PASS
+[ ] scope regression test PASS
+[ ] existing services unchanged by migration
+[ ] mid-onboarding business continues successfully
+[ ] Services quick-start works from canonical RPC
+[ ] no R5/D4/D2/Reviews/Growth/Google files changed
+</code></pre></div></div>
+
+
+      
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+  </body>
+</html>

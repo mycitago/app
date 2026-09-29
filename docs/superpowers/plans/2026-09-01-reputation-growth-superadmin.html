@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>MyCitaGo Reputation, Growth and Super Admin Implementation Plan | app</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="MyCitaGo Reputation, Growth and Super Admin Implementation Plan" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="CITAS" />
+<meta property="og:description" content="CITAS" />
+<link rel="canonical" href="https://mycitago.github.io/app/docs/superpowers/plans/2026-09-01-reputation-growth-superadmin.html" />
+<meta property="og:url" content="https://mycitago.github.io/app/docs/superpowers/plans/2026-09-01-reputation-growth-superadmin.html" />
+<meta property="og:site_name" content="app" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="MyCitaGo Reputation, Growth and Super Admin Implementation Plan" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","description":"CITAS","headline":"MyCitaGo Reputation, Growth and Super Admin Implementation Plan","url":"https://mycitago.github.io/app/docs/superpowers/plans/2026-09-01-reputation-growth-superadmin.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/app/assets/css/style.css?v=b49e04b7df3c8314bb03944b0392696f51019dfa">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/app/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <div class="container-lg px-3 my-5 markdown-body">
+      
+      <h1><a href="https://mycitago.github.io/app/">app</a></h1>
+      
+
+      <h1 id="mycitago-reputation-growth-and-super-admin-implementation-plan">MyCitaGo Reputation, Growth and Super Admin Implementation Plan</h1>
+
+<blockquote>
+  <p><strong>For agentic workers:</strong> REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (<code class="language-plaintext highlighter-rouge">- [ ]</code>) syntax for tracking.</p>
+</blockquote>
+
+<p><strong>Goal:</strong> Add secure internal reviews/growth attribution and stabilize the Super Admin without breaking V6.</p>
+
+<p><strong>Architecture:</strong> Additive Supabase migration with RLS/RPC boundaries, static GitHub Pages UI, and independent widget loading. Google remains feature-gated; internal reputation is the guaranteed fallback.</p>
+
+<p><strong>Tech Stack:</strong> Supabase/PostgreSQL, vanilla JavaScript, HTML/CSS, Node contract tests.</p>
+
+<p><strong>Spec:</strong> <code class="language-plaintext highlighter-rouge">docs/superpowers/specs/2026-09-01-reputation-growth-superadmin-design.md</code></p>
+
+<h2 id="global-constraints">Global Constraints</h2>
+<ul>
+  <li>Never expose Supabase <code class="language-plaintext highlighter-rouge">service_role</code> in browser code.</li>
+  <li>Use existing <code class="language-plaintext highlighter-rouge">platform_admins</code> and <code class="language-plaintext highlighter-rouge">is_platform_admin()</code>.</li>
+  <li>Do not rename/remove stable V6 Agenda, Team, Branches or Google Login contracts.</li>
+  <li>Real Supabase data only; no mock production data.</li>
+  <li>Every Super Admin widget has loading, empty and error states.</li>
+  <li>Google Business Profile calls remain gated until configured.</li>
+</ul>
+
+<hr />
+
+<h3 id="task-1-contract-tests">Task 1: Contract tests</h3>
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Add failing tests for Super Admin resilience, reputation RPCs, Growth source attribution and reports.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Run new tests and verify RED.</li>
+</ul>
+
+<h3 id="task-2-additive-migration">Task 2: Additive migration</h3>
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Add idempotent migration for missing platform tables/RLS/RPCs.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Add secure review request/public submission RPCs and booking source tracking RPC.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Run SQL/static contract tests.</li>
+</ul>
+
+<h3 id="task-3-super-admin-stabilization">Task 3: Super Admin stabilization</h3>
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Make operational widgets independent with visible retry/error/empty states.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Add real sections for integrations, incidents, payments and audit without fake values.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Run platform tests.</li>
+</ul>
+
+<h3 id="task-4-internal-reviews">Task 4: Internal reviews</h3>
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Add public <code class="language-plaintext highlighter-rouge">resena.html</code> and review client script/CSS.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Update admin reviews to unified internal/Google source display and internal replies.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Add completed-appointment review link generation.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Run review tests.</li>
+</ul>
+
+<h3 id="task-5-growth-and-source-attribution">Task 5: Growth and source attribution</h3>
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Add Growth page and shell nav entry.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Add source-tagged share actions.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Capture <code class="language-plaintext highlighter-rouge">src</code> after public booking using appointment access token.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Run growth tests.</li>
+</ul>
+
+<h3 id="task-6-reporting-and-verification">Task 6: Reporting and verification</h3>
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Add monthly review, rating and shared-booking metrics.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Run full legacy + new tests, verifier and JS syntax checks.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Produce final ZIP and SQL file.</li>
+</ul>
+
+
+      
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+  </body>
+</html>

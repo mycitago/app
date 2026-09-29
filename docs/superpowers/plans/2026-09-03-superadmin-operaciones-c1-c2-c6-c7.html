@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Super Admin C1+C2+C6+C7 Implementation Plan | app</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="Super Admin C1+C2+C6+C7 Implementation Plan" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="CITAS" />
+<meta property="og:description" content="CITAS" />
+<link rel="canonical" href="https://mycitago.github.io/app/docs/superpowers/plans/2026-09-03-superadmin-operaciones-c1-c2-c6-c7.html" />
+<meta property="og:url" content="https://mycitago.github.io/app/docs/superpowers/plans/2026-09-03-superadmin-operaciones-c1-c2-c6-c7.html" />
+<meta property="og:site_name" content="app" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Super Admin C1+C2+C6+C7 Implementation Plan" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","description":"CITAS","headline":"Super Admin C1+C2+C6+C7 Implementation Plan","url":"https://mycitago.github.io/app/docs/superpowers/plans/2026-09-03-superadmin-operaciones-c1-c2-c6-c7.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/app/assets/css/style.css?v=b49e04b7df3c8314bb03944b0392696f51019dfa">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/app/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <div class="container-lg px-3 my-5 markdown-body">
+      
+      <h1><a href="https://mycitago.github.io/app/">app</a></h1>
+      
+
+      <h1 id="super-admin-c1c2c6c7-implementation-plan">Super Admin C1+C2+C6+C7 Implementation Plan</h1>
+
+<blockquote>
+  <p><strong>For agentic workers:</strong> REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (<code class="language-plaintext highlighter-rouge">- [x]</code>) syntax for tracking.</p>
+</blockquote>
+
+<p><strong>Goal:</strong> Convertir la sección Negocios y módulos operativos del Super Admin en una herramienta utilizable para 100-1,000 negocios, manteniendo la seguridad en RPC y auditoría por negocio.</p>
+
+<p><strong>Architecture:</strong> El navegador conserva filtrado, orden, selección y exportación; las mutaciones siguen pasando por RPC específicos que validan <code class="language-plaintext highlighter-rouge">is_platform_admin(auth.uid())</code>. Se añade una migración aditiva para reforzar/crear RPC de lote seguros que procesan cada negocio de forma individual y generan una fila de auditoría por negocio. No se modifica <code class="language-plaintext highlighter-rouge">SUPABASE_V6_MASTER.sql</code>.</p>
+
+<p><strong>Tech Stack:</strong> HTML/CSS/JavaScript vanilla, Supabase JS, PostgreSQL/RPC, Node.js tests.</p>
+
+<p><strong>Spec:</strong> PROMPT MAESTRO Super Admin, Bloque C.1, C.2, C.6 y C.7 aprobado por el usuario.</p>
+
+<h2 id="global-constraints">Global Constraints</h2>
+
+<ul>
+  <li>La seguridad real vive dentro de PostgreSQL/RPC, nunca en JavaScript del navegador.</li>
+  <li>Toda mutación administrativa valida <code class="language-plaintext highlighter-rouge">public.is_platform_admin(auth.uid())</code> dentro del RPC.</li>
+  <li>Suspender/reactivar N negocios genera N filas independientes en <code class="language-plaintext highlighter-rouge">audit_logs</code>.</li>
+  <li>Migración aditiva; no modificar <code class="language-plaintext highlighter-rouge">SUPABASE_V6_MASTER.sql</code>.</li>
+  <li>No añadir Stripe, correos automáticos ni datos ficticios en esta entrega.</li>
+  <li>Exportar CSV respeta filtros/orden visibles.</li>
+</ul>
+
+<hr />
+
+<h3 id="task-1-contratos-de-seguridad-y-lote">Task 1: Contratos de seguridad y lote</h3>
+
+<p><strong>Files:</strong></p>
+<ul>
+  <li>Create: <code class="language-plaintext highlighter-rouge">sql/platform_bulk_operations.sql</code></li>
+  <li>Modify: <code class="language-plaintext highlighter-rouge">js/platform-api.js</code></li>
+  <li>Test: <code class="language-plaintext highlighter-rouge">tests/platform-bulk-security.test.mjs</code></li>
+</ul>
+
+<p><strong>Interfaces:</strong></p>
+<ul class="task-list">
+  <li>
+    <p>Produces: <code class="language-plaintext highlighter-rouge">platform_bulk_suspend(uuid[])</code>, <code class="language-plaintext highlighter-rouge">platform_bulk_reactivate(uuid[], integer)</code> y métodos <code class="language-plaintext highlighter-rouge">PlatformAPI.bulkSuspend(ids)</code>, <code class="language-plaintext highlighter-rouge">PlatformAPI.bulkReactivate(ids, days)</code>.</p>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Escribir prueba que exija validación interna de Super Admin, <code class="language-plaintext highlighter-rouge">security definer</code>, <code class="language-plaintext highlighter-rouge">search_path</code>, sin RPC genérico y auditoría dentro del bucle por negocio.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Ejecutar y confirmar fallo por archivos/contratos inexistentes.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Crear migración aditiva con los dos RPC; cada iteración llama/replica la mutación segura por negocio y deja auditoría individual.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Exponer adaptadores en <code class="language-plaintext highlighter-rouge">platform-api.js</code>.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Ejecutar prueba y confirmar PASS.</li>
+</ul>
+
+<h3 id="task-2-buscar-ordenar-y-seleccionar-negocios">Task 2: Buscar, ordenar y seleccionar negocios</h3>
+
+<p><strong>Files:</strong></p>
+<ul>
+  <li>Modify: <code class="language-plaintext highlighter-rouge">admin/plataforma.html</code></li>
+  <li>Modify: <code class="language-plaintext highlighter-rouge">js/admin-platform.js</code></li>
+  <li>Modify: <code class="language-plaintext highlighter-rouge">css/admin-platform.css</code></li>
+  <li>Test: <code class="language-plaintext highlighter-rouge">tests/platform-business-operations.test.mjs</code></li>
+</ul>
+
+<p><strong>Interfaces:</strong></p>
+<ul class="task-list">
+  <li>Consumes: <code class="language-plaintext highlighter-rouge">platformState.businesses</code>, <code class="language-plaintext highlighter-rouge">platformState.subs</code>, RPC bulk de Task 1.</li>
+  <li>
+    <p>Produces: búsqueda nombre/correo/teléfono/slug; orden por vencimiento/alta; selección múltiple; barra de acciones en lote.</p>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Escribir prueba de controles, orden, selección y llamadas API.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Confirmar fallo.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Añadir controles y estado de selección.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Implementar orden estable y combinado con filtro/búsqueda.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Implementar seleccionar visible/todo visible, suspender/reactivar seleccionados y refresco posterior.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Confirmar PASS.</li>
+</ul>
+
+<h3 id="task-3-exportación-csv-visible">Task 3: Exportación CSV visible</h3>
+
+<p><strong>Files:</strong></p>
+<ul>
+  <li>Modify: <code class="language-plaintext highlighter-rouge">admin/plataforma.html</code></li>
+  <li>Modify: <code class="language-plaintext highlighter-rouge">js/admin-platform.js</code></li>
+  <li>Test: <code class="language-plaintext highlighter-rouge">tests/platform-csv-export.test.mjs</code></li>
+</ul>
+
+<p><strong>Interfaces:</strong></p>
+<ul class="task-list">
+  <li>
+    <p>Produces: <code class="language-plaintext highlighter-rouge">exportBusinessesCsv()</code>, <code class="language-plaintext highlighter-rouge">exportPaymentsCsv()</code>, <code class="language-plaintext highlighter-rouge">exportAuditCsv()</code> y helper CSV seguro.</p>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Escribir prueba para BOM UTF-8, escapado CSV y botones Negocios/Pagos/Auditoría.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Confirmar fallo.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Implementar helper CSV y exportaciones que respeten estado visible.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Confirmar PASS.</li>
+</ul>
+
+<h3 id="task-4-cerrar-huecos-c7">Task 4: Cerrar huecos C7</h3>
+
+<p><strong>Files:</strong></p>
+<ul>
+  <li>Modify: <code class="language-plaintext highlighter-rouge">js/admin-platform.js</code></li>
+  <li>Modify: <code class="language-plaintext highlighter-rouge">admin/plataforma.html</code></li>
+  <li>Test: <code class="language-plaintext highlighter-rouge">tests/platform-c7-completeness.test.mjs</code></li>
+</ul>
+
+<p><strong>Interfaces:</strong></p>
+<ul class="task-list">
+  <li>Plantillas: estado explícito por categoría vacía con acción de creación.</li>
+  <li>Cambios de giro: aprobar/rechazar por fila.</li>
+  <li>
+    <p>Detalle negocio: plan/vencimiento, historial pagos y enlaces/filtro a soporte del negocio.</p>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Escribir prueba de los tres criterios.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Confirmar fallo para los huecos actuales.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Mejorar <code class="language-plaintext highlighter-rouge">renderTemplateSummary()</code> con estado vacío accionable.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Conservar y reforzar acciones de cambios de giro.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Completar drawer con pagos del negocio y tickets de soporte relacionados.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Confirmar PASS.</li>
+</ul>
+
+<h3 id="task-5-verificación-integral-y-paquete">Task 5: Verificación integral y paquete</h3>
+
+<p><strong>Files:</strong></p>
+<ul class="task-list">
+  <li>Create: <code class="language-plaintext highlighter-rouge">INSTALAR_SUPERADMIN_C1_C2_C6_C7.md</code></li>
+  <li>
+    <p>Create: ZIP acumulado final.</p>
+  </li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Ejecutar todos los tests <code class="language-plaintext highlighter-rouge">tests/*.test.mjs</code>.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Ejecutar <code class="language-plaintext highlighter-rouge">python tools/verify-v6.py</code>.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Validar sintaxis de todos los JS con <code class="language-plaintext highlighter-rouge">node --check</code>.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Confirmar <code class="language-plaintext highlighter-rouge">SUPABASE_V6_MASTER.sql</code> sin cambios mediante SHA-256 contra paquete base.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Validar que la migración contiene rechazo no-admin y auditoría por fila.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Crear ZIP y ejecutar <code class="language-plaintext highlighter-rouge">unzip -t</code>.</li>
+</ul>
+
+
+      
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+  </body>
+</html>

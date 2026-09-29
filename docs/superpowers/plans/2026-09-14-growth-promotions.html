@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Growth Promotions Implementation Plan | app</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="Growth Promotions Implementation Plan" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="CITAS" />
+<meta property="og:description" content="CITAS" />
+<link rel="canonical" href="https://mycitago.github.io/app/docs/superpowers/plans/2026-09-14-growth-promotions.html" />
+<meta property="og:url" content="https://mycitago.github.io/app/docs/superpowers/plans/2026-09-14-growth-promotions.html" />
+<meta property="og:site_name" content="app" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Growth Promotions Implementation Plan" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","description":"CITAS","headline":"Growth Promotions Implementation Plan","url":"https://mycitago.github.io/app/docs/superpowers/plans/2026-09-14-growth-promotions.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/app/assets/css/style.css?v=b49e04b7df3c8314bb03944b0392696f51019dfa">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/app/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <div class="container-lg px-3 my-5 markdown-body">
+      
+      <h1><a href="https://mycitago.github.io/app/">app</a></h1>
+      
+
+      <h1 id="growth-promotions-implementation-plan">Growth Promotions Implementation Plan</h1>
+
+<blockquote>
+  <p><strong>For agentic workers:</strong> REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (<code class="language-plaintext highlighter-rouge">- [ ]</code>) syntax for tracking.</p>
+</blockquote>
+
+<p><strong>Goal:</strong> Activar promociones reales, enlaces rastreables y segmentación CRM sin incluir pagos.</p>
+
+<p><strong>Architecture:</strong> El panel administra <code class="language-plaintext highlighter-rouge">business_promotions</code>; el booking consulta <code class="language-plaintext highlighter-rouge">get_public_promotion</code> y crea la cita con <code class="language-plaintext highlighter-rouge">create_appointment_v3</code>. Utilidades puras concentran validación, cálculo, URLs y segmentación para poder probarlas con Node.</p>
+
+<p><strong>Tech Stack:</strong> HTML/CSS/JavaScript vanilla, Supabase/PostgreSQL, Node.js para pruebas.</p>
+
+<p><strong>Spec:</strong> <code class="language-plaintext highlighter-rouge">docs/superpowers/specs/2026-09-14-growth-promotions-design.md</code></p>
+
+<h2 id="global-constraints">Global Constraints</h2>
+<ul>
+  <li>No modificar D2 Mercado Pago.</li>
+  <li>No confiar en precio/discount calculado por frontend.</li>
+  <li>Solo segmentar clientes con <code class="language-plaintext highlighter-rouge">marketing_opt_in=true</code>.</li>
+  <li>No hacer envío masivo automático.</li>
+</ul>
+
+<hr />
+
+<h3 id="task-1-utilidades-de-promociones">Task 1: Utilidades de promociones</h3>
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />RED: crear <code class="language-plaintext highlighter-rouge">tests/growth-promotion-utils.test.js</code> antes de implementación.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Ejecutar y confirmar fallo por módulo faltante.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />GREEN: crear <code class="language-plaintext highlighter-rouge">js/growth-promotion-utils.js</code>.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Ejecutar test y confirmar PASS.</li>
+</ul>
+
+<h3 id="task-2-panel-crecimiento">Task 2: Panel Crecimiento</h3>
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Reemplazar <code class="language-plaintext highlighter-rouge">admin/crecimiento.html</code> con panel unificado.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Reemplazar <code class="language-plaintext highlighter-rouge">js/admin-growth.js</code> con servicios, promociones, CRM y métricas.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Actualizar <code class="language-plaintext highlighter-rouge">css/growth.css</code>.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Verificar sintaxis JavaScript.</li>
+</ul>
+
+<h3 id="task-3-booking-público">Task 3: Booking público</h3>
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Preparar <code class="language-plaintext highlighter-rouge">js/public-promotion.js</code>.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Preparar <code class="language-plaintext highlighter-rouge">PATCH_RESERVAR.txt</code> para activar el script después de <code class="language-plaintext highlighter-rouge">app.js</code>.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Verificar sintaxis JavaScript.</li>
+</ul>
+
+<h3 id="task-4-validación-de-backend">Task 4: Validación de backend</h3>
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Confirmar <code class="language-plaintext highlighter-rouge">business_promotions</code>.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Confirmar <code class="language-plaintext highlighter-rouge">get_public_promotion</code>.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Confirmar <code class="language-plaintext highlighter-rouge">create_appointment_v3</code>.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Confirmar <code class="language-plaintext highlighter-rouge">track_booking_source</code>.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Confirmar <code class="language-plaintext highlighter-rouge">customer_crm.segment</code> y <code class="language-plaintext highlighter-rouge">marketing_opt_in</code>.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />Verificación final y empaquetado.</li>
+</ul>
+
+
+      
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+  </body>
+</html>

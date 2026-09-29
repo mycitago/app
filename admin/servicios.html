@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1"><script data-mycitago-theme-boot>(function(){try{var p=localStorage.getItem('mycitago:tenant-theme')||'system',d=p==='dark'||(p==='system'&&matchMedia('(prefers-color-scheme:dark)').matches)?'dark':'light';document.documentElement.dataset.theme=d;document.documentElement.dataset.ctTheme=d;document.documentElement.style.colorScheme=d}catch(e){}})();</script>
   <title>Servicios · MyCitaGo</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -12,51 +12,11 @@
 <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
 <link rel="stylesheet" href="../css/citago-admin.css"><link rel="stylesheet" href="../css/admin-services.css"><link rel="stylesheet" href="../css/mycitago-themes.css">
 <script src="../js/ui-theme.js"></script>
+<link rel="stylesheet" href="../css/mycitago-fase3-unified.css">
 </head>
 <body class="svc-body"><div id="citago-shell"></div>
 
-<header class="svc-mobile-topbar">
-  <div class="svc-brand-mark">C</div>
-  <div>
-    <strong>MyCitaGo</strong>
-    <small>Servicios y disponibilidad</small>
-  </div>
-  <button id="svc-mobile-menu" class="svc-icon-btn" type="button" aria-label="Abrir menú">☰</button>
-</header>
-
-<div class="svc-shell">
-  <aside class="svc-sidebar" id="svc-sidebar">
-    <div class="svc-brand">
-      <div class="svc-logo">C</div>
-      <div><strong>MyCitaGo</strong><small>Tu negocio, organizado</small></div>
-    </div>
-
-    <div class="svc-side-label">MI NEGOCIO</div>
-    <nav class="svc-nav">
-      <a href="configuracion.html"><i data-lucide="building-2"></i> Información</a>
-      <a class="active" href="servicios.html"><i data-lucide="package"></i> Servicios</a>
-      <a href="equipo.html"><i data-lucide="users"></i> Personal</a>
-      <a href="index.html"><i data-lucide="calendar-clock"></i> Reservas</a>
-      <a href="clientes.html"><i data-lucide="contact"></i> Clientes</a>
-      <a href="contabilidad.html"><i data-lucide="chart-no-axes-column-increasing"></i> Reportes</a>
-      <a href="integraciones.html"><i data-lucide="plug"></i> Integraciones</a>
-    </nav>
-
-    <div class="svc-side-spacer"></div>
-    <section class="svc-plan-card">
-      <span class="svc-plan-kicker">TU PLAN ACTUAL</span>
-      <div id="svc-plan-skeleton" class="svc-plan-skeleton"><i></i><i></i></div>
-<strong id="svc-plan-name" class="hidden"></strong>
-<small id="svc-plan-date" class="hidden"></small>
-      <a href="planes.html">Ver mi plan</a>
-    </section>
-    <section class="svc-help-card">
-      <b>¿Necesitas ayuda?</b>
-      <p>Configura tu negocio paso a paso. Empieza con un horario rápido y ajusta después.</p>
-    </section>
-  </aside>
-
-  <main class="svc-main">
+<main class="svc-main">
     <div class="svc-view-tabs"><button class="active" type="button" data-svc-view="create">+ Agregar servicio</button><button type="button" data-svc-view="catalog">Mis servicios</button></div>
     <section class="svc-page-head">
       <div>
@@ -306,7 +266,6 @@
       </div>
     </div>
   </main>
-</div>
 
 <div id="toast" class="toast hidden"></div>
 

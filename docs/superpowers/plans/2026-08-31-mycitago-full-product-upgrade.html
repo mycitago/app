@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>MyCitaGo Full Product Upgrade Implementation Plan | app</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="MyCitaGo Full Product Upgrade Implementation Plan" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="CITAS" />
+<meta property="og:description" content="CITAS" />
+<link rel="canonical" href="https://mycitago.github.io/app/docs/superpowers/plans/2026-08-31-mycitago-full-product-upgrade.html" />
+<meta property="og:url" content="https://mycitago.github.io/app/docs/superpowers/plans/2026-08-31-mycitago-full-product-upgrade.html" />
+<meta property="og:site_name" content="app" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="MyCitaGo Full Product Upgrade Implementation Plan" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","description":"CITAS","headline":"MyCitaGo Full Product Upgrade Implementation Plan","url":"https://mycitago.github.io/app/docs/superpowers/plans/2026-08-31-mycitago-full-product-upgrade.html"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/app/assets/css/style.css?v=b49e04b7df3c8314bb03944b0392696f51019dfa">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/app/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <div class="container-lg px-3 my-5 markdown-body">
+      
+      <h1><a href="https://mycitago.github.io/app/">app</a></h1>
+      
+
+      <h1 id="mycitago-full-product-upgrade-implementation-plan">MyCitaGo Full Product Upgrade Implementation Plan</h1>
+
+<blockquote>
+  <p><strong>For agentic workers:</strong> REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.</p>
+</blockquote>
+
+<p><strong>Goal:</strong> Convert CITAGO into the approved MyCitaGo product experience: unified brand, compact dashboard, guided service setup with templates, support center, preloaded visual content, improved public page, and an operational Super Admin.</p>
+
+<p><strong>Architecture:</strong> Keep Supabase Auth/RLS/business_id and current booking logic. Add presentation/system tables for templates/support/service commercial settings, use one shared MyCitaGo design system, and preserve server-side boundaries for platform/global operations and Google integration.</p>
+
+<p><strong>Tech Stack:</strong> Static HTML/CSS/JS on GitHub Pages, Supabase JS/Postgres/RLS/Storage/Edge Functions.</p>
+
+<p><strong>Spec:</strong> Conversation-approved design based on MyCitaGo reference images and the prior CITAGO redesign spec.</p>
+
+<h2 id="global-constraints">Global Constraints</h2>
+<ul>
+  <li>Keep existing multi-tenant RLS/security boundaries.</li>
+  <li>Do not expose Google secrets in frontend.</li>
+  <li>Work under GitHub Pages <code class="language-plaintext highlighter-rouge">/app/</code> relative paths.</li>
+  <li>Use one visual system across tenant admin, public booking, and platform admin.</li>
+  <li>Mobile-first behavior must remain functional.</li>
+</ul>
+
+<hr />
+
+<h3 id="task-1-mycitago-brand-system-and-assets">Task 1: MyCitaGo brand system and assets</h3>
+<ul>
+  <li>Create brand logo assets derived from user-provided reference.</li>
+  <li>Rebrand shared shell and public page from CITAGO to MyCitaGo.</li>
+  <li>Add preloaded visual assets for common service categories.</li>
+  <li>Verify no broken asset paths.</li>
+</ul>
+
+<h3 id="task-2-compact-dashboard">Task 2: Compact dashboard</h3>
+<ul>
+  <li>Remove dashboard whitespace/min-height problem and duplicate floating CTA.</li>
+  <li>Move greeting/KPIs above the fold.</li>
+  <li>Add health/actions/support summary.</li>
+  <li>Verify desktop/mobile layout.</li>
+</ul>
+
+<h3 id="task-3-guided-services-and-presets">Task 3: Guided services and presets</h3>
+<ul>
+  <li>Replace service-first empty form flow with Quick Setup + Advanced.</li>
+  <li>Add business-category service templates and preloaded images.</li>
+  <li>Add price-triggered guided setup, margin/capacity calculations, validations, staff, schedule inheritance, duplicate/autosave UX.</li>
+  <li>Preserve legacy service save contract.</li>
+</ul>
+
+<h3 id="task-4-service-data-model">Task 4: Service data model</h3>
+<ul>
+  <li>Add service_templates, business_categories, service_commercial_settings, service_exceptions, service_versions.</li>
+  <li>Add RLS and seed curated templates.</li>
+  <li>Merge migration into APLICAR_EN_SUPABASE.sql.</li>
+</ul>
+
+<h3 id="task-5-support-center">Task 5: Support center</h3>
+<ul>
+  <li>Add tenant Help/Support screen and contextual contact button.</li>
+  <li>Add support_tickets/support_messages tables and RLS.</li>
+  <li>Add Super Admin support inbox and status workflow.</li>
+</ul>
+
+<h3 id="task-6-super-admin-operations-center">Task 6: Super Admin operations center</h3>
+<ul>
+  <li>Modernize platform overview.</li>
+  <li>Add support, template catalog, health/action queues, business drilldown.</li>
+  <li>Keep cross-tenant aggregation behind platform RPC.</li>
+</ul>
+
+<h3 id="task-7-onboarding-and-category-presets">Task 7: Onboarding and category presets</h3>
+<ul>
+  <li>Add guided business category selection and recommended services flow.</li>
+  <li>Show completion progress and launch checklist.</li>
+</ul>
+
+<h3 id="task-8-public-page-and-preloaded-imagery">Task 8: Public page and preloaded imagery</h3>
+<ul>
+  <li>Apply MyCitaGo brand language to public booking while preserving tenant branding.</li>
+  <li>Show service images/default images, reviews, staff, and polished mobile booking.</li>
+</ul>
+
+<h3 id="task-9-regressionsecurity-verification">Task 9: Regression/security verification</h3>
+<ul>
+  <li>Add contract tests for branding, dashboard layout, service templates, support and platform.</li>
+  <li>Run JS syntax checks and structural verification.</li>
+  <li>Package full repository plus SQL/install instructions.</li>
+</ul>
+
+
+      
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+  </body>
+</html>

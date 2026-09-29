@@ -1,0 +1,14 @@
+/* MYCitaGo V2 — Phase 2 / Block 1: Clientes responsive containment */
+.crm-grid-name,.crm-name{min-width:0}
+.crm-name strong,.crm-name small{overflow-wrap:anywhere}
+@media(max-width:900px){
+  #customer-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #customer-stats>*{min-width:0}
+  .ct-table-scroll .ct-data-table{min-width:760px}
+  .ct-drawer-panel{max-width:100%;overscroll-behavior:contain}
+}
+@media(max-width:420px){
+  #customer-stats{grid-template-columns:1fr 1fr;gap:10px}
+  #customer-stats .ct-stat-card{padding:14px}
+  .ct-drawer-panel{width:100vw;padding:18px 15px}
+}
