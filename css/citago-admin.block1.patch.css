@@ -1,0 +1,16 @@
+/* MYCitaGo V2 — Phase 2 / Block 1: responsive structural containment */
+html,body{max-width:100%;overflow-x:hidden}
+.ct-app,.ct-main,.ct-content,.ct-page-host{min-width:0}
+.ct-content>*{min-width:0}
+.ct-table-scroll{max-width:100%;min-width:0}
+@media(max-width:900px){
+  .ct-content{width:100%;max-width:100%;overflow:visible}
+  .ct-page-head,.ct-stat-grid,.ct-filter-row,.ct-card{min-width:0;max-width:100%}
+  .ct-table-scroll{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-inline:contain}
+  .ct-data-table{width:max-content;min-width:760px;max-width:none}
+}
+@media(max-width:420px){
+  .ct-stat-grid{grid-template-columns:1fr 1fr;gap:10px}
+  .ct-stat-card{min-width:0;padding:14px}
+  .ct-stat-card strong{font-size:22px;overflow-wrap:anywhere}
+}

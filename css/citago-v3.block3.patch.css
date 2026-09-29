@@ -1,0 +1,27 @@
+/* MYCitaGo V2 — Fase 2 / Bloque 3
+   Compatibilidad temporal: ambos selectores representan el MISMO tema. */
+html[data-theme="dark"][data-ct-theme="dark"] .ct-card,
+html[data-theme="dark"][data-ct-theme="dark"] .ct-stat-card,
+html[data-theme="dark"][data-ct-theme="dark"] .ct-drawer-panel,
+html[data-theme="dark"][data-ct-theme="dark"] .ct-dialog-panel,
+html[data-theme="dark"][data-ct-theme="dark"] .ct-user-menu,
+html[data-theme="dark"][data-ct-theme="dark"] .ct-more-panel{
+  background:var(--ct-surface)!important;color:var(--ct-text)!important;border-color:var(--ct-border)!important
+}
+html[data-theme="dark"][data-ct-theme="dark"] .ct-data-table td,
+html[data-theme="dark"][data-ct-theme="dark"] .ct-data-table th,
+html[data-theme="dark"][data-ct-theme="dark"] .ct-page-head h1,
+html[data-theme="dark"][data-ct-theme="dark"] .ct-page-head h2{color:var(--ct-text)}
+html[data-theme="dark"][data-ct-theme="dark"] .ct-data-table tbody tr:hover{background:var(--ct-surface-2)}
+html[data-theme="dark"][data-ct-theme="dark"] .ct-more-grid a{
+  background:var(--ct-surface-2);color:var(--ct-text);border-color:var(--ct-border)
+}
+html[data-theme="dark"][data-ct-theme="dark"] .ct-more-close{
+  background:var(--ct-surface-2);color:var(--ct-text)
+}
+html[data-theme="dark"][data-ct-theme="dark"] .settings-section,
+html[data-theme="dark"][data-ct-theme="dark"] .settings-link-card,
+html[data-theme="dark"][data-ct-theme="dark"] .category-change-panel{
+  background:var(--ct-surface)!important;color:var(--ct-text)!important;border-color:var(--ct-border)!important
+}
+html[data-theme="dark"][data-ct-theme="dark"] .settings-field label{color:var(--ct-text)}

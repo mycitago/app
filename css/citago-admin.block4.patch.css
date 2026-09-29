@@ -1,0 +1,47 @@
+/* MYCitaGo V2 — Fase 2 / Bloque 4: modales e interacción móvil */
+.ct-dialog{height:100vh;height:100dvh;overflow:hidden}
+.ct-dialog-panel{
+  max-height:calc(100vh - 40px);
+  max-height:calc(100dvh - 40px);
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+}
+.ct-dialog-panel input,.ct-dialog-panel select,.ct-dialog-panel textarea{max-width:100%}
+@media(max-width:720px){
+  .ct-dialog{
+    align-items:flex-end;
+    padding:max(8px,env(safe-area-inset-top,0px)) 8px max(8px,env(safe-area-inset-bottom,0px));
+  }
+  .ct-dialog-panel{
+    width:100%;
+    max-width:none;
+    max-height:calc(100vh - max(16px,env(safe-area-inset-top,0px)) - max(8px,env(safe-area-inset-bottom,0px)));
+    max-height:calc(100dvh - max(16px,env(safe-area-inset-top,0px)) - max(8px,env(safe-area-inset-bottom,0px)));
+    border-radius:20px 20px 16px 16px;
+    padding:20px 16px calc(16px + env(safe-area-inset-bottom,0px));
+    scroll-padding-bottom:90px;
+  }
+  .ct-dialog-panel h2{font-size:22px;padding-right:42px}
+  .ct-dialog-close{position:sticky;float:right;right:0;top:0;z-index:3}
+  .ct-appointment-form input,.ct-appointment-form select,.ct-appointment-form textarea{
+    min-height:44px;font-size:16px
+  }
+  .ct-appointment-form textarea{min-height:78px}
+  .ct-dialog-footer{
+    position:sticky;bottom:calc(-16px - env(safe-area-inset-bottom,0px));
+    z-index:2;
+    margin:8px -16px calc(-16px - env(safe-area-inset-bottom,0px));
+    padding:10px 16px calc(12px + env(safe-area-inset-bottom,0px));
+    background:var(--ct-surface,#fff);
+    border-top:1px solid var(--ct-border);
+  }
+  .ct-dialog-footer .ct-btn{min-height:44px;flex:1}
+  .ct-global-toast{
+    left:12px;right:12px;bottom:calc(var(--ct-mobile-nav-h,68px) + 22px + env(safe-area-inset-bottom,0px));
+    text-align:center
+  }
+}
+@media(max-width:390px){
+  .ct-dialog-actions{grid-template-columns:1fr}
+  .ct-dialog-panel>p{margin-bottom:14px}
+}

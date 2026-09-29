@@ -1,0 +1,79 @@
+/* MYCitaGo V2 — Fase 3 / Bloque 1
+   Dashboard administrativo: lenguaje Teamwork adaptado a la identidad MyCitaGo.
+   Solo presentación. No modifica datos, Supabase ni eventos. */
+
+.dashboard-v3 .ct-content{max-width:1480px!important;padding:26px 30px 44px!important}
+.dashboard-v3 .dash-main{display:grid;gap:18px}
+.dashboard-v3 .dash-welcome.v3-welcome{
+  min-height:116px!important;padding:24px 26px!important;margin:0!important;
+  border:1px solid var(--v3-border)!important;border-radius:20px!important;
+  background:var(--v3-card)!important;box-shadow:0 8px 28px rgba(37,30,55,.04)!important
+}
+.dashboard-v3 .dash-welcome h1{font-size:28px!important}
+.dashboard-v3 .dash-welcome p{margin-top:7px!important}
+.dashboard-v3 .dash-welcome .btn-new,
+.dashboard-v3 .dash-welcome .ct-btn-primary{min-height:42px;border-radius:11px}
+
+.dashboard-v3 .dash-kpis{gap:12px!important;margin:0!important}
+.dashboard-v3 .kpi-card{
+  min-height:132px!important;padding:17px 18px!important;border-radius:16px!important;
+  box-shadow:none!important;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease
+}
+.dashboard-v3 .kpi-card:hover{transform:translateY(-2px);border-color:#d9d2e7!important;box-shadow:0 10px 26px rgba(37,30,55,.06)!important}
+.dashboard-v3 .kpi-card .kpi-icon{width:38px!important;height:38px!important;border-radius:11px!important}
+.dashboard-v3 .kpi-card .kpi-copy strong{font-size:27px!important}
+.dashboard-v3 .kpi-card>a{margin-top:12px!important;padding-top:10px!important}
+
+.dashboard-v3 .v3-health-card{margin:0!important;border-radius:16px!important}
+.dashboard-v3 .dash-grid-main{gap:14px!important}
+.dashboard-v3 .dash-card{
+  border-radius:16px!important;box-shadow:none!important;
+  transition:border-color .16s ease,box-shadow .16s ease
+}
+.dashboard-v3 .dash-card:hover{border-color:#ded9e8!important;box-shadow:0 8px 24px rgba(37,30,55,.04)!important}
+.dashboard-v3 .card-head{padding-bottom:14px!important}
+.dashboard-v3 .card-head h2{font-size:15px!important}
+.dashboard-v3 .appointment-card,.dashboard-v3 .v3-attention-item{border-radius:11px!important}
+.dashboard-v3 .v3-attention-card{top:82px}
+.dashboard-v3 .activity-card,.dashboard-v3 .top-services-card{margin-top:14px!important}
+
+/* Densidad de trabajo: menos decoración y más lectura */
+.dashboard-v3 .ct-page-host,
+.dashboard-v3 .dash-left-col,
+.dashboard-v3 .dash-right-col{min-width:0}
+.dashboard-v3 .today-timeline,
+.dashboard-v3 .upcoming-list,
+.dashboard-v3 .activity-list{min-width:0}
+.dashboard-v3 .card-head a,
+.dashboard-v3 .card-footer-link a{font-weight:750;text-decoration:none}
+
+/* El shell canónico es la única navegación visible. */
+.ct-shell-ready .dash-sidebar,
+.ct-shell-ready .dash-topbar,
+.ct-shell-ready .dash-mobile-top,
+.ct-shell-ready .mobile-bottom-nav{display:none!important}
+
+/* Oscuro: usa el sistema unificado de Bloque 3. */
+html[data-theme="dark"][data-ct-theme="dark"] .dashboard-v3 .dash-welcome.v3-welcome,
+html[data-theme="dark"][data-ct-theme="dark"] .dashboard-v3 .dash-card,
+html[data-theme="dark"][data-ct-theme="dark"] .dashboard-v3 .kpi-card{
+  background:var(--v3-card)!important;color:var(--v3-text)!important;border-color:var(--v3-border)!important
+}
+
+@media(max-width:1150px){
+  .dashboard-v3 .ct-content{padding:22px!important}
+}
+@media(max-width:900px){
+  .dashboard-v3 .ct-content{padding:15px!important}
+  .dashboard-v3 .dash-main{gap:14px}
+  .dashboard-v3 .dash-welcome.v3-welcome{min-height:0!important;padding:18px!important}
+  .dashboard-v3 .dash-welcome h1{font-size:24px!important}
+  .dashboard-v3 .dash-kpis{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:520px){
+  .dashboard-v3 .dash-welcome.v3-welcome{align-items:flex-start!important}
+  .dashboard-v3 .dash-welcome .btn-new,
+  .dashboard-v3 .dash-welcome .ct-btn-primary{width:100%;justify-content:center}
+  .dashboard-v3 .dash-kpis{grid-template-columns:1fr!important}
+  .dashboard-v3 .kpi-card{min-height:124px!important}
+}
