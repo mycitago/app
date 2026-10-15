@@ -13,3 +13,13 @@ body.dashboard-v3{background:#f6f7fb}
 .marketplace-dashboard .dash-card{border-radius:21px;box-shadow:0 9px 30px rgba(28,25,55,.05)}
 @media(max-width:820px){.marketplace-dashboard{padding-top:12px}.marketplace-hero{grid-template-columns:1fr;padding:24px 20px;border-radius:22px;margin-bottom:20px}.marketplace-hero h1{font-size:31px}.marketplace-today-card{min-height:128px;display:grid;grid-template-columns:1fr auto;align-items:center}.marketplace-today-card strong{grid-row:1/4;grid-column:2;font-size:46px}.marketplace-today-card p{margin:3px 0}.marketplace-today-card a{margin-top:8px}.marketplace-section-head{margin-top:20px}}
 @media(max-width:520px){.marketplace-hero-actions{display:grid}.marketplace-primary,.marketplace-secondary{justify-content:center}.marketplace-section-head h2{font-size:16px}.marketplace-section-head>a{display:none}}
+
+/* Agenda Marketplace V3 */
+.marketplace-agenda-v3 .agenda-page{max-width:none}
+.agenda-marketplace-hero{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:22px;padding:28px 30px;border-radius:24px;background:linear-gradient(125deg,#191526,#342058 58%,#6731d7 130%);color:#fff;box-shadow:0 18px 48px rgba(39,28,66,.12)}
+.agenda-marketplace-hero h1{margin:7px 0 8px;font-size:32px;line-height:1.06;letter-spacing:-.045em}.agenda-marketplace-hero p{margin:0;max-width:620px;color:#d9d2e4;font-size:11px;line-height:1.6}
+.marketplace-agenda-v3 .agenda-toolbar{border-radius:18px;padding:13px 15px;box-shadow:0 8px 28px rgba(28,25,55,.04)}
+.marketplace-agenda-v3 .agenda-summary{gap:12px}.marketplace-agenda-v3 .agenda-summary>div{border:1px solid #ebe7ef;border-radius:17px;background:#fff;padding:16px;box-shadow:0 7px 24px rgba(28,25,55,.04)}
+.marketplace-agenda-v3 .calendar-shell,.marketplace-agenda-v3 .agenda-month,.marketplace-agenda-v3 .agenda-mobile-list{border-radius:20px;overflow:hidden;box-shadow:0 9px 30px rgba(28,25,55,.05)}
+@media(max-width:820px){.agenda-marketplace-hero{padding:22px 18px;border-radius:20px;align-items:flex-start}.agenda-marketplace-hero h1{font-size:26px}.agenda-marketplace-hero .marketplace-primary{white-space:nowrap}.marketplace-agenda-v3 .agenda-summary{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.agenda-marketplace-hero{display:block}.agenda-marketplace-hero .marketplace-primary{width:100%;margin-top:16px}.marketplace-agenda-v3 .agenda-summary{grid-template-columns:1fr 1fr}}
