@@ -7,6 +7,7 @@
 <meta name="description" content="Reserva una cita en línea de forma rápida y sencilla.">
 <title>Reservar cita · MyCitaGo</title>
 <link rel="stylesheet" href="css/booking-adaptive.css?v=20260910-redesign">
+<link rel="stylesheet" href="css/booking-marketplace-v3.css?v=20261015">
 <style>
 #hero[hidden]{display:none!important}
 .online-payment-card{margin:18px 0 4px;padding:16px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--surface-muted)}
@@ -23,7 +24,7 @@
 @media(max-width:640px){.booking-resource-grid{grid-template-columns:1fr}}
 </style>
 </head>
-<body>
+<body class="booking-marketplace-v3">
 <a class="skip-link" href="#booking-main">Saltar a la reserva</a>
 <div id="app" class="public-booking-page">
 <header class="booking-hero" id="hero" data-brand-section="hero">
@@ -31,27 +32,28 @@
 </header>
 <nav class="booking-stepper" aria-label="Progreso de la reserva"><span data-progress-step="1" class="is-active"><b>1</b><em>Servicio</em></span><span data-progress-step="2"><b>2</b><em>Horario</em></span><span data-progress-step="3"><b>3</b><em>Datos</em></span><span data-progress-step="4"><b>4</b><em>Listo</em></span></nav>
 <main id="booking-main" class="booking-main">
+  <section class="booking-confidence" aria-label="Ventajas de reservar en línea"><div><b>✓</b><span><strong>Reserva inmediata</strong><small>Elige entre horarios disponibles</small></span></div><div><b>24/7</b><span><strong>Reserva cuando quieras</strong><small>Sin llamadas ni esperas</small></span></div><div><b>🔒</b><span><strong>Datos protegidos</strong><small>Solo para gestionar tu cita</small></span></div></section>
   <div id="availability-live" class="sr-only" aria-live="polite"></div><div id="error-live" class="sr-only" aria-live="assertive"></div>
   <div class="booking-flow-shell">
     <section id="step-services" class="flow-step" data-brand-section="services">
-      <div class="flow-heading"><span id="booking-kicker" class="section-kicker">Reserva en línea</span><h2 id="booking-service-question" tabindex="-1">¿Qué servicio necesitas?</h2><p id="booking-service-subtitle">Selecciona una opción y después elige el horario que mejor te convenga.</p></div>
+      <div class="flow-heading marketplace-flow-heading"><span id="booking-kicker" class="section-kicker">EMPIEZA TU RESERVA</span><h2 id="booking-service-question" tabindex="-1">¿Qué te gustaría reservar?</h2><p id="booking-service-subtitle">Elige un servicio. Te mostraremos profesionales y horarios disponibles en el siguiente paso.</p></div>
       <label class="service-search-wrap"><span class="sr-only">Buscar servicios</span><input id="service-search" class="service-search" type="search" placeholder="Buscar servicio…" autocomplete="off"></label>
       <div id="category-tabs" class="category-tabs hidden" aria-label="Categorías de servicios"></div>
-      <div class="services-heading-row"><h3>Servicios disponibles</h3><span id="services-count"></span></div><div id="services-list" class="services-grid"></div>
+      <div class="services-heading-row"><h3>Elige tu servicio</h3><span id="services-count"></span></div><div id="services-list" class="services-grid"></div>
       <aside id="booking-selection-summary" class="selection-summary" aria-live="polite"><div><span class="summary-kicker">Tu reserva</span><strong id="booking-side-service">Selecciona un servicio</strong><span id="booking-side-meta">Duración y precio aparecerán aquí</span><span id="booking-side-time">Después elegirás fecha y hora</span></div><div class="selection-summary-action"><div class="privacy-note">🔒 Tus datos se usan únicamente para gestionar tu cita.</div><button id="btn-agendar" class="btn btn-primary" disabled>Elegir fecha y hora</button></div></aside>
     </section>
     <section id="booking-step" class="flow-step hidden">
       <button class="back-link" type="button" data-back="step-services">← Cambiar servicio</button>
-      <div class="flow-heading"><span class="section-kicker">Paso 2</span><h2 id="booking-date-title" tabindex="-1">Elige quién te atenderá, fecha y hora</h2><p>Selecciona sucursal, profesional y después un horario disponible.</p></div>
+      <div class="flow-heading marketplace-flow-heading"><span class="section-kicker">PASO 2 DE 4</span><h2 id="booking-date-title" tabindex="-1">¿Cuándo quieres venir?</h2><p>Elige sucursal y profesional; después selecciona el horario que mejor te funcione.</p></div>
       <div id="booking-resource-panel" class="booking-resource-panel"><h3>Sucursal y profesional</h3><div class="booking-resource-grid"><label>Sucursal<select id="booking-branch" disabled><option value="">Selecciona primero un servicio</option></select></label><label>Profesional<select id="booking-staff" disabled><option value="">Selecciona primero una sucursal</option></select></label></div><p id="booking-resource-help" class="booking-resource-help">Selecciona un servicio para consultar disponibilidad.</p></div>
       <div class="date-scroller" id="date-scroller"></div><div id="slot-grid" class="slot-grid"><p class="empty-state">Selecciona sucursal y profesional para ver horarios.</p></div><div class="step-action"><button id="btn-go-to-form" class="btn btn-primary" disabled>Continuar con mis datos</button></div>
     </section>
     <section id="form-step" class="flow-step hidden">
-      <button class="back-link" type="button" data-back="booking-step">← Cambiar horario</button><div class="flow-heading"><span class="section-kicker">Paso 3</span><h2 id="booking-form-title" tabindex="-1">Tus datos</h2><p>Solo pedimos la información necesaria para gestionar tu cita.</p></div>
+      <button class="back-link" type="button" data-back="booking-step">← Cambiar horario</button><div class="flow-heading marketplace-flow-heading"><span class="section-kicker">PASO 3 DE 4</span><h2 id="booking-form-title" tabindex="-1">Ya casi terminamos</h2><p>Déjanos tus datos para identificar y confirmar correctamente tu cita.</p></div>
       <div class="form-card"><div class="field"><label for="input-name">Nombre completo</label><input type="text" id="input-name" required><div class="field-error">Escribe tu nombre.</div></div><div class="field"><label for="input-whatsapp">WhatsApp</label><input type="tel" id="input-whatsapp" required><div class="field-error">Escribe un número válido.</div></div><div class="field"><label for="input-notes">Comentario <span>(opcional)</span></label><textarea id="input-notes"></textarea></div><button id="btn-confirm-booking" class="btn btn-primary btn-wide">Confirmar cita</button></div>
     </section>
     <section id="success-step" class="flow-step success-card hidden">
-      <span class="section-kicker">Paso 4</span><h2 id="booking-success-title">¡Cita confirmada!</h2>
+      <div class="booking-success-icon">✓</div><span class="section-kicker">RESERVA COMPLETADA</span><h2 id="booking-success-title">¡Tu cita está confirmada!</h2><p class="booking-success-copy">Guarda los datos de tu reserva y contacta al negocio por WhatsApp si necesitas ayuda.</p>
       <div class="appointment-summary"><div><span>Servicio</span><strong id="summary-service"></strong></div><div><span>Sucursal</span><strong id="summary-branch"></strong></div><div><span>Profesional</span><strong id="summary-staff"></strong></div><div><span>Fecha</span><strong id="summary-date"></strong></div><div><span>Hora</span><strong id="summary-time"></strong></div><div><span>Duración</span><strong id="summary-duration"></strong></div><div><span>Negocio</span><strong id="summary-business"></strong></div><div><span>Dirección</span><strong id="summary-address"></strong></div></div>
       <div id="online-payment-card" class="online-payment-card" hidden><strong>Pago online disponible</strong><span id="online-payment-copy">Puedes pagar de forma segura con el método habilitado por el negocio.</span><button id="btn-pay-online" class="btn btn-primary" type="button">Pagar online</button></div>
       <a id="btn-whatsapp" class="btn btn-primary" target="_blank" rel="noopener">Confirmar por WhatsApp</a>
