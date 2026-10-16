@@ -78,7 +78,8 @@ window.MyCitaGoOAuth = (() => {
   function showError(msg){$('msg-error').textContent=msg;$('msg-error').classList.remove('hidden');$('msg-info').classList.add('hidden')}
   function showInfo(msg){$('msg-info').textContent=msg;$('msg-info').classList.remove('hidden');$('msg-error').classList.add('hidden')}
   function hideMsgs(){$('msg-error').classList.add('hidden');$('msg-info').classList.add('hidden')}
-  function mapLoginError(msg){if(/invalid login credentials/i.test(msg||''))return'Correo o contraseña incorrectos.';if(/not confirmed/i.test(msg||''))return'La cuenta no está confirmada todavía.';return msg||'No se pudo iniciar sesión.'}
+  function mapLoginError(msg){if(/invalid login credentials/i.test(msg||''))return'Correo o contraseña incorrectos.';if(/not confirmed/i.test(msg||''))return'La cuenta no está confirmada todavía. Revisa tu correo.';if(/rate limit|too many requests/i.test(msg||''))return'Demasiados intentos. Espera un momento y vuelve a intentar.';return msg||'No se pudo iniciar sesión.'}
+  function mapRegisterError(msg){if(/already registered|user already registered/i.test(msg||''))return'Este correo ya está registrado. Inicia sesión o recupera tu contraseña.';if(/rate limit|too many requests/i.test(msg||''))return'Demasiados intentos. Espera un momento y vuelve a intentar.';if(/password/i.test(msg||'')&&/weak|characters|least/i.test(msg||''))return'La contraseña no cumple los requisitos de seguridad.';return msg||'No se pudo completar el registro.'}
   function onlyDigits(s){return(s||'').replace(/\D/g,'')}
   function internationalPhone(){const code=$('country-code').value;const national=onlyDigits($('reg-whatsapp').value);return{code,national,e164:`${code}${national}`}}
   function validPhone({national,e164}){if(!national)return false;if($('country-code').value==='+52'&&national.length!==10)return false;return /^\+[1-9]\d{7,14}$/.test(e164)}
@@ -131,8 +132,8 @@ window.MyCitaGoOAuth = (() => {
       if(oauthMode){const{data:auth}=await supabaseClient.auth.getUser();if(!auth?.user)throw new Error('La sesión de Google expiró. Vuelve a ingresar.');await completeOAuthBusiness(auth.user,bizName,phone,selectedPlan);location.replace('onboarding.html');return}
       if(!email)throw new Error('Escribe tu correo.');if(password.length<10)throw new Error('Usa una contraseña de al menos 10 caracteres.');
       const{data,error}=await supabaseClient.auth.signUp({email,password,options:{emailRedirectTo:`${getAppBaseUrl()}admin/login.html`,data:{business_name:bizName,business_whatsapp:phone.e164,business_phone:phone.e164,plan_id:selectedPlan,invite_token:new URLSearchParams(location.search).get('invite')||localStorage.getItem('mycitago:invite')||null}}});
-      if(error)throw error;if(!data.session){showInfo('Cuenta creada. Revisa tu correo, confirma tu cuenta y luego inicia sesión.');return}location.replace('onboarding.html');
-    }catch(error){showError(error.message||'No se pudo completar el registro.')}finally{btn.disabled=false;btn.textContent=oauthMode?'Crear mi negocio':'Crear cuenta y negocio'}
+      if(error)throw error;if(!data?.user)throw new Error('No se pudo crear la cuenta. Intenta de nuevo.');if(!data.session){showInfo('Cuenta creada. Revisa tu correo, confirma tu cuenta y luego inicia sesión.');$('reg-email').disabled=true;$('reg-password').disabled=true;$('reg-business').disabled=true;$('reg-whatsapp').disabled=true;$('country-code').disabled=true;btn.textContent='Correo de confirmación enviado';return}location.replace('onboarding.html');
+    }catch(error){showError(mapRegisterError(error?.message))}finally{if(!$('reg-email').disabled){btn.disabled=false;btn.textContent=oauthMode?'Crear mi negocio':'Crear cuenta y negocio'}}
   }
 
   async function handleForgot(){hideMsgs();const email=$('forgot-email').value.trim();if(!email)return showError('Escribe tu correo.');const{error}=await supabaseClient.auth.resetPasswordForEmail(email,{redirectTo:location.href.split('#')[0]});if(error)return showError(error.message);showInfo('Listo. Revisa tu correo y abre el enlace para crear una nueva contraseña.')}
