@@ -17,7 +17,7 @@ const dashState = {
 const $ = id => document.getElementById(id);
 
 function pad(n){ return String(n).padStart(2,'0'); }
-function dateKey(d=new Date()){ return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
+function dateKey(d=new Date()){ if(dashState.dashboardTimezone && window.DashboardPunctuality?.businessNowParts){ return DashboardPunctuality.businessNowParts(d,dashState.dashboardTimezone).dateKey; } return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
 function monthKey(){ return dateKey().slice(0,7); }
 function monthStart(){ return `${monthKey()}-01`; }
 function addDaysKey(days){
