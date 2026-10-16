@@ -20,7 +20,7 @@
     <div>
       <span class="ct-eyebrow">REPUTACIÓN</span>
       <h1>Reputación de tu negocio</h1>
-      <p>Administra reseñas verificadas de MyCitaGo y, cuando esté disponible, también las de Google.</p>
+      <p>Administra las reseñas verificadas de tus clientes en MyCitaGo.</p>
     </div>
   </header>
 
@@ -29,33 +29,11 @@
     <span id="review-access-message"></span>
   </section>
 
-  <section id="google-connect-card" class="google-connect-card">
-    <div class="google-brand-badge" aria-hidden="true"><span>G</span></div>
-    <div class="google-connect-copy">
-      <div class="google-connect-title-row">
-        <div><span class="ct-eyebrow">GOOGLE BUSINESS PROFILE</span><h2>Conecta tu negocio con Google</h2></div>
-        <span id="google-connection-pill" class="connection-pill disconnected"><i></i> No conectado</span>
-      </div>
-      <p id="google-connect-description">Importa tus reseñas, consulta tu calificación y responde comentarios desde un solo lugar.</p>
-      <div id="google-connection-name" class="google-connected-business hidden"></div>
-      <div id="google-config-alert" class="google-config-alert hidden"><strong>La conexión de Google necesita configuración</strong><span id="google-config-message">No se pudo contactar el servicio de conexión.</span></div>
-      <div class="google-connect-actions">
-        <button id="google-connect" class="google-modern-btn" type="button"><span class="google-g">G</span><strong>Conectar con Google</strong><span class="arrow">→</span></button>
-        <button id="google-sync" class="ct-btn ct-btn-secondary" type="button">Actualizar reseñas</button>
-      </div>
-    </div>
-  </section>
-
-  <section id="google-location-card" class="ct-card google-location-card hidden">
-    <div><span class="ct-eyebrow">UBICACIÓN DE GOOGLE</span><h2>Selecciona el perfil correcto</h2><p>Si administras más de un negocio en Google, elige cuál corresponde a este espacio.</p></div>
-    <div class="google-location-controls"><select id="google-location" class="ct-input"><option value="">Cargar ubicaciones…</option></select><button id="google-location-save" class="ct-btn ct-btn-primary" type="button">Usar ubicación</button></div>
-  </section>
 
   <section class="reviews-summary">
     <article class="ct-stat-card"><span>Calificación</span><strong id="review-rating">–</strong><small>Promedio de reseñas publicadas</small></article>
-    <article class="ct-stat-card"><span>Reseñas</span><strong id="review-total">0</strong><small>MyCitaGo + Google</small></article>
+    <article class="ct-stat-card"><span>Reseñas</span><strong id="review-total">0</strong><small>Reseñas publicadas en MyCitaGo</small></article>
     <article class="ct-stat-card verified-stat"><span>Clientes verificados</span><strong id="verified-total">0</strong><small>Reseñas ligadas a citas completadas</small></article>
-    <article class="ct-stat-card"><span>Estado Google</span><strong id="google-status" class="status-text">No conectado</strong><small id="google-status-help">Conecta Google para comenzar</small></article>
   </section>
 
   <div class="reviews-toolbar">
@@ -63,7 +41,6 @@
       <option value="">Todas las reseñas visibles</option>
       <option value="verified">Clientes verificados</option>
       <option value="internal">Solo MyCitaGo</option>
-      <option value="google">Solo Google</option>
       <option value="hidden">Ocultas</option>
       <option value="5">5 estrellas</option>
       <option value="4">4 estrellas</option>
