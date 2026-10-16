@@ -230,27 +230,43 @@ function readHoursEditor(){
   return result;
 }
 
-async function syncPrimaryBranchHours(hours){
-  const {data:branch,error:branchError}=await supabaseClient
+async function ensurePrimaryBranch(hours=onboardingHours){
+  const {data:branches,error:branchError}=await supabaseClient
     .from('business_branches')
-    .select('id')
+    .select('*')
     .eq('business_id',onboardingBiz.id)
-    .eq('is_primary',true)
-    .maybeSingle();
+    .order('is_primary',{ascending:false})
+    .order('created_at',{ascending:true});
 
-  if(branchError){
-    console.warn('[Onboarding] No se pudo consultar sucursal principal:',branchError);
-    return;
+  if(branchError)throw new Error('No se pudo consultar la sucursal principal: '+branchError.message);
+
+  let branch=(branches||[]).find(x=>x.is_primary)||branches?.[0]||null;
+  const payload={
+    business_id:onboardingBiz.id,
+    name:branch?.name||'Principal',
+    address:onboardingBiz.address||branch?.address||null,
+    phone:onboardingBiz.phone||branch?.phone||null,
+    opening_hours:hours,
+    timezone:branch?.timezone||'America/Mexico_City',
+    active:true,
+    is_primary:true,
+    updated_at:new Date().toISOString()
+  };
+
+  let result;
+  if(branch?.id){
+    result=await supabaseClient.from('business_branches').update(payload)
+      .eq('id',branch.id).eq('business_id',onboardingBiz.id).select().single();
+  }else{
+    result=await supabaseClient.from('business_branches').insert(payload).select().single();
   }
-  if(!branch?.id)return;
+  if(result.error)throw new Error('No se pudo preparar la sucursal principal: '+result.error.message);
+  return result.data;
+}
 
-  const {error}=await supabaseClient
-    .from('business_branches')
-    .update({opening_hours:hours,updated_at:new Date().toISOString()})
-    .eq('id',branch.id)
-    .eq('business_id',onboardingBiz.id);
-
-  if(error)console.warn('[Onboarding] Horario guardado en negocio, pero no sincronizado en sucursal:',error);
+async function syncPrimaryBranchHours(hours){
+  try{await ensurePrimaryBranch(hours)}
+  catch(error){console.warn('[Onboarding] Horario guardado en negocio, pero la sucursal principal no quedó sincronizada:',error)}
 }
 
 async function saveHoursStep(){
@@ -558,6 +574,7 @@ async function finishOnboarding(){
   button.textContent='Finalizando…';
 
   try{
+    await ensurePrimaryBranch(onboardingHours);
     const teamOk=await saveOptionalTeam();
     if(!teamOk)return;
 
