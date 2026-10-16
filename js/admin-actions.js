@@ -34,7 +34,7 @@
     await ensureContext();
     const [{data:services,error:servicesError},{data:branches,error:branchesError},{data:staff,error:staffError},{data:links,error:linksError}]=await Promise.all([
       supabaseClient.from('services').select('id,name,duration_minutes,price,active').eq('business_id',ctx.business.id).eq('active',true).order('name'),
-      supabaseClient.from('business_branches').select('id,name,is_primary,active').eq('business_id',ctx.business.id).eq('active',true).order('is_primary',{ascending:false}),
+      supabaseClient.from('business_branches').select('id,name,is_primary,active,timezone').eq('business_id',ctx.business.id).eq('active',true).order('is_primary',{ascending:false}),
       supabaseClient.from('staff').select('id,name,branch_id,active').eq('business_id',ctx.business.id).eq('active',true).order('name'),
       supabaseClient.from('service_staff').select('service_id,staff_id').eq('business_id',ctx.business.id)
     ]);
@@ -52,8 +52,15 @@
   }
   function minToTime(total){const h=Math.floor(total/60)%24,m=total%60;return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`}
   function endTime(start,duration){const [h,m]=String(start).split(':').map(Number);return minToTime(h*60+m+Number(duration||60))}
+  function businessDateKey(){
+    const tz=ctx.branches.find(b=>b.is_primary)?.timezone||ctx.branches[0]?.timezone||null;
+    if(!tz){const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10)}
+    const parts=new Intl.DateTimeFormat('en-CA',{timeZone:tz,year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
+    const x=Object.fromEntries(parts.filter(p=>p.type!=='literal').map(p=>[p.type,p.value]));
+    return `${x.year}-${x.month}-${x.day}`;
+  }
   async function openAppointment(){
-    try{await ensureContext();await loadServices();const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());$('ct-appt-date').value=d.toISOString().slice(0,10);$('ct-appt-time').value='09:00';openDialog('ct-appointment-dialog');setTimeout(()=>$('ct-appt-name')?.focus(),80)}catch(e){toast(e.message,'error')}
+    try{await ensureContext();await loadServices();$('ct-appt-date').value=businessDateKey();$('ct-appt-time').value='09:00';openDialog('ct-appointment-dialog');setTimeout(()=>$('ct-appt-name')?.focus(),80)}catch(e){toast(e.message,'error')}
   }
   async function createAppointment(ev){
     ev.preventDefault();const btn=$('ct-appt-submit');btn.disabled=true;const old=btn.textContent;btn.textContent='Guardando…';
