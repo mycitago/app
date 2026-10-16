@@ -21,9 +21,10 @@ function dateKey(d=new Date()){ if(dashState.dashboardTimezone && window.Dashboa
 function monthKey(){ return dateKey().slice(0,7); }
 function monthStart(){ return `${monthKey()}-01`; }
 function addDaysKey(days){
-  const d=new Date();
-  d.setDate(d.getDate()+days);
-  return dateKey(d);
+  const base=dateKey();
+  const [y,m,d]=base.split('-').map(Number);
+  const x=new Date(Date.UTC(y,m-1,d+days,12));
+  return `${x.getUTCFullYear()}-${pad(x.getUTCMonth()+1)}-${pad(x.getUTCDate())}`;
 }
 function money(n){ return new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN',minimumFractionDigits:2,maximumFractionDigits:2}).format(Number(n)||0); }
 function hour(t){ return String(t||'').slice(0,5); }
@@ -176,10 +177,11 @@ function renderMiniChart(id,values,color){
 
 function statsByDay(filterFn,mapper=()=>1){
   const vals=[];
+  const base=dateKey();
+  const [y,m,d]=base.split('-').map(Number);
   for(let i=-6;i<=0;i++){
-    const d=new Date();
-    d.setDate(d.getDate()+i);
-    const key=dateKey(d);
+    const x=new Date(Date.UTC(y,m-1,d+i,12));
+    const key=`${x.getUTCFullYear()}-${pad(x.getUTCMonth()+1)}-${pad(x.getUTCDate())}`;
     vals.push(dashState.appointments.filter(a=>a.appointment_date===key && filterFn(a)).reduce((s,a)=>s+mapper(a),0));
   }
   return vals;
@@ -549,7 +551,7 @@ function actionButton(label,status,cls){
   const btn=document.createElement('button');btn.type='button';btn.textContent=label;if(cls)btn.className=cls;
   btn.addEventListener('click',async()=>{
     btn.disabled=true;
-    const {error}=await supabaseClient.from('appointments').update({status}).eq('id',dashState.selectedAppointment.id);
+    const {error}=await supabaseClient.from('appointments').update({status}).eq('id',dashState.selectedAppointment.id).eq('business_id',dashState.business.id);
     if(error){toast(error.message);btn.disabled=false;return}
     if(dashState.selectedAppointment){
       dashState.selectedAppointment.status=status;
