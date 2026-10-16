@@ -1,7 +1,7 @@
 (function(global){
   const $=(id)=>document.getElementById(id);
   const esc=(v)=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  let ctx={business:null,user:null,services:[]};
+  let ctx={business:null,user:null,services:[],branches:[],staff:[]};
 
   function toast(message,type='info'){
     let node=$('ct-global-toast');
@@ -32,8 +32,23 @@
   function renderShareQr(url){const root=$('ct-share-qr');if(!root)return;root.innerHTML='';const img=document.createElement('img');img.alt='Código QR del enlace de reservas';img.width=140;img.height=140;img.src=`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(url)}`;root.appendChild(img)}
   async function loadServices(){
     await ensureContext();
-    const {data,error}=await supabaseClient.from('services').select('id,name,duration_minutes,price,active').eq('business_id',ctx.business.id).eq('active',true).order('name');
-    if(error)throw error;ctx.services=data||[];const sel=$('ct-appt-service');sel.innerHTML='<option value="">Selecciona un servicio</option>'+ctx.services.map(s=>`<option value="${esc(s.id)}">${esc(s.name)} · ${Number(s.duration_minutes||60)} min</option>`).join('');
+    const [{data:services,error:servicesError},{data:branches,error:branchesError},{data:staff,error:staffError},{data:links,error:linksError}]=await Promise.all([
+      supabaseClient.from('services').select('id,name,duration_minutes,price,active').eq('business_id',ctx.business.id).eq('active',true).order('name'),
+      supabaseClient.from('business_branches').select('id,name,is_primary,active').eq('business_id',ctx.business.id).eq('active',true).order('is_primary',{ascending:false}),
+      supabaseClient.from('staff').select('id,name,branch_id,active').eq('business_id',ctx.business.id).eq('active',true).order('name'),
+      supabaseClient.from('service_staff').select('service_id,staff_id').eq('business_id',ctx.business.id)
+    ]);
+    if(servicesError)throw servicesError;if(branchesError)throw branchesError;if(staffError)throw staffError;if(linksError)throw linksError;
+    ctx.services=services||[];ctx.branches=branches||[];ctx.staff=staff||[];ctx.serviceStaff=links||[];
+    $('ct-appt-service').innerHTML='<option value="">Selecciona un servicio</option>'+ctx.services.map(s=>`<option value="${esc(s.id)}">${esc(s.name)} · ${Number(s.duration_minutes||60)} min</option>`).join('');
+    $('ct-appt-branch').innerHTML='<option value="">Selecciona una sucursal</option>'+ctx.branches.map(b=>`<option value="${esc(b.id)}">${esc(b.name)}</option>`).join('');
+    refreshAppointmentStaff();
+  }
+  function refreshAppointmentStaff(){
+    const branchId=$('ct-appt-branch')?.value||'',serviceId=$('ct-appt-service')?.value||'';
+    const allowed=new Set((ctx.serviceStaff||[]).filter(x=>!serviceId||x.service_id===serviceId).map(x=>x.staff_id));
+    const rows=(ctx.staff||[]).filter(s=>(!branchId||s.branch_id===branchId)&&(!serviceId||allowed.has(s.id)));
+    $('ct-appt-staff').innerHTML='<option value="">Selecciona un profesional</option>'+rows.map(s=>`<option value="${esc(s.id)}">${esc(s.name)}</option>`).join('');
   }
   function minToTime(total){const h=Math.floor(total/60)%24,m=total%60;return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`}
   function endTime(start,duration){const [h,m]=String(start).split(':').map(Number);return minToTime(h*60+m+Number(duration||60))}
@@ -45,8 +60,8 @@
     try{
       await ensureContext();const service=ctx.services.find(s=>s.id===$('ct-appt-service').value);if(!service)throw new Error('Selecciona un servicio.');
       const name=$('ct-appt-name').value.trim(),digits=$('ct-appt-phone').value.replace(/\D/g,'');if(!name)throw new Error('Escribe el nombre del cliente.');if(digits.length<8)throw new Error('Escribe un teléfono válido.');
-      const phone=digits.startsWith('52')?digits:`52${digits}`;const date=$('ct-appt-date').value,start=$('ct-appt-time').value,end=endTime(start,service.duration_minutes);
-      const {data,error}=await supabaseClient.rpc('create_appointment',{p_business_id:ctx.business.id,p_service_id:service.id,p_name:name,p_whatsapp:phone,p_date:date,p_start:start,p_end:end,p_notes:$('ct-appt-notes').value.trim()||null});
+      const phone=digits.startsWith('52')?digits:`52${digits}`;const branchId=$('ct-appt-branch').value,staffId=$('ct-appt-staff').value;if(!branchId)throw new Error('Selecciona una sucursal.');if(!staffId)throw new Error('Selecciona un profesional.');const date=$('ct-appt-date').value,start=$('ct-appt-time').value,end=endTime(start,service.duration_minutes);
+      const {data,error}=await supabaseClient.rpc('create_appointment_v2',{p_business_id:ctx.business.id,p_service_id:service.id,p_branch_id:branchId,p_staff_id:staffId,p_name:name,p_whatsapp:phone,p_date:date,p_start:start,p_end:end,p_notes:$('ct-appt-notes').value.trim()||null});
       if(error)throw error;closeDialog('ct-appointment-dialog');$('ct-appt-form').reset();toast('Cita creada correctamente','success');global.dispatchEvent(new CustomEvent('mycitago:appointment-created',{detail:{data}}));
     }catch(e){const raw=String(e?.message||e);const friendly=/slot_taken|23P01|exclu/i.test(raw)?'Ese horario ya está ocupado. Elige otro.':raw;toast(friendly,'error')}finally{btn.disabled=false;btn.textContent=old}
   }
@@ -57,7 +72,7 @@
     document.querySelectorAll('.ct-new-appointment-trigger').forEach(b=>b.addEventListener('click',openAppointment));
     document.querySelectorAll('[data-ct-close]').forEach(b=>b.addEventListener('click',()=>closeDialog(b.dataset.ctClose)));
     $('ct-share-copy')?.addEventListener('click',async()=>{await copyText($('ct-share-url').value);toast('Link copiado','success')});
-    $('ct-appt-form')?.addEventListener('submit',createAppointment);$('ct-user-trigger')?.addEventListener('click',userMenu);$('ct-logout')?.addEventListener('click',logout);
+    $('ct-appt-form')?.addEventListener('submit',createAppointment);$('ct-appt-service')?.addEventListener('change',refreshAppointmentStaff);$('ct-appt-branch')?.addEventListener('change',refreshAppointmentStaff);$('ct-user-trigger')?.addEventListener('click',userMenu);$('ct-logout')?.addEventListener('click',logout);
     document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeDialog('ct-share-dialog');closeDialog('ct-appointment-dialog')}});
     document.addEventListener('click',e=>{if(!e.target.closest('.ct-user-wrap'))$('ct-user-menu')?.classList.remove('open')});
   }
