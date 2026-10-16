@@ -2,6 +2,13 @@ let branchBiz=null,branches=[];
 const R=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
+function branchErrorMessage(error){
+  const raw=String(error?.message||error||'');
+  if(/max_branches_exceeded/i.test(raw))return 'Alcanzaste el límite de sucursales activas de tu plan. Desactiva una o cambia de plan.';
+  if(/branch_subscription_inactive/i.test(raw))return 'Tu suscripción no permite activar sucursales en este momento.';
+  if(/business_branches_one_primary|uq_business.*primary|duplicate key/i.test(raw))return 'Este negocio ya tiene una sucursal principal.';
+  return raw||'No se pudo guardar la sucursal.';
+}
 function rToast(m){
   const e=R('toast');
   if(!e)return;
@@ -100,6 +107,8 @@ async function saveBranch(e){
   };
 
   if(!payload.name)return rToast('Escribe el nombre.');
+  const current=id?branches.find(b=>b.id===id):null;
+  if(current?.is_primary&&!payload.active)return rToast('La sucursal principal no puede desactivarse. Primero define otra sucursal principal.');
 
   if(id){
     const {error}=await supabaseClient
@@ -147,7 +156,7 @@ async function initBranches(){
   if(!branchBiz)return;
 
   R('new-branch').onclick=()=>openBranch();
-  R('branch-form').onsubmit=e=>saveBranch(e).catch(err=>rToast(err.message));
+  R('branch-form').onsubmit=e=>saveBranch(e).catch(err=>rToast(branchErrorMessage(err)));
   document.querySelectorAll('[data-branch-close]').forEach(x=>x.onclick=closeBranch);
 
   try{
