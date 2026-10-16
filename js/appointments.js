@@ -5,11 +5,13 @@
 const DOW_KEYS=['sun','mon','tue','wed','thu','fri','sat'];
 const DOW_LABELS=['D','L','M','M','J','V','S'];
 const SLOT_STEP_MINUTES=15;
-function toDateKey(date){const y=date.getFullYear(),m=String(date.getMonth()+1).padStart(2,'0'),d=String(date.getDate()).padStart(2,'0');return `${y}-${m}-${d}`;}
+function bookingTimezone(business){return business?.timezone||business?.primary_branch_timezone||business?.branch_timezone||null;}
+function businessDateParts(date,business){const tz=bookingTimezone(business);if(!tz)return{year:date.getFullYear(),month:date.getMonth()+1,day:date.getDate(),dow:date.getDay(),minutes:date.getHours()*60+date.getMinutes()};const fmt=new Intl.DateTimeFormat('en-CA',{timeZone:tz,year:'numeric',month:'2-digit',day:'2-digit',weekday:'short',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}),p=Object.fromEntries(fmt.formatToParts(date).filter(x=>x.type!=='literal').map(x=>[x.type,x.value])),dow={Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6}[p.weekday];return{year:Number(p.year),month:Number(p.month),day:Number(p.day),dow,minutes:Number(p.hour)*60+Number(p.minute)};}
+function toDateKey(date,business){const p=businessDateParts(date,business);return `${p.year}-${String(p.month).padStart(2,'0')}-${String(p.day).padStart(2,'0')}`;}
 function timeToMinutes(t){const [h,m]=String(t).split(':').map(Number);return h*60+m;}
 function minutesToTime(mins){return `${String(Math.floor(mins/60)).padStart(2,'0')}:${String(mins%60).padStart(2,'0')}`;}
 function getDayHours(business,date){const h=business.opening_hours?.[DOW_KEYS[date.getDay()]];return (!h||h.closed||!h.open||!h.close)?null:h;}
-function buildUpcomingDays(business,count=21){const days=[],today=new Date();today.setHours(0,0,0,0);for(let i=0;i<count;i++){const date=new Date(today);date.setDate(today.getDate()+i);days.push({date,dateKey:toDateKey(date),dow:DOW_LABELS[date.getDay()],dayNum:date.getDate(),isClosed:!getDayHours(business,date)});}return days;}
+function buildUpcomingDays(business,count=21){const days=[],p=businessDateParts(new Date(),business),today=new Date(p.year,p.month-1,p.day,12);for(let i=0;i<count;i++){const date=new Date(today);date.setDate(today.getDate()+i);days.push({date,dateKey:toDateKey(date),dow:DOW_LABELS[date.getDay()],dayNum:date.getDate(),isClosed:!getDayHours(business,date)});}return days;}
 
 async function fetchBookingResources(businessId,serviceId){
   const {data,error}=await supabaseClient.rpc('get_booking_resources_v2',{p_business_id:businessId,p_service_id:serviceId});
@@ -41,7 +43,7 @@ async function getAvailableSlots(business,date,durationMinutes,resource){
   const dateKey=toDateKey(date),dayHours=getDayHours(business,date);if(!dayHours)return[];
   if(await isDateFullyBlocked(business.id,dateKey))return[];
   const busyRanges=await fetchBusyRanges(business.id,dateKey,resource),openMin=timeToMinutes(dayHours.open),closeMin=timeToMinutes(dayHours.close);
-  const now=new Date(),isToday=toDateKey(now)===dateKey,nowMinutes=now.getHours()*60+now.getMinutes(),slots=[];
+  const now=new Date(),nowParts=businessDateParts(now,business),isToday=toDateKey(now,business)===dateKey,nowMinutes=nowParts.minutes,slots=[];
   for(let start=openMin;start+durationMinutes<=closeMin;start+=SLOT_STEP_MINUTES){
     const end=start+durationMinutes;if(isToday&&start<=nowMinutes)continue;
     slots.push({start:minutesToTime(start),end:minutesToTime(end),label:minutesToTime(start),available:!busyRanges.some(([bs,be])=>rangesOverlap(start,end,bs,be))});
