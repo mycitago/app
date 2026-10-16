@@ -126,7 +126,7 @@ window.MyCitaGoOAuth = (() => {
   async function handleRegister(){
     hideMsgs();const bizName=$('reg-business').value.trim(),phone=internationalPhone(),email=$('reg-email').value.trim().toLowerCase(),password=$('reg-password').value;
     if(!bizName)return showError('Escribe el nombre de tu negocio.');if(!validPhone(phone))return showError($('country-code').value==='+52'?'Escribe un número de México de 10 dígitos.':'Revisa el número internacional.');
-    const btn=$('btn-register');btn.disabled=true;btn.textContent=oauthMode?'Preparando tu negocio…':'Creando cuenta…';const selectedPlan=new URLSearchParams(location.search).get('plan')||'reserva';
+    const btn=$('btn-register');btn.disabled=true;btn.textContent=oauthMode?'Preparando tu negocio…':'Creando cuenta…';const selectedPlan=new URLSearchParams(location.search).get('plan')||'49f3df58-ac73-42cf-8e94-deb9b4f356bc';
     try{
       if(oauthMode){const{data:auth}=await supabaseClient.auth.getUser();if(!auth?.user)throw new Error('La sesión de Google expiró. Vuelve a ingresar.');await completeOAuthBusiness(auth.user,bizName,phone,selectedPlan);location.replace('onboarding.html');return}
       if(!email)throw new Error('Escribe tu correo.');if(password.length<10)throw new Error('Usa una contraseña de al menos 10 caracteres.');
