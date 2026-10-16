@@ -102,6 +102,7 @@ async function loadPaymentSettings() {
   pay$('prefer-card').checked = s.prefer_card !== false;
   pay$('prefer-spei').checked = Boolean(s.prefer_spei);
   pay$('prefer-oxxo').checked = Boolean(s.prefer_oxxo);
+  pay$('manual-payment-link').value = s.manual_payment_link || '';
 
   syncModeUi();
   setMercadoPagoStatus(accountResult.data || null);
@@ -177,6 +178,8 @@ async function startMercadoPago() {
 }
 
 async function saveSettings() {
+  const manualLink=pay$('manual-payment-link').value.trim();
+  if(manualLink && !/^https:\/\//i.test(manualLink)) return payToast('El link de pago debe comenzar con https://', 'error');
   const mode = selectedMode();
   const value = Number(pay$('deposit-value').value || 0);
 
@@ -205,6 +208,7 @@ async function saveSettings() {
     prefer_spei: Boolean(pay$('prefer-spei').checked),
     prefer_oxxo: Boolean(pay$('prefer-oxxo').checked),
     currency: 'mxn',
+    manual_payment_link: manualLink || null,
     updated_at: new Date().toISOString()
   };
 
