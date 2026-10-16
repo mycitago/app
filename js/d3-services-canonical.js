@@ -168,9 +168,18 @@ Requires the one-line listener patch documented in PATCH_INTEGRACION.md. */
           duration_minutes:t.duration,description:t.description||'',image_url,active:true
         };
         const result=existing
-          ? await supabaseClient.from('services').update(payload).eq('id',existing.id).eq('business_id',biz.id)
-          : await supabaseClient.from('services').insert(payload);
+          ? await supabaseClient.from('services').update(payload).eq('id',existing.id).eq('business_id',biz.id).select('id').single()
+          : await supabaseClient.from('services').insert(payload).select('id').single();
         if(result.error)throw result.error;
+        const serviceId=result.data?.id||existing?.id;
+        if(serviceId){
+          const activeStaff=staffItems.filter(st=>st.active!==false);
+          if(activeStaff.length){
+            const links=activeStaff.map(st=>({business_id:biz.id,service_id:serviceId,staff_id:st.id}));
+            const {error:staffError}=await supabaseClient.from('service_staff').upsert(links,{onConflict:'business_id,service_id,staff_id'});
+            if(staffError)throw staffError;
+          }
+        }
       }
       toast(`${list.length} servicios guardados`);box.remove();await loadServices();
     }catch(e){toast('No se pudieron crear: '+e.message)}
