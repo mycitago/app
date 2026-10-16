@@ -832,42 +832,13 @@ function setUserMenuOpen(open){
   }
 }
 
-function setupUserMenu(){
-  const trigger=$('user-menu-trigger');
-  const menu=$('user-menu');
-  if(!trigger || !menu) return;
-
-  trigger.addEventListener('click',event=>{
-    event.stopPropagation();
-    const open=trigger.getAttribute('aria-expanded')==='true';
-    setUserMenuOpen(!open);
-  });
-
-  menu.addEventListener('click',event=>event.stopPropagation());
-
-  document.addEventListener('click',()=>setUserMenuOpen(false));
-  document.addEventListener('keydown',event=>{
-    if(event.key==='Escape' && trigger.getAttribute('aria-expanded')==='true'){
-      setUserMenuOpen(false);
-      trigger.focus();
-    }
-  });
-}
-
 function bind(){
-  setupUserMenu();
-  $('btn-logout').addEventListener('click',logout);
-  ['new-appointment','hero-new-appointment','quick-new','mobile-new','mobile-bottom-new']
-    .forEach(id=>$(id)?.addEventListener('click',publicBooking));
-  $('drawer-close').addEventListener('click',closeDrawer);$('drawer-backdrop').addEventListener('click',closeDrawer);
-  $('global-search').addEventListener('input',performSearch);
-  document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$('global-search').focus()}if(e.key==='Escape'){closeDrawer();$('search-results').classList.add('hidden')}});
-  $('mobile-menu')?.addEventListener('click',()=>$('sidebar').classList.toggle('open'));
-  document.querySelectorAll('.dash-nav a').forEach(a=>{
-    a.addEventListener('click',()=>{
-      if(window.innerWidth<=820) $('sidebar')?.classList.remove('open');
-    });
-  });
+  // Navegación, usuario, logout y acción global "Nueva cita" pertenecen a CitagoShell/AdminActions.
+  // Este módulo conserva únicamente acciones propias del contenido del Dashboard.
+  $('hero-new-appointment')?.addEventListener('click',publicBooking);
+  $('quick-new')?.addEventListener('click',publicBooking);
+  $('drawer-close')?.addEventListener('click',closeDrawer);
+  $('drawer-backdrop')?.addEventListener('click',closeDrawer);
 }
 
 async function init(){
