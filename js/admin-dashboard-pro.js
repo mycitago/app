@@ -341,6 +341,36 @@ function statusPill(status){
   return span;
 }
 
+function dashboardAppointmentActions(a){
+  const wrap=document.createElement('div');
+  wrap.className='dashboard-appointment-actions';
+
+  const add=(label,status,cls)=>{
+    const btn=document.createElement('button');
+    btn.type='button';
+    btn.className='small-btn '+(cls||'');
+    btn.textContent=label;
+    btn.addEventListener('click',async e=>{
+      e.stopPropagation();
+      if(status==='cancelada' && !confirm(`¿Cancelar la cita de ${a.customers?.name||'este cliente'}? La cita se conservará en el historial.`)) return;
+      btn.disabled=true;
+      const {error}=await supabaseClient.from('appointments')
+        .update({status})
+        .eq('id',a.id)
+        .eq('business_id',dashState.business.id);
+      if(error){toast(error.message);btn.disabled=false;return}
+      toast(status==='confirmada'?'Cita confirmada':status==='completada'?'Cita completada':'Cita cancelada');
+      await refreshData();
+    });
+    wrap.appendChild(btn);
+  };
+
+  if(a.status==='pendiente') add('Confirmar','confirmada','primary');
+  if(a.status==='confirmada') add('Completar','completada','primary');
+  if(activeStatus(a.status)) add('Cancelar','cancelada','danger');
+  return wrap;
+}
+
 function appointmentCard(a){
   const card=document.createElement('article');
   card.className='appointment-card';
@@ -369,6 +399,7 @@ function appointmentCard(a){
   const punctuality=buildPunctualityBadge(a);
   if(punctuality) statusWrap.appendChild(punctuality);
   statusWrap.appendChild(statusPill(a.status));
+  statusWrap.appendChild(dashboardAppointmentActions(a));
   card.append(left,statusWrap);
   return card;
 }
@@ -439,6 +470,7 @@ function renderUpcoming(){
     const punctuality=buildPunctualityBadge(a);
     if(punctuality) statusWrap.appendChild(punctuality);
     statusWrap.appendChild(statusPill(a.status));
+    statusWrap.appendChild(dashboardAppointmentActions(a));
     row.append(tile,info,statusWrap);
     root.appendChild(row);
   });
