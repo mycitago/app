@@ -89,13 +89,15 @@
             <label><input id="prefer-oxxo" type="checkbox"> OXXO</label>
           </div>
 
-          <div class="deposit-value-wrap">
-<label for="manual-payment-link"><strong>Link de pago propio</strong></label>
-<p style="margin:4px 0 8px">Opcional. Pega aquí una liga HTTPS de Mercado Pago u otro proveedor para cobrar con tu enlace.</p>
-<input id="manual-payment-link" type="url" inputmode="url" placeholder="https://..." autocomplete="url">
-</div>
-<button id="save-payment-settings" class="ct-btn ct-btn-primary" type="button">Guardar configuración</button>
+          <button id="save-mercadopago-settings" class="ct-btn ct-btn-primary" type="button">Guardar configuración de Mercado Pago</button>
         </fieldset>
+
+        <div class="payment-rules" style="margin-top:16px">
+          <legend style="display:block;margin-bottom:8px;font-weight:800">Link de pago propio</legend>
+          <p style="margin:4px 0 8px">Alternativa independiente. Pega una liga HTTPS de Mercado Pago para cobrar con tu propio enlace, aunque no conectes la cuenta.</p>
+          <input id="manual-payment-link" type="url" inputmode="url" placeholder="https://..." autocomplete="url" style="width:100%">
+          <button id="save-manual-payment-link" class="ct-btn ct-btn-secondary" type="button" style="margin-top:10px">Guardar link de pago</button>
+        </div>
       </article>
 
       <aside class="payments-side">
