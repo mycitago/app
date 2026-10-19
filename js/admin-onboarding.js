@@ -385,6 +385,56 @@ function renderPrices(){
   }));
 }
 
+function ensureCustomServiceCreator(){
+  const prices=ob('onboarding-prices');
+  if(!prices||ob('custom-service-box'))return;
+  const box=document.createElement('section');
+  box.id='custom-service-box';
+  box.style.cssText='margin:18px 0;padding:16px;border:1px dashed #b9a5ff;border-radius:14px;background:rgba(124,58,237,.035)';
+  box.innerHTML=`
+    <button id="toggle-custom-service" type="button" class="ct-btn ct-btn-secondary">＋ Crear servicio nuevo</button>
+    <div id="custom-service-form" class="hidden" style="margin-top:14px;display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px">
+      <label>Nombre<input id="custom-service-name" placeholder="Ej. Corte infantil"></label>
+      <label>Precio MXN<input id="custom-service-price" type="number" min="0" step="0.01" placeholder="250"></label>
+      <label>Duración<input id="custom-service-duration" type="number" min="5" step="5" value="60"></label>
+      <label style="grid-column:1/-1">Descripción<input id="custom-service-description" placeholder="Descripción opcional"></label>
+      <div style="grid-column:1/-1;display:flex;gap:8px">
+        <button id="save-custom-service" type="button" class="ct-btn ct-btn-primary">Agregar servicio</button>
+        <button id="cancel-custom-service" type="button" class="ct-btn ct-btn-secondary">Cancelar</button>
+      </div>
+    </div>`;
+  prices.parentNode.insertBefore(box,prices.nextSibling);
+  const form=ob('custom-service-form');
+  ob('toggle-custom-service').onclick=()=>{form.classList.remove('hidden');ob('custom-service-name').focus()};
+  ob('cancel-custom-service').onclick=()=>form.classList.add('hidden');
+  ob('save-custom-service').onclick=saveCustomService;
+}
+async function saveCustomService(){
+  const btn=ob('save-custom-service');
+  const name=ob('custom-service-name').value.trim();
+  const price=Number(ob('custom-service-price').value);
+  const duration=Number(ob('custom-service-duration').value);
+  const description=ob('custom-service-description').value.trim()||null;
+  if(!name)return obToast('Escribe el nombre del servicio.','error');
+  if(!Number.isFinite(price)||price<0)return obToast('Escribe un precio válido.','error');
+  if(!Number.isInteger(duration)||duration<5||duration>1440)return obToast('La duración debe estar entre 5 y 1440 minutos.','error');
+  if(onboardingExistingServices.some(s=>normalizeName(s.name)===normalizeName(name)))return obToast('Ya existe un servicio con ese nombre.','error');
+  btn.disabled=true;btn.textContent='Agregando…';
+  try{
+    const {error}=await supabaseClient.from('services').insert({
+      business_id:onboardingBiz.id,name,price,duration_minutes:duration,
+      description,category:'Servicios',active:true,featured:false
+    });
+    if(error)throw error;
+    await loadExistingServices();
+    renderTeamServiceOptions();
+    ob('custom-service-name').value='';ob('custom-service-price').value='';ob('custom-service-duration').value='60';ob('custom-service-description').value='';
+    ob('custom-service-form').classList.add('hidden');
+    obToast('Servicio nuevo agregado.','success');
+  }catch(error){obToast('No se pudo crear el servicio: '+error.message,'error')}
+  finally{btn.disabled=false;btn.textContent='Agregar servicio'}
+}
+
 async function saveServicesStep(){
   const rows=[...document.querySelectorAll('.price-row')];
   if(!rows.length)return obToast('Selecciona al menos un servicio.','error');
@@ -637,6 +687,7 @@ async function initOnboarding(){
   renderHoursEditor();
   renderTemplates();
   renderPrices();
+  ensureCustomServiceCreator();
   renderTeamServiceOptions();
   setTeamMode('solo');
   bindEvents();
