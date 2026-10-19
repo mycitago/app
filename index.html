@@ -35,10 +35,10 @@
 <section class="hero">
 <div class="hero-grid">
 <div class="hero-copy">
-<span class="pill">RESERVAS ONLINE PARA NEGOCIOS DE SERVICIOS</span>
-<h1>Haz que reservar contigo <em>sea fácil.</em></h1>
-<p>MyCitaGo organiza tus citas, clientes y servicios en un solo lugar. Configura tu negocio en pocos pasos y comparte tu enlace para empezar a recibir reservaciones.</p>
-<div class="hero-actions"><a class="btn btn-primary" href="admin/login.html?view=register">Primer mes 100% gratis →</a><a class="btn" href="#como-funciona">Ver cómo funciona ↓</a></div>
+<span class="pill">PRUEBA SIN RIESGO · 100% DE DESCUENTO</span>
+<h1><em>30 días gratis</em> para transformar tu agenda.</h1>
+<p>Organiza citas, reduce cancelaciones y brinda una experiencia profesional a tus clientes. Tu primer mes tiene 100% de descuento: hoy pagas $0.</p>
+<div class="hero-actions"><a class="btn btn-primary" href="admin/login.html?view=register">Comenzar gratis →</a><a class="btn" href="#como-funciona">Ver cómo funciona ↓</a></div>
 <div class="hero-trust"><span>Configuración guiada</span><span>Funciona en celular y computadora</span><span>Tu propio enlace de reservación</span></div>
 </div>
 <div class="hero-media"><img src="assets/marketing/hero-platform.jpg" alt="Panel de MyCitaGo"></div>
@@ -123,19 +123,18 @@ function renderPublicPlans(plans){
   root.replaceChildren(...plans.slice(0,3).map(plan=>{
     const article=document.createElement('article'); article.className='plan';
     const name=document.createElement('h3'); name.textContent=plan.name||'Plan';
-    const price=document.createElement('div'); price.className='price';
     const amount=Number(plan.price_monthly??plan.monthly_price??0);
-    price.textContent=`$${Number.isFinite(amount)?amount.toLocaleString('es-MX'):0}`;
+    const price=document.createElement('div'); price.className='price'; price.textContent='$'+(Number.isFinite(amount)?amount.toLocaleString('es-MX'):0);
     const cadence=document.createElement('small'); cadence.textContent=' MXN / mes'; price.append(cadence);
     const planCode=String(plan.plan_code||plan.id||plan.name||'plan').toLowerCase().replace(/\s+/g,'-');
-    const firstMonth=0;
-    const paymentLinks={autonomo_v1:'https://mpago.la/2sLYNJ8',pro_v2:'https://mpago.la/1EiGkvG',premium_v2:'https://mpago.la/2Byumjb'};
-    const promo=document.createElement('span'); promo.className='promo'; promo.textContent='PRIMER MES GRATIS · 100% OFF';
-    const promoPrice=document.createElement('p'); promoPrice.className='promo-price'; promoPrice.textContent='Primer mes 
+    const promo=document.createElement('span'); promo.className='promo'; promo.textContent='100% DE DESCUENTO · PRIMER MES';
+    const promoPrice=document.createElement('p'); promoPrice.className='promo-price'; promoPrice.textContent='Hoy pagas $0 MXN';
+    const desc=document.createElement('p'); desc.className='desc'; desc.textContent='30 días gratis. Después $'+amount.toLocaleString('es-MX')+' MXN/mes. Cancela cuando quieras.';
     const list=document.createElement('ul');
     const features=publicPlanFeatures(plan.features);
     list.replaceChildren(...features.slice(0,6).map(label=>{const li=document.createElement('li');li.textContent=label;return li}));
-    const cta=document.createElement('a'); cta.className='btn btn-primary'; cta.href='admin/login.html?view=register&plan='+encodeURIComponent(planCode); cta.dataset.renewalUrl=paymentLinks[planCode]||''; cta.textContent='Comenzar por 
+    const cta=document.createElement('a'); cta.className='btn btn-primary'; cta.href='admin/login.html?view=register&plan='+encodeURIComponent(planCode); cta.textContent='Activar 30 días gratis';
+    article.append(name,price,promo,promoPrice,desc,list,cta); return article;
   }));
 }
 
