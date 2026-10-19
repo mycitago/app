@@ -17,6 +17,7 @@
 <main class="adm-login-card">
   <img class="mycitago-login-logo" src="../assets/brand/mycitago-logo.png" alt="MyCitaGo">
   <span class="login-kicker">GESTIÓN DE CITAS Y CLIENTES</span>
+  <div id="selected-plan-offer" class="adm-info hidden"></div>
   <h1 id="card-title">Bienvenido a MyCitaGo</h1>
   <p class="text-muted" id="card-sub">Ingresa para administrar tu negocio.</p>
 
@@ -78,6 +79,9 @@ window.MyCitaGoOAuth = (() => {
   function showError(msg){$('msg-error').textContent=msg;$('msg-error').classList.remove('hidden');$('msg-info').classList.add('hidden')}
   function showInfo(msg){$('msg-info').textContent=msg;$('msg-info').classList.remove('hidden');$('msg-error').classList.add('hidden')}
   function hideMsgs(){$('msg-error').classList.add('hidden');$('msg-info').classList.add('hidden')}
+  const PLAN_INFO={autonomo_v1:['Autónomo',199],pro_v2:['Pro',399],premium_v2:['Premium',899]};
+  function selectedPlanCode(){const raw=(new URLSearchParams(location.search).get('plan')||localStorage.getItem('mycitago:selected-plan')||'autonomo_v1').toLowerCase();return PLAN_INFO[raw]?raw:'autonomo_v1'}
+  function persistSelectedPlan(){const code=selectedPlanCode();localStorage.setItem('mycitago:selected-plan',code);const info=PLAN_INFO[code];const el=$('selected-plan-offer');if(el){el.textContent=`Plan ${info[0]} · PRIMER MES GRATIS (100% OFF) · después ${info[1]} MXN/mes`;el.classList.remove('hidden')}return code}
   function mapLoginError(msg){if(/invalid login credentials/i.test(msg||''))return'Correo o contraseña incorrectos.';if(/not confirmed/i.test(msg||''))return'La cuenta no está confirmada todavía.';return msg||'No se pudo iniciar sesión.'}
   function onlyDigits(s){return(s||'').replace(/\D/g,'')}
   function internationalPhone(){const code=$('country-code').value;const national=onlyDigits($('reg-whatsapp').value);return{code,national,e164:`${code}${national}`}}
@@ -105,7 +109,7 @@ window.MyCitaGoOAuth = (() => {
     try{
       if(!window.MyCitaGoOAuth)throw new Error('No se cargó el módulo de acceso con Google. Recarga la página.');
       const invite=window.MyCitaGoOAuth.inviteForOAuth(location.href);
-      const redirectTo=`${getAppBaseUrl()}admin/login.html?oauth=1${invite?'&invite='+encodeURIComponent(invite):''}`;
+      const plan=persistSelectedPlan();const redirectTo=`${getAppBaseUrl()}admin/login.html?oauth=1&plan=${encodeURIComponent(plan)}${invite?'&invite='+encodeURIComponent(invite):''}`;
       const authorizeUrl=window.MyCitaGoOAuth.buildOAuthAuthorizeUrl(SUPABASE_URL,'google',redirectTo);
       window.location.assign(authorizeUrl);
     }catch(error){
@@ -126,7 +130,7 @@ window.MyCitaGoOAuth = (() => {
   async function handleRegister(){
     hideMsgs();const bizName=$('reg-business').value.trim(),phone=internationalPhone(),email=$('reg-email').value.trim().toLowerCase(),password=$('reg-password').value;
     if(!bizName)return showError('Escribe el nombre de tu negocio.');if(!validPhone(phone))return showError($('country-code').value==='+52'?'Escribe un número de México de 10 dígitos.':'Revisa el número internacional.');
-    const btn=$('btn-register');btn.disabled=true;btn.textContent=oauthMode?'Preparando tu negocio…':'Creando cuenta…';const selectedPlan=new URLSearchParams(location.search).get('plan')||'reserva';
+    const btn=$('btn-register');btn.disabled=true;btn.textContent=oauthMode?'Preparando tu negocio…':'Creando cuenta…';const selectedPlan=persistSelectedPlan();
     try{
       if(oauthMode){const{data:auth}=await supabaseClient.auth.getUser();if(!auth?.user)throw new Error('La sesión de Google expiró. Vuelve a ingresar.');await completeOAuthBusiness(auth.user,bizName,phone,selectedPlan);location.replace('onboarding.html');return}
       if(!email)throw new Error('Escribe tu correo.');if(password.length<10)throw new Error('Usa una contraseña de al menos 10 caracteres.');
@@ -182,7 +186,7 @@ window.MyCitaGoOAuth = (() => {
       prepareOAuthRegistration(user);return
     }
     if(oauthReturn){showError('Google regresó a MyCitaGo, pero no se recibió una sesión válida. Intenta de nuevo. Si Google muestra un error, MyCitaGo lo mostrará aquí.');return}
-    if(params.get('view')==='register')showView('register');
+    persistSelectedPlan();if(params.get('view')==='register')showView('register');
   })();
 </script>
 </body>
