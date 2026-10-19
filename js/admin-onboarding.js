@@ -65,13 +65,13 @@ function normalizeHours(hours){
 }
 
 function showStep(step){
-  const ids=['step-business','step-hours','step-services','step-team','onboarding-success'];
+  const ids=['step-business','step-hours','step-services','step-team','step-branding','onboarding-success'];
   ids.forEach(id=>ob(id)?.classList.add('hidden'));
 
-  const map={1:'step-business',2:'step-hours',3:'step-services',4:'step-team',5:'onboarding-success'};
+  const map={1:'step-business',2:'step-hours',3:'step-services',4:'step-team',5:'step-branding',6:'onboarding-success'};
   ob(map[step])?.classList.remove('hidden');
 
-  const pct=step>=5?100:step*25;
+  const pct=step>=6?100:Math.min(100,step*20);
   if(ob('onboarding-progress'))ob('onboarding-progress').style.width=`${pct}%`;
 
   document.querySelectorAll('[data-step-jump]').forEach(btn=>{
@@ -587,35 +587,42 @@ function configureSuccess(){
 }
 
 async function finishOnboarding(){
-  const button=ob('finish-onboarding');
-  button.disabled=true;
-  button.textContent='Finalizando…';
-
+  const button=ob('finish-onboarding');button.disabled=true;button.textContent='Guardando…';
+  try{const teamOk=await saveOptionalTeam();if(!teamOk)return;showStep(5)}
+  catch(error){obToast('No se pudo continuar: '+error.message,'error')}
+  finally{button.disabled=false;button.textContent='Continuar con imagen'}
+}
+function renderBrandPreview(logoUrl,coverUrl){
+  const root=ob('onboarding-brand-preview');if(!root)return;
+  root.innerHTML=`<div style="border:1px solid #e7e2ee;border-radius:14px;padding:10px;text-align:center"><small>Logo</small><div style="height:90px;display:grid;place-items:center">${logoUrl?`<img src="${logoUrl}" alt="Logo" style="max-width:100%;max-height:80px">`:'Sin logo'}</div></div><div style="border:1px solid #e7e2ee;border-radius:14px;padding:10px"><small>Portada</small><div style="height:90px;border-radius:10px;background:${coverUrl?`url('${coverUrl}') center/cover`:'#f4f1f8'}"></div></div>`;
+}
+async function saveBrandingAndComplete(skip=false){
+  const btn=ob('save-branding-finish');if(btn){btn.disabled=true;btn.textContent='Guardando…'}
   try{
-    const teamOk=await saveOptionalTeam();
-    if(!teamOk)return;
-
-    const {data,error}=await supabaseClient
-      .from('businesses')
-      .update({setup_completed:true})
-      .eq('id',onboardingBiz.id)
-      .select('*')
-      .single();
-    if(error)throw error;
-
-    onboardingBiz={...onboardingBiz,...data};
-    configureSuccess();
-    showStep(5);
-  }catch(error){
-    obToast('No se pudo finalizar: '+error.message,'error');
-  }finally{
-    button.disabled=false;
-    button.textContent='Finalizar configuración';
-  }
+    let logoUrl=null,coverUrl=null;
+    if(!skip){
+      const logo=ob('onboarding-logo')?.files?.[0],cover=ob('onboarding-cover')?.files?.[0];
+      if(logo){const up=await CitagoMedia.uploadPublicImage(logo,{businessId:onboardingBiz.id,kind:'logo'});logoUrl=up.url}
+      if(cover){const up=await CitagoMedia.uploadPublicImage(cover,{businessId:onboardingBiz.id,kind:'cover'});coverUrl=up.url}
+      if(logoUrl||coverUrl){
+        const {data:existing}=await supabaseClient.from('business_branding').select('*').eq('business_id',onboardingBiz.id).maybeSingle();
+        const draft={...(existing?.draft_config||{})};if(logoUrl)draft.logo_url=logoUrl;if(coverUrl)draft.cover_url=coverUrl;
+        const payload={business_id:onboardingBiz.id,draft_config:draft,updated_at:new Date().toISOString()};
+        if(logoUrl)payload.logo_url=logoUrl;if(coverUrl)payload.cover_url=coverUrl;
+        const {error:brandError}=await supabaseClient.from('business_branding').upsert(payload,{onConflict:'business_id'});if(brandError)throw brandError;
+        const businessPatch={};if(logoUrl)businessPatch.logo_url=logoUrl;if(coverUrl)businessPatch.cover_image_url=coverUrl;
+        const {error:bizMediaError}=await supabaseClient.from('businesses').update(businessPatch).eq('id',onboardingBiz.id);if(bizMediaError)console.warn('[Onboarding branding]',bizMediaError);
+        renderBrandPreview(logoUrl,coverUrl);
+      }
+    }
+    const {data,error}=await supabaseClient.from('businesses').update({setup_completed:true}).eq('id',onboardingBiz.id).select('*').single();if(error)throw error;
+    onboardingBiz={...onboardingBiz,...data};configureSuccess();showStep(6);
+  }catch(error){obToast('No se pudo finalizar: '+error.message,'error')}
+  finally{if(btn){btn.disabled=false;btn.textContent='Guardar y terminar'}}
 }
 
 function chooseInitialStep(){
-  if(onboardingBiz?.setup_completed)return 5;
+  if(onboardingBiz?.setup_completed)return 6;
   if(!onboardingBiz?.business_category_id)return 1;
   if(!hasOpeningHours(onboardingBiz?.opening_hours))return 2;
   if(!onboardingExistingServices.length)return 3;
@@ -627,10 +634,13 @@ function bindEvents(){
   ob('save-hours-next').onclick=saveHoursStep;
   ob('save-services-next').onclick=saveServicesStep;
   ob('finish-onboarding').onclick=finishOnboarding;
+  ob('save-branding-finish').onclick=()=>saveBrandingAndComplete(false);
+  ob('skip-branding').onclick=()=>saveBrandingAndComplete(true);
 
   ob('back-business').onclick=()=>showStep(1);
   ob('back-hours').onclick=()=>showStep(2);
   ob('back-services').onclick=()=>showStep(3);
+  ob('back-team').onclick=()=>showStep(4);
 
   document.querySelectorAll('[data-hours-preset]').forEach(btn=>{
     btn.onclick=()=>applyHoursPreset(btn.dataset.hoursPreset);
@@ -677,7 +687,7 @@ async function initOnboarding(){
   bindEvents();
 
   const initial=chooseInitialStep();
-  if(initial===5)configureSuccess();
+  if(initial===6)configureSuccess();
   showStep(initial);
 }
 
