@@ -31,25 +31,135 @@ async function cancelAppointment(id){
   if(!confirm(`¿Cancelar la cita de ${a.customers?.name||'este cliente'}? La cita se conservará en el historial.`))return;
   await updateAppointmentStatus(id,'cancelada');
 }
+function agendaWhatsApp(a){
+  const phone=String(a?.customers?.whatsapp||'').replace(/\D/g,'');
+  if(!phone)return;
+  const service=a?.services?.name||'tu servicio';
+  const date=new Date(a.appointment_date+'T12:00:00').toLocaleDateString('es-MX',{day:'numeric',month:'long'});
+  const message=`Hola ${a.customers?.name||''} 👋 Te recordamos tu cita en ${agendaBiz?.name||'nuestro negocio'} el ${date} a las ${String(a.start_time||'').slice(0,5)} para ${service}. Te esperamos.`;
+  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`,'_blank','noopener');
+}
+function timeToMinutes(value){const [h,m]=String(value||'00:00').split(':').map(Number);return h*60+m}
+function ensureRescheduleDialog(){
+  let dialog=A('agenda-reschedule-dialog');if(dialog)return dialog;
+  dialog=document.createElement('dialog');dialog.id='agenda-reschedule-dialog';dialog.className='agenda-payment-dialog';
+  dialog.innerHTML=`<form method="dialog" id="agenda-reschedule-form"><div class="agenda-dialog-head"><div><span class="ct-eyebrow">REPROGRAMAR</span><h3>Mover cita</h3></div><button type="button" class="agenda-dialog-close" data-close-reschedule>×</button></div><p id="agenda-reschedule-caption"></p><label>Nueva fecha<input id="agenda-reschedule-date" type="date" required></label><label>Nueva hora<input id="agenda-reschedule-time" type="time" step="900" required></label><div class="agenda-dialog-actions"><button type="button" class="ct-btn ct-btn-secondary" data-close-reschedule>Cancelar</button><button type="submit" class="ct-btn ct-btn-primary">Guardar cambio</button></div></form>`;
+  document.body.appendChild(dialog);
+  dialog.querySelectorAll('[data-close-reschedule]').forEach(b=>b.onclick=()=>dialog.close());
+  dialog.querySelector('#agenda-reschedule-form').onsubmit=saveReschedule;
+  return dialog;
+}
+function openReschedule(id){
+  const a=agendaItems.find(x=>String(x.id)===String(id));if(!a)return;
+  const dialog=ensureRescheduleDialog();dialog.dataset.appointmentId=a.id;
+  A('agenda-reschedule-caption').textContent=`${a.customers?.name||'Cliente'} · ${a.services?.name||'Servicio'}`;
+  A('agenda-reschedule-date').value=a.appointment_date;
+  A('agenda-reschedule-time').value=String(a.start_time||'').slice(0,5);
+  dialog.showModal();
+}
+async function saveReschedule(ev){
+  ev.preventDefault();
+  const form=ev.currentTarget,submit=form?.querySelector('[type="submit"]');
+  if(submit?.disabled)return;
+  const dialog=A('agenda-reschedule-dialog'),id=dialog?.dataset.appointmentId;
+  const a=agendaItems.find(x=>String(x.id)===String(id));if(!a)return;
+  if(!canCancel(a))return alert('Esta cita ya no se puede reprogramar por su estado actual.');
+  const date=A('agenda-reschedule-date')?.value,start=A('agenda-reschedule-time')?.value;
+  if(!date||!/^\d{2}:\d{2}$/.test(start||''))return alert('Selecciona una fecha y hora válidas.');
+  const duration=Number(a.duration_charged||a.services?.duration_minutes)||60;
+  const startMin=timeToMinutes(start),endMin=startMin+duration;
+  if(endMin>24*60)return alert('La cita no puede terminar después de medianoche.');
+  if(date===a.appointment_date && start===String(a.start_time||'').slice(0,5)){dialog.close();return}
+  const end=`${String(Math.floor(endMin/60)).padStart(2,'0')}:${String(endMin%60).padStart(2,'0')}`;
+  if(submit){submit.disabled=true;submit.textContent='Validando…'}
+  try{
+    if(a.staff_id){
+      const {data:conflicts,error:conflictError}=await supabaseClient.from('appointments')
+        .select('id,start_time,end_time,status')
+        .eq('business_id',agendaBiz.id).eq('staff_id',a.staff_id).eq('appointment_date',date)
+        .neq('id',a.id);
+      if(conflictError)throw new Error('No pudimos validar la disponibilidad: '+conflictError.message);
+      const active=(conflicts||[]).filter(x=>!['cancelada','cancelled'].includes(String(x.status||'').toLowerCase()));
+      const overlap=active.some(x=>startMin<timeToMinutes(x.end_time)&&endMin>timeToMinutes(x.start_time));
+      if(overlap)return alert('Ese profesional ya tiene una cita en ese horario. Elige otro horario.');
+    }
+    if(submit)submit.textContent='Guardando…';
+    const {data,error}=await supabaseClient.from('appointments').update({appointment_date:date,start_time:start,end_time:end})
+      .eq('id',a.id).eq('business_id',agendaBiz.id).select('id,appointment_date,start_time,end_time,status').maybeSingle();
+    if(error)throw error;
+    if(!data)throw new Error('La cita no se actualizó. Verifica tus permisos y vuelve a intentar.');
+    dialog.close();
+    window.dispatchEvent(new CustomEvent('mycitago:appointment-updated',{detail:{id:a.id,data}}));
+    await loadAgenda();
+  }catch(error){
+    const raw=String(error?.message||error);
+    alert(/23P01|exclu|slot_taken/i.test(raw)?'Ese horario ya está ocupado. Elige otro.':'No se pudo reprogramar la cita: '+raw);
+  }finally{
+    if(submit){submit.disabled=false;submit.textContent='Guardar cambio'}
+  }
+}
 function managementActions(a){
   const out=[];
   if(canConfirm(a))out.push(`<button type="button" class="agenda-mini-btn primary" data-appt-confirm="${a.id}">Confirmar</button>`);
   if(canComplete(a))out.push(`<button type="button" class="agenda-mini-btn primary" data-appt-complete="${a.id}">Completar</button>`);
+  if(canCancel(a))out.push(`<button type="button" class="agenda-mini-btn" data-appt-reschedule="${a.id}">Reprogramar</button>`);
+  if(a.customers?.whatsapp)out.push(`<button type="button" class="agenda-mini-btn" data-appt-whatsapp="${a.id}">WhatsApp</button>`);
   if(canCancel(a))out.push(`<button type="button" class="agenda-mini-btn danger" data-appt-cancel="${a.id}">Cancelar</button>`);
   return out.join('');
 }
 function bindManagementActions(root){
   root.querySelectorAll('[data-appt-confirm]').forEach(b=>b.onclick=()=>updateAppointmentStatus(b.dataset.apptConfirm,'confirmada'));
   root.querySelectorAll('[data-appt-complete]').forEach(b=>b.onclick=()=>updateAppointmentStatus(b.dataset.apptComplete,'completada'));
+  root.querySelectorAll('[data-appt-reschedule]').forEach(b=>b.onclick=()=>openReschedule(b.dataset.apptReschedule));
+  root.querySelectorAll('[data-appt-whatsapp]').forEach(b=>b.onclick=()=>{const a=agendaItems.find(x=>String(x.id)===String(b.dataset.apptWhatsapp));if(a)agendaWhatsApp(a)});
   root.querySelectorAll('[data-appt-cancel]').forEach(b=>b.onclick=()=>cancelAppointment(b.dataset.apptCancel));
 }
-async function requestReview(id){const a=agendaItems.find(x=>x.id===id);const{data,error}=await supabaseClient.rpc('create_review_request',{p_appointment_id:id});if(error)return alert('No se pudo generar la solicitud: '+error.message);const url=`${location.origin}${location.pathname.split('/admin/')[0]}/resena.html?t=${encodeURIComponent(data.token)}`;const phone=String(a?.customers?.whatsapp||'').replace(/\D/g,'');if(phone)window.open(`https://wa.me/${phone}?text=${encodeURIComponent(`Gracias por tu visita. ¿Nos compartes tu opinión? ${url}`)}`,'_blank','noopener');else{await navigator.clipboard.writeText(url);alert('Enlace de reseña copiado.')}await loadAgenda()}
+const reviewRequestsInFlight=new Set();
+async function requestReview(id){
+  if(reviewRequestsInFlight.has(id))return;
+  const a=agendaItems.find(x=>String(x.id)===String(id));if(!a||!isCompleted(a))return;
+  const existing=agendaReviewRequests.get(a.id);
+  if(existing?.status==='pending'||existing?.status==='completed')return;
+  reviewRequestsInFlight.add(id);
+  try{
+    const{data,error}=await supabaseClient.rpc('create_review_request',{p_appointment_id:id});
+    if(error)throw error;
+    const token=data?.token||data?.[0]?.token;
+    if(!token)throw new Error('No se recibió el enlace de reseña.');
+    const url=`${location.origin}${location.pathname.split('/admin/')[0]}/resena.html?t=${encodeURIComponent(token)}`;
+    const phone=String(a?.customers?.whatsapp||'').replace(/\D/g,'');
+    if(phone)window.open(`https://wa.me/${phone}?text=${encodeURIComponent(`Gracias por tu visita. ¿Nos compartes tu opinión? ${url}`)}`,'_blank','noopener');
+    else{await navigator.clipboard.writeText(url);alert('Enlace de reseña copiado.')}
+    await loadAgenda();
+  }catch(error){alert('No se pudo generar la solicitud: '+String(error?.message||error))}
+  finally{reviewRequestsInFlight.delete(id)}
+}
 function paymentLabel(a){const p=agendaPayments.get(a.id);if(!p)return'<span class="agenda-op-pill neutral">Sin pago registrado</span>';const partial=Number(p.amount)<Number(a.price_charged||0),prefix=partial?'Anticipo':'Pago',state=String(p.status||'pending').toLowerCase(),cls=state==='paid'?'good':state==='review_required'?'warn':'neutral',method=p.payment_method?` · ${p.payment_method}`:(p.provider==='mercadopago'?' · Mercado Pago':'');return`<span class="agenda-op-pill ${cls}">${prefix} ${money(p.amount)} · ${state}${method}</span>`}
 function reviewLabel(a){if(!isCompleted(a))return'';const r=agendaReviewRequests.get(a.id);if(!r)return`<button type="button" class="agenda-mini-btn" data-review-request="${a.id}">Solicitar reseña</button>`;if(r.status==='completed')return'<span class="agenda-op-pill good">Reseña recibida</span>';if(r.status==='pending')return'<span class="agenda-op-pill neutral">Reseña solicitada</span>';return`<button type="button" class="agenda-mini-btn" data-review-request="${a.id}">Solicitar de nuevo</button>`}
 function canRegisterPayment(a){return!['cancelada','cancelled'].includes(String(a.status||'').toLowerCase())&&agendaPayments.get(a.id)?.status!=='paid'}
 function ensurePaymentDialog(){let dialog=A('agenda-payment-dialog');if(dialog)return dialog;dialog=document.createElement('dialog');dialog.id='agenda-payment-dialog';dialog.className='agenda-payment-dialog';dialog.innerHTML=`<form method="dialog" id="agenda-payment-form"><div class="agenda-dialog-head"><div><span class="ct-eyebrow">PAGO</span><h3>Registrar pago de la cita</h3></div><button type="button" class="agenda-dialog-close" data-close-payment>×</button></div><p id="agenda-payment-caption"></p><label>Importe<input id="agenda-payment-amount" type="number" min="0.01" step="0.01" required></label><label>Método<select id="agenda-payment-method" required><option value="cash">Efectivo</option><option value="card">Tarjeta</option><option value="transfer">Transferencia</option><option value="other">Otro</option></select></label><div class="agenda-dialog-actions"><button type="button" class="ct-btn ct-btn-secondary" data-close-payment>Cancelar</button><button type="submit" class="ct-btn ct-btn-primary">Guardar pago</button></div></form>`;document.body.appendChild(dialog);dialog.querySelectorAll('[data-close-payment]').forEach(b=>b.onclick=()=>dialog.close());dialog.querySelector('#agenda-payment-form').onsubmit=saveManualPayment;return dialog}
 function openPaymentDialog(id){const a=agendaItems.find(x=>x.id===id);if(!a)return;const dialog=ensurePaymentDialog();dialog.dataset.appointmentId=id;A('agenda-payment-caption').textContent=`${a.customers?.name||'Cliente'} · ${a.services?.name||'Servicio'} · Total ${money(a.price_charged)}`;A('agenda-payment-amount').value=String(Number(a.price_charged||0).toFixed(2));dialog.showModal()}
-async function saveManualPayment(ev){ev.preventDefault();const dialog=A('agenda-payment-dialog'),id=dialog?.dataset.appointmentId,a=agendaItems.find(x=>x.id===id);if(!id||!a)return;const amount=Number(A('agenda-payment-amount').value||0),method=A('agenda-payment-method').value;if(!(amount>0)||amount>Number(a.price_charged||0)){alert('El importe debe ser mayor a cero y no puede superar el precio de la cita.');return}const collectionMode=amount<Number(a.price_charged||0)?'partial':'full';const{error}=await supabaseClient.rpc('record_appointment_payment',{p_appointment_id:id,p_amount:amount,p_payment_method:method,p_collection_mode:collectionMode});if(error)return alert('No se pudo guardar el pago: '+error.message);dialog.close();await loadAgenda()}
+async function saveManualPayment(ev){
+  ev.preventDefault();
+  const form=ev.currentTarget,submit=form?.querySelector('[type="submit"]');
+  if(submit?.disabled)return;
+  const dialog=A('agenda-payment-dialog'),id=dialog?.dataset.appointmentId,a=agendaItems.find(x=>String(x.id)===String(id));
+  if(!id||!a)return;
+  if(['cancelada','cancelled'].includes(normalizedStatus(a)))return alert('No puedes registrar un pago en una cita cancelada.');
+  if(agendaPayments.get(a.id)?.status==='paid')return alert('Esta cita ya tiene un pago registrado.');
+  const amount=Number(A('agenda-payment-amount')?.value||0),method=A('agenda-payment-method')?.value;
+  const total=Number(a.price_charged||0);
+  if(!(amount>0)||amount>total){alert('El importe debe ser mayor a cero y no puede superar el precio de la cita.');return}
+  const collectionMode=amount<total?'partial':'full';
+  if(submit){submit.disabled=true;submit.textContent='Guardando…'}
+  try{
+    const{error}=await supabaseClient.rpc('record_appointment_payment',{p_appointment_id:id,p_amount:amount,p_payment_method:method,p_collection_mode:collectionMode});
+    if(error)throw error;
+    dialog.close();
+    await loadAgenda();
+  }catch(error){alert('No se pudo guardar el pago: '+String(error?.message||error))}
+  finally{if(submit){submit.disabled=false;submit.textContent='Guardar pago'}}
+}
 function renderList(items){
   const root=A('agenda-list');
   root.innerHTML=items.length?items.map(a=>`<div class="agenda-list-row"><time>${new Date(a.appointment_date+'T12:00:00').toLocaleDateString('es-MX',{weekday:'short',day:'numeric',month:'short'})} ${String(a.start_time).slice(0,5)}</time><div><b>${a.customers?.name||'Cliente'}</b><small>${a.services?.name||'Servicio'}${a.staff_id?' · '+(agendaStaff.find(s=>s.id===a.staff_id)?.name||'Profesional'):''}</small><div class="agenda-ops">${paymentLabel(a)}${reviewLabel(a)}</div></div><div class="agenda-row-actions"><em>${a.status||'Pendiente'}</em><div class="agenda-management-actions">${managementActions(a)}${canRegisterPayment(a)?`<button type="button" class="agenda-mini-btn" data-payment-register="${a.id}">Registrar pago</button>`:''}</div></div></div>`).join(''):'<div class="agenda-empty">No hay citas para esta vista.</div>';
