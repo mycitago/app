@@ -386,29 +386,13 @@ function renderPrices(){
 }
 
 function ensureCustomServiceCreator(){
-  const prices=ob('onboarding-prices');
-  if(!prices||ob('custom-service-box'))return;
-  const box=document.createElement('section');
-  box.id='custom-service-box';
-  box.style.cssText='margin:18px 0;padding:16px;border:1px dashed #b9a5ff;border-radius:14px;background:rgba(124,58,237,.035)';
-  box.innerHTML=`
-    <button id="toggle-custom-service" type="button" class="ct-btn ct-btn-secondary">＋ Crear servicio nuevo</button>
-    <div id="custom-service-form" class="hidden" style="margin-top:14px;display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px">
-      <label>Nombre<input id="custom-service-name" placeholder="Ej. Corte infantil"></label>
-      <label>Precio MXN<input id="custom-service-price" type="number" min="0" step="0.01" placeholder="250"></label>
-      <label>Duración<input id="custom-service-duration" type="number" min="5" step="5" value="60"></label>
-      <label style="grid-column:1/-1">Descripción<input id="custom-service-description" placeholder="Descripción opcional"></label>
-      <div style="grid-column:1/-1;display:flex;gap:8px">
-        <button id="save-custom-service" type="button" class="ct-btn ct-btn-primary">Agregar servicio</button>
-        <button id="cancel-custom-service" type="button" class="ct-btn ct-btn-secondary">Cancelar</button>
-      </div>
-    </div>`;
-  prices.parentNode.insertBefore(box,prices.nextSibling);
-  const form=ob('custom-service-form');
-  ob('toggle-custom-service').onclick=()=>{form.classList.remove('hidden');ob('custom-service-name').focus()};
-  ob('cancel-custom-service').onclick=()=>form.classList.add('hidden');
+  const box=ob('custom-service-box'),form=ob('custom-service-form');
+  if(!box||!form)return;
+  ob('toggle-custom-service').onclick=()=>{form.classList.remove('hidden');form.style.display='grid';ob('custom-service-name').focus()};
+  ob('cancel-custom-service').onclick=()=>{form.classList.add('hidden');form.style.display='none'};
   ob('save-custom-service').onclick=saveCustomService;
 }
+
 async function saveCustomService(){
   const btn=ob('save-custom-service');
   const name=ob('custom-service-name').value.trim();
@@ -429,7 +413,7 @@ async function saveCustomService(){
     await loadExistingServices();
     renderTeamServiceOptions();
     ob('custom-service-name').value='';ob('custom-service-price').value='';ob('custom-service-duration').value='60';ob('custom-service-description').value='';
-    ob('custom-service-form').classList.add('hidden');
+    ob('custom-service-form').classList.add('hidden');ob('custom-service-form').style.display='none';
     obToast('Servicio nuevo agregado.','success');
   }catch(error){obToast('No se pudo crear el servicio: '+error.message,'error')}
   finally{btn.disabled=false;btn.textContent='Agregar servicio'}
