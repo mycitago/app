@@ -87,6 +87,16 @@
 
       <div id="onboarding-services" class="onboarding-services"></div>
       <div id="onboarding-prices" class="onboarding-prices"></div>
+      <section id="custom-service-box" style="margin:18px 0;padding:16px;border:1px dashed #9b62ff;border-radius:14px;background:rgba(124,58,237,.04)">
+        <button id="toggle-custom-service" type="button" class="ct-btn ct-btn-secondary">＋ Crear servicio nuevo</button>
+        <div id="custom-service-form" class="hidden" style="margin-top:14px;grid-template-columns:2fr 1fr 1fr;gap:10px">
+          <label>Nombre<input id="custom-service-name" placeholder="Ej. Corte infantil"></label>
+          <label>Precio MXN<input id="custom-service-price" type="number" min="0" step="0.01" placeholder="250"></label>
+          <label>Duración (min)<input id="custom-service-duration" type="number" min="5" step="5" value="60"></label>
+          <label style="grid-column:1/-1">Descripción<input id="custom-service-description" placeholder="Descripción opcional"></label>
+          <div style="grid-column:1/-1;display:flex;gap:8px"><button id="save-custom-service" type="button" class="ct-btn ct-btn-primary">Agregar servicio</button><button id="cancel-custom-service" type="button" class="ct-btn ct-btn-secondary">Cancelar</button></div>
+        </div>
+      </section>
 
       <div class="onboarding-actions">
         <button id="back-hours" class="ct-btn ct-btn-secondary" type="button">Atrás</button>
@@ -150,7 +160,7 @@
   <script src="../js/config.js"></script>
   <script src="../js/supabase.js"></script>
   <script src="../js/admin-auth.js"></script>
-  <script src="../js/admin-onboarding.js?v=20261019-custom1"></script>
+  <script src="../js/admin-onboarding.js?v=20261019-custom2"></script>
   <script src="../js/d3-onboarding-canonical.js?v=20260914-d3"></script>
   <script src="../js/citago-shell.js"></script>
   <script>document.addEventListener('DOMContentLoaded',()=>CitagoShell.mount({mode:'tenant',activePage:'inicio'}));</script>
