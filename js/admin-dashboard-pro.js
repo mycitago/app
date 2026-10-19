@@ -790,6 +790,8 @@ function renderDashboardLoadError(error){
 }
 
 async function refreshData(){
+  let snapshotError=null;
+
   try{
     const snap=await DashboardDataLoader.loadBusinessDashboardSnapshot(
       supabaseClient,
@@ -804,7 +806,23 @@ async function refreshData(){
     dashState.primaryBranchId=snap.primaryBranchId;
     dashState.primaryBranchName=snap.primaryBranchName;
     dashState.branchCount=snap.branchCount;
+  }catch(error){
+    snapshotError=error;
+    console.warn('[MyCitaGo dashboard] Snapshot no disponible; usando consultas directas.',error);
 
+    try{
+      await Promise.all([
+        fetchAppointments(),
+        fetchServices(),
+        fetchCustomers()
+      ]);
+    }catch(fallbackError){
+      renderDashboardLoadError(fallbackError);
+      return;
+    }
+  }
+
+  try{
     setDates();
     await renderBusinessHealth();
     renderKPIs();
@@ -814,6 +832,10 @@ async function refreshData(){
     renderTopServices();
     startBusinessClock();
     window.lucide?.createIcons();
+
+    if(snapshotError){
+      console.info('[MyCitaGo dashboard] Panel recuperado con datos directos.');
+    }
   }catch(error){
     renderDashboardLoadError(error);
   }
@@ -867,6 +889,12 @@ function bind(){
     a.addEventListener('click',()=>{
       if(window.innerWidth<=820) $('sidebar')?.classList.remove('open');
     });
+  });
+
+  window.addEventListener('mycitago:appointment-created',()=>refreshData());
+  window.addEventListener('focus',()=>refreshData());
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible') refreshData();
   });
 }
 
