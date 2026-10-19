@@ -178,8 +178,6 @@ async function startMercadoPago() {
 }
 
 async function saveSettings() {
-  const manualLink=pay$('manual-payment-link').value.trim();
-  if(manualLink && !/^https:\/\//i.test(manualLink)) return payToast('El link de pago debe comenzar con https://', 'error');
   const mode = selectedMode();
   const value = Number(pay$('deposit-value').value || 0);
 
@@ -208,7 +206,6 @@ async function saveSettings() {
     prefer_spei: Boolean(pay$('prefer-spei').checked),
     prefer_oxxo: Boolean(pay$('prefer-oxxo').checked),
     currency: 'mxn',
-    manual_payment_link: manualLink || null,
     updated_at: new Date().toISOString()
   };
 
@@ -217,7 +214,23 @@ async function saveSettings() {
     .upsert(payload);
 
   if (error) return payToast('No se pudo guardar: ' + error.message, 'error');
-  payToast('Configuración de pagos guardada.', 'success');
+  payToast('Configuración de Mercado Pago guardada.', 'success');
+}
+
+async function saveManualPaymentLink() {
+  const manualLink = pay$('manual-payment-link').value.trim();
+  if (manualLink && !/^https:\/\//i.test(manualLink)) {
+    return payToast('El link de pago debe comenzar con https://', 'error');
+  }
+  const { error } = await supabaseClient
+    .from('business_payment_settings')
+    .upsert({
+      business_id: paymentBiz.id,
+      manual_payment_link: manualLink || null,
+      updated_at: new Date().toISOString()
+    });
+  if (error) return payToast('No se pudo guardar el link: ' + error.message, 'error');
+  payToast(manualLink ? 'Link de pago guardado.' : 'Link de pago eliminado.', 'success');
 }
 
 async function initAdminPayments() {
@@ -248,7 +261,8 @@ async function initAdminPayments() {
 
   pay$('connect-mercadopago').onclick = startMercadoPago;
   pay$('refresh-mercadopago').onclick = () => refreshMercadoPagoStatus(true);
-  pay$('save-payment-settings').onclick = saveSettings;
+  pay$('save-mercadopago-settings').onclick = saveSettings;
+  pay$('save-manual-payment-link').onclick = saveManualPaymentLink;
 
   try {
     await Promise.all([loadPaymentSettings(), loadSubscription()]);
