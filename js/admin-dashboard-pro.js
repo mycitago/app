@@ -17,13 +17,29 @@ const dashState = {
 const $ = id => document.getElementById(id);
 
 function pad(n){ return String(n).padStart(2,'0'); }
-function dateKey(d=new Date()){ return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
+function dateKey(d=new Date()){
+  const timezone=dashState.dashboardTimezone;
+  if(timezone){
+    try{
+      const parts=new Intl.DateTimeFormat('en-CA',{
+        timeZone:timezone,year:'numeric',month:'2-digit',day:'2-digit'
+      }).formatToParts(d);
+      const get=type=>parts.find(p=>p.type===type)?.value;
+      const year=get('year'),month=get('month'),day=get('day');
+      if(year&&month&&day) return `${year}-${month}-${day}`;
+    }catch(error){
+      console.warn('[MyCitaGo dashboard] Zona horaria inválida; usando hora local.',error);
+    }
+  }
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+}
 function monthKey(){ return dateKey().slice(0,7); }
 function monthStart(){ return `${monthKey()}-01`; }
 function addDaysKey(days){
-  const d=new Date();
+  const base=dateKey();
+  const d=new Date(`${base}T12:00:00`);
   d.setDate(d.getDate()+days);
-  return dateKey(d);
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 }
 function money(n){ return new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN',minimumFractionDigits:2,maximumFractionDigits:2}).format(Number(n)||0); }
 function hour(t){ return String(t||'').slice(0,5); }
@@ -41,10 +57,10 @@ function toast(msg){
 function setBusinessIdentity(){
   const b=dashState.business;
   const name=b?.name || 'MyCitaGo';
-  $('sidebar-biz').textContent=name;
-  $('mobile-biz-name').textContent=name;
+  if($('sidebar-biz')) $('sidebar-biz').textContent=name;
+  if($('mobile-biz-name')) $('mobile-biz-name').textContent=name;
 
-  const logos=[$('brand-logo'),$('mobile-logo')];
+  const logos=[$('brand-logo'),$('mobile-logo')].filter(Boolean);
   logos.forEach(box=>{
     box.replaceChildren();
     if(b?.logo_url){
@@ -79,12 +95,12 @@ function setUserIdentity(){
   const user=dashState.session?.user;
   const rawName=user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Administrador';
   const display=rawName.split(/[._-]/).map(x=>x?x[0].toUpperCase()+x.slice(1):'').join(' ').trim();
-  $('user-name').textContent=display || 'Administrador';
-  $('user-avatar').textContent=(display || 'A').slice(0,2).toUpperCase();
+  if($('user-name')) $('user-name').textContent=display || 'Administrador';
+  if($('user-avatar')) $('user-avatar').textContent=(display || 'A').slice(0,2).toUpperCase();
   if($('user-role')) $('user-role').textContent=humanizeRole(dashState.business?.memberRole);
 
   const first=(display || 'Administrador').split(' ')[0];
-  $('welcome-title').textContent=`¡Hola, ${first}! 👋`;
+  if($('welcome-title')) $('welcome-title').textContent=`¡Hola, ${first}! 👋`;
 }
 
 function setDates(){
@@ -93,9 +109,9 @@ function setDates(){
   const long=timezone
     ? DashboardPunctuality.formatBusinessDate(now,timezone)
     : now.toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-  $('today-label').textContent=`Aquí tienes el resumen de tu negocio para ${long}.`;
-  $('agenda-date').textContent=long.charAt(0).toUpperCase()+long.slice(1);
-  $('month-label').textContent=new Intl.DateTimeFormat('es-MX',{
+  if($('today-label')) $('today-label').textContent=`Aquí tienes el resumen de tu negocio para ${long}.`;
+  if($('agenda-date')) $('agenda-date').textContent=long.charAt(0).toUpperCase()+long.slice(1);
+  if($('month-label')) $('month-label').textContent=new Intl.DateTimeFormat('es-MX',{
     timeZone:timezone || undefined,
     month:'long',year:'numeric'
   }).format(now);
@@ -322,16 +338,18 @@ function renderKPIs(){
     .filter(a=>a.appointment_date.startsWith(monthKey()) && ['confirmada','completada'].includes(a.status))
     .reduce((s,a)=>s+appointmentPrice(a),0);
 
-  $('kpi-today').textContent=todayItems.length;
+  if($('kpi-today')) $('kpi-today').textContent=todayItems.length;
   if($('kpi-upcoming'))$('kpi-upcoming').textContent=upcoming.length;
-  $('kpi-pending').textContent=pending.length;
-  $('kpi-revenue').textContent=money(revenue);
-  $('kpi-today-sub').textContent=`${todayItems.filter(a=>a.status==='confirmada').length} confirmada${todayItems.filter(a=>a.status==='confirmada').length===1?'':'s'}`;
+  if($('kpi-pending')) $('kpi-pending').textContent=pending.length;
+  if($('kpi-revenue')) $('kpi-revenue').textContent=money(revenue);
+  if($('kpi-today-sub')) $('kpi-today-sub').textContent=`${todayItems.filter(a=>a.status==='confirmada').length} confirmada${todayItems.filter(a=>a.status==='confirmada').length===1?'':'s'}`;
 
   const notify=pending.length;
   const badge=$('notification-count');
-  badge.textContent=notify;
-  badge.classList.toggle('hidden',!notify);
+  if(badge){
+    badge.textContent=notify;
+    badge.classList.toggle('hidden',!notify);
+  }
 }
 
 function statusPill(status){
@@ -806,11 +824,11 @@ function renderDashboardLoadError(error){
     ? 'La consulta tardó más de 12 segundos.'
     : (error?.message || 'Error de conexión o permisos.');
 
-  $('today-label').textContent='No pudimos cargar el resumen del negocio.';
-  $('kpi-today').textContent='—';
-  $('kpi-pending').textContent='—';
-  $('kpi-revenue').textContent='—';
-  $('kpi-today-sub').textContent='Error al cargar';
+  if($('today-label')) $('today-label').textContent='No pudimos cargar el resumen del negocio.';
+  if($('kpi-today')) $('kpi-today').textContent='0';
+  if($('kpi-pending')) $('kpi-pending').textContent='0';
+  if($('kpi-revenue')) $('kpi-revenue').textContent=money(0);
+  if($('kpi-today-sub')) $('kpi-today-sub').textContent='No se pudieron actualizar los datos';
 
   ['today-timeline','upcoming-list','recent-activity','top-services'].forEach(id=>{
     const root=$(id);
@@ -823,12 +841,13 @@ function renderDashboardLoadError(error){
 
 async function refreshData(){
   let snapshotError=null;
+  let snapshotLoaded=false;
 
   try{
     const snap=await DashboardDataLoader.loadBusinessDashboardSnapshot(
       supabaseClient,
       dashState.business.id,
-      {timeoutMs:12000}
+      {timeoutMs:8000}
     );
 
     dashState.appointments=snap.appointments;
@@ -838,20 +857,32 @@ async function refreshData(){
     dashState.primaryBranchId=snap.primaryBranchId;
     dashState.primaryBranchName=snap.primaryBranchName;
     dashState.branchCount=snap.branchCount;
+    snapshotLoaded=true;
   }catch(error){
     snapshotError=error;
-    console.warn('[MyCitaGo dashboard] Snapshot no disponible; usando consultas directas.',error);
+    console.warn('[MyCitaGo dashboard] Snapshot no disponible; usando tablas canónicas.',error);
+  }
 
-    try{
-      await Promise.all([
-        fetchAppointments(),
-        fetchServices(),
-        fetchCustomers()
-      ]);
-    }catch(fallbackError){
-      renderDashboardLoadError(fallbackError);
+  // appointments es la fuente operativa crítica. Siempre se verifica directamente
+  // para evitar que un snapshot vacío o desactualizado oculte citas existentes.
+  try{
+    await fetchAppointments();
+  }catch(appointmentsError){
+    if(!snapshotLoaded){
+      renderDashboardLoadError(appointmentsError);
       return;
     }
+    console.warn('[MyCitaGo dashboard] No se pudo verificar appointments; se conserva el snapshot.',appointmentsError);
+  }
+
+  // Servicios y clientes son complementarios: sus errores no deben derribar Agenda/KPIs.
+  if(!snapshotLoaded){
+    const secondary=await Promise.allSettled([fetchServices(),fetchCustomers()]);
+    secondary.forEach((result,index)=>{
+      if(result.status==='rejected'){
+        console.warn(index===0?'[MyCitaGo dashboard] Servicios no disponibles.':'[MyCitaGo dashboard] Clientes no disponibles.',result.reason);
+      }
+    });
   }
 
   try{
@@ -866,7 +897,7 @@ async function refreshData(){
     window.lucide?.createIcons();
 
     if(snapshotError){
-      console.info('[MyCitaGo dashboard] Panel recuperado con datos directos.');
+      console.info('[MyCitaGo dashboard] Panel recuperado con fuentes canónicas.');
     }
   }catch(error){
     renderDashboardLoadError(error);
@@ -910,13 +941,29 @@ function setupUserMenu(){
 
 function bind(){
   setupUserMenu();
-  $('btn-logout').addEventListener('click',logout);
+  $('btn-logout')?.addEventListener('click',logout);
   ['new-appointment','hero-new-appointment','quick-new','mobile-new','mobile-bottom-new']
     .forEach(id=>$(id)?.addEventListener('click',publicBooking));
-  $('drawer-close').addEventListener('click',closeDrawer);$('drawer-backdrop').addEventListener('click',closeDrawer);
-  $('global-search').addEventListener('input',performSearch);
-  document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$('global-search').focus()}if(e.key==='Escape'){closeDrawer();$('search-results').classList.add('hidden')}});
-  $('mobile-menu')?.addEventListener('click',()=>$('sidebar').classList.toggle('open'));
+
+  $('drawer-close')?.addEventListener('click',closeDrawer);
+  $('drawer-backdrop')?.addEventListener('click',closeDrawer);
+
+  const globalSearch=$('global-search');
+  const searchResults=$('search-results');
+  globalSearch?.addEventListener('input',performSearch);
+
+  document.addEventListener('keydown',e=>{
+    if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k' && globalSearch){
+      e.preventDefault();
+      globalSearch.focus();
+    }
+    if(e.key==='Escape'){
+      closeDrawer();
+      searchResults?.classList.add('hidden');
+    }
+  });
+
+  $('mobile-menu')?.addEventListener('click',()=>$('sidebar')?.classList.toggle('open'));
   document.querySelectorAll('.dash-nav a').forEach(a=>{
     a.addEventListener('click',()=>{
       if(window.innerWidth<=820) $('sidebar')?.classList.remove('open');
@@ -924,6 +971,7 @@ function bind(){
   });
 
   window.addEventListener('mycitago:appointment-created',()=>refreshData());
+  window.addEventListener('mycitago:appointment-updated',()=>refreshData());
   window.addEventListener('focus',()=>refreshData());
   document.addEventListener('visibilitychange',()=>{
     if(document.visibilityState==='visible') refreshData();
