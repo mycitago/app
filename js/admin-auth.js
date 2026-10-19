@@ -41,14 +41,26 @@ function subscriptionExpired(sub) {
 }
 
 function showPaywall(sub) {
-  const fin = sub ? sub.current_period_end : '';
+  const fin=sub?.current_period_end||'';
+  const planId=String(sub?.plan_id||'');
+  const plan=String(sub?.plan||'').toLowerCase();
+  const PAYMENT_LINKS={
+    '49f3df58-ac73-42cf-8e94-deb9b4f356bc':'https://mpago.la/2sLYNJ8',
+    '3eb5d4a1-fe6a-41d9-9338-c25e58b42f60':'https://mpago.la/1EiGkvG',
+    '3b8e6a1d-28f5-4bd4-83b4-4dfe369d46e6':'https://mpago.la/2Byumjb'
+  };
+  const legacy=plan==='premium'?'https://mpago.la/2Byumjb':plan==='profesional'?'https://mpago.la/1EiGkvG':'https://mpago.la/2sLYNJ8';
+  const payUrl=PAYMENT_LINKS[planId]||legacy;
+  const amount=Number(sub?.price_monthly||0);
   document.body.innerHTML = `
-    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#f4efec;">
-      <div style="width:min(92vw,420px);background:#fff;border-radius:16px;padding:28px 24px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.08);">
-        <div style="font-size:40px;">🔒</div>
-        <h1 style="margin:8px 0;">Suscripción vencida</h1>
-        <p style="color:#6b5a5e;">Tu periodo terminó el ${fin}. Contacta al proveedor de la plataforma para renovar y seguir usando el panel.</p>
-        <button class="btn btn-primary" onclick="location.href='login.html'">Salir</button>
+    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#f4efec;padding:20px;">
+      <div style="width:min(92vw,440px);background:#fff;border-radius:18px;padding:30px 24px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.08);">
+        <div style="font-size:40px;">◇</div>
+        <h1 style="margin:8px 0;">Tu primer mes gratis terminó</h1>
+        <p style="color:#6b5a5e;">Disfrutaste 30 días con 100% de descuento. Para continuar con MyCitaGo, renueva tu plan${amount?' por $'+amount.toLocaleString('es-MX')+' MXN/mes':''}.</p>
+        <p style="font-size:12px;color:#85757a;">Periodo gratuito hasta ${fin}.</p>
+        <a href="${payUrl}" target="_blank" rel="noopener" style="display:inline-flex;padding:12px 18px;border-radius:12px;background:#7c3aed;color:#fff;text-decoration:none;font:700 13px system-ui;">Pagar con Mercado Pago</a>
+        <div style="margin-top:14px;"><button onclick="location.href='login.html'" style="border:0;background:transparent;cursor:pointer;color:#6b5a5e;">Salir</button></div>
       </div>
     </div>`;
 }
