@@ -28,7 +28,7 @@
 <nav class="nav">
 <a class="brand" href="./"><img src="assets/brand/mycitago-icon.png" alt=""><span>MyCita<em>Go</em></span></a>
 <div class="nav-links"><a href="#como-funciona">Cómo funciona</a><a href="#funciones">Funciones</a><a href="#sectores">Para quién es</a><a href="#planes">Planes</a></div>
-<div class="nav-actions"><a class="btn" href="admin/login.html">Iniciar sesión</a><a class="btn btn-primary" href="admin/login.html?view=register">Crear mi negocio gratis →</a></div>
+<div class="nav-actions"><a class="btn" href="admin/login.html">Iniciar sesión</a><a class="btn btn-primary" href="admin/login.html?view=register">Primer mes 100% gratis →</a></div>
 </nav>
 
 <main>
@@ -38,7 +38,7 @@
 <span class="pill">RESERVAS ONLINE PARA NEGOCIOS DE SERVICIOS</span>
 <h1>Haz que reservar contigo <em>sea fácil.</em></h1>
 <p>MyCitaGo organiza tus citas, clientes y servicios en un solo lugar. Configura tu negocio en pocos pasos y comparte tu enlace para empezar a recibir reservaciones.</p>
-<div class="hero-actions"><a class="btn btn-primary" href="admin/login.html?view=register">Crear mi negocio gratis →</a><a class="btn" href="#como-funciona">Ver cómo funciona ↓</a></div>
+<div class="hero-actions"><a class="btn btn-primary" href="admin/login.html?view=register">Primer mes 100% gratis →</a><a class="btn" href="#como-funciona">Ver cómo funciona ↓</a></div>
 <div class="hero-trust"><span>Configuración guiada</span><span>Funciona en celular y computadora</span><span>Tu propio enlace de reservación</span></div>
 </div>
 <div class="hero-media"><img src="assets/marketing/hero-platform.jpg" alt="Panel de MyCitaGo"></div>
@@ -77,13 +77,13 @@
 </section>
 
 <section class="section" id="planes">
-<div class="section-head"><div><span class="eyebrow">PLANES</span><h2>Elige el tamaño que necesita tu negocio.</h2></div><p>Consulta las opciones disponibles. Al registrarte podrás comenzar la configuración de tu negocio.</p></div>
+<div class="section-head"><div><span class="eyebrow">PLANES</span><h2>Elige el tamaño que necesita tu negocio.</h2></div><p>Elige tu plan y úsalo 30 días con 100% de descuento. No pagas durante el primer mes.</p></div>
 <div class="plans-grid" id="public-plans"><div class="plans-loading">Cargando planes…</div></div>
-<p class="plans-note" id="plans-note">Los precios y características se cargan desde el catálogo activo de MyCitaGo.</p>
+<p class="plans-note" id="plans-note">30 días 100% gratis. Después continúa con el precio mensual del plan seleccionado. Cancela cuando quieras.</p>
 </section>
 
 <section class="section">
-<div class="cta"><div><h2>Tus clientes reservan mientras tú trabajas.</h2><p>Crea tu negocio, configura tu disponibilidad y comparte tu enlace de reservación.</p></div><a class="btn btn-primary" href="admin/login.html?view=register">Crear mi negocio gratis →</a></div>
+<div class="cta"><div><h2>Tus clientes reservan mientras tú trabajas.</h2><p>Empieza hoy con 30 días 100% gratis. Configura tu negocio y comparte tu enlace de reservación.</p></div><a class="btn btn-primary" href="admin/login.html?view=register">Primer mes 100% gratis →</a></div>
 </section>
 </main>
 
@@ -129,12 +129,13 @@ function renderPublicPlans(plans){
     const cadence=document.createElement('small'); cadence.textContent=' MXN / mes'; price.append(cadence);
     const planCode=String(plan.plan_code||plan.id||plan.name||'plan').toLowerCase().replace(/\s+/g,'-');
     const firstMonth=0;
+    const paymentLinks={autonomo_v1:'https://mpago.la/2sLYNJ8',pro_v2:'https://mpago.la/1EiGkvG',premium_v2:'https://mpago.la/2Byumjb'};
     const promo=document.createElement('span'); promo.className='promo'; promo.textContent='PRIMER MES GRATIS · 100% OFF';
     const promoPrice=document.createElement('p'); promoPrice.className='promo-price'; promoPrice.textContent='Primer mes 
     const list=document.createElement('ul');
     const features=publicPlanFeatures(plan.features);
     list.replaceChildren(...features.slice(0,6).map(label=>{const li=document.createElement('li');li.textContent=label;return li}));
-    const cta=document.createElement('a'); cta.className='btn btn-primary'; cta.href='admin/login.html?view=register&plan='+encodeURIComponent(planCode); cta.textContent='Comenzar por 
+    const cta=document.createElement('a'); cta.className='btn btn-primary'; cta.href='admin/login.html?view=register&plan='+encodeURIComponent(planCode); cta.dataset.renewalUrl=paymentLinks[planCode]||''; cta.textContent='Comenzar por 
   }));
 }
 
