@@ -128,8 +128,8 @@ function renderPublicPlans(plans){
     price.textContent=`$${Number.isFinite(amount)?amount.toLocaleString('es-MX'):0}`;
     const cadence=document.createElement('small'); cadence.textContent=' MXN / mes'; price.append(cadence);
     const planCode=String(plan.plan_code||plan.id||plan.name||'plan').toLowerCase().replace(/\s+/g,'-');
-    const firstMonth=Math.round(amount*.25*100)/100;
-    const promo=document.createElement('span'); promo.className='promo'; promo.textContent='75% OFF · PRIMER MES';
+    const firstMonth=0;
+    const promo=document.createElement('span'); promo.className='promo'; promo.textContent='PRIMER MES GRATIS · 100% OFF';
     const promoPrice=document.createElement('p'); promoPrice.className='promo-price'; promoPrice.textContent='Primer mes 
     const list=document.createElement('ul');
     const features=publicPlanFeatures(plan.features);
