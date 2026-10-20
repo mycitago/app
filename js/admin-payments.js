@@ -92,6 +92,7 @@ async function loadPaymentSettings() {
 
   const s = settingsResult.data || {};
   pay$('online-payments-enabled').checked = Boolean(s.online_payments_enabled);
+  if(pay$('manual-payment-link'))pay$('manual-payment-link').value=s.manual_payment_link||'';
 
   const radio = document.querySelector(
     `input[name="collection-mode"][value="${s.collection_mode || 'none'}"]`
@@ -245,6 +246,7 @@ async function initAdminPayments() {
   pay$('connect-mercadopago').onclick = startMercadoPago;
   pay$('refresh-mercadopago').onclick = () => refreshMercadoPagoStatus(true);
   pay$('save-payment-settings').onclick = saveSettings;
+  if(pay$('save-manual-payment-link'))pay$('save-manual-payment-link').onclick=async()=>{const value=pay$('manual-payment-link').value.trim();if(value&&!/^https:\/\/(?:www\.)?(?:mpago\.la|mercadopago\.com(?:\.mx)?)\//i.test(value))return payToast('Introduce un enlace válido de Mercado Pago.','error');const {error}=await supabaseClient.from('business_payment_settings').upsert({business_id:paymentBiz.id,manual_payment_link:value||null},{onConflict:'business_id'});payToast(error?'Error al guardar: '+error.message:'Enlace de pago guardado.',error?'error':'success')};
 
   try {
     await Promise.all([loadPaymentSettings(), loadSubscription()]);
