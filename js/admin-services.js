@@ -587,22 +587,35 @@ async function loadServiceStaff(serviceId) {
 }
 
 async function saveServiceStaff(serviceId) {
-  const {error:delError}=await supabaseClient
+  // Preserve existing assignments until new ones have been saved successfully.
+  // Replacing every link on each edit can leave a published service unbookable
+  // if the second request fails.
+  const {data:current,error:readError}=await supabaseClient
     .from('service_staff')
-    .delete()
+    .select('staff_id')
     .eq('service_id',serviceId)
     .eq('business_id',biz.id);
-  if(delError) throw delError;
+  if(readError) throw readError;
 
-  if(!selectedStaffIds.size) return;
+  const previous=new Set((current||[]).map(row=>row.staff_id));
+  const desired=new Set([...selectedStaffIds].filter(id=>staffItems.some(st=>st.id===id)));
+  const additions=[...desired].filter(id=>!previous.has(id));
+  const removals=[...previous].filter(id=>!desired.has(id));
 
-  const rows=[...selectedStaffIds].map(staff_id=>({
-    service_id:serviceId,
-    staff_id,
-    business_id:biz.id
-  }));
-  const {error}=await supabaseClient.from('service_staff').insert(rows);
-  if(error) throw error;
+  if(additions.length){
+    const {error}=await supabaseClient.from('service_staff').insert(
+      additions.map(staff_id=>({service_id:serviceId,staff_id,business_id:biz.id}))
+    );
+    if(error) throw error;
+  }
+  if(removals.length){
+    const {error}=await supabaseClient.from('service_staff')
+      .delete()
+      .eq('service_id',serviceId)
+      .eq('business_id',biz.id)
+      .in('staff_id',removals);
+    if(error) throw error;
+  }
 }
 
 
