@@ -70,7 +70,7 @@ window.MyCitaGoOAuth = (() => {
 })();
 </script>
 <script>
-  if (typeof LOCAL_NO_LOGIN !== 'undefined' && LOCAL_NO_LOGIN) window.location.replace('index.html');
+  // En la página de acceso nunca se redirige automáticamente: el usuario decide continuar o cambiar de cuenta.
   const views=['login','register','forgot','reset'];
   const titles={login:['Bienvenido a MyCitaGo','Ingresa para administrar tu negocio.'],register:['Crea tu espacio MyCitaGo','Registra tu negocio y empieza con una configuración guiada.'],forgot:['Recuperar contraseña','Te enviaremos un enlace por correo.'],reset:['Nueva contraseña','Escribe tu nueva contraseña.']};
   let oauthMode=false;
