@@ -12,7 +12,9 @@
   <link rel="stylesheet" href="../css/mycitago-themes.css">
   <script src="../js/ui-theme.js"></script>
 <link rel="stylesheet" href="../css/mycitago-fase3-unified.css">
-</head>
+<style>
+.ob-custom-box{margin:20px 0;padding:22px;border:1px solid #e7e1f1;border-radius:16px;background:#faf9fd}.ob-custom-head{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}.ob-custom-head strong{font-size:16px}.ob-custom-head p{margin:6px 0 0;color:#777083}.ob-custom-form{margin-top:18px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.ob-custom-form.hidden{display:none!important}.ob-custom-form label{display:flex;flex-direction:column;gap:8px;font-size:13px;font-weight:700}.ob-custom-form input{width:100%;min-width:0;box-sizing:border-box;border:1px solid #e0dce9;border-radius:10px;padding:12px;background:#fff;font:inherit}.ob-custom-wide,.ob-custom-actions{grid-column:1/-1}.ob-custom-actions{display:flex;gap:10px}.ob-brand-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:22px 0}.ob-brand-upload{padding:24px;border:1px dashed #9b62ff;border-radius:14px;display:flex;flex-direction:column;gap:12px;background:#faf9fd}.ob-brand-upload span{color:#777083;font-size:12px}.ob-brand-upload input{max-width:100%}@media(max-width:700px){.ob-custom-form,.ob-brand-grid{grid-template-columns:1fr}.ob-custom-head{align-items:stretch}}
+</style></head>
 <body>
   <div id="citago-shell"></div>
 
@@ -87,15 +89,15 @@
 
       <div id="onboarding-services" class="onboarding-services"></div>
       <div id="onboarding-prices" class="onboarding-prices"></div>
-      <p style="margin-top:12px;font-size:13px">¿No aparece tu servicio? Usa el botón «＋ Crear servicio nuevo» debajo de los precios.</p>
-      <section id="custom-service-box" style="margin:18px 0;padding:16px;border:1px dashed #9b62ff;border-radius:14px;background:rgba(124,58,237,.04)">
-        <button id="toggle-custom-service" type="button" class="ct-btn ct-btn-secondary">＋ Crear servicio nuevo</button>
-        <div id="custom-service-form" class="hidden" style="margin-top:14px;grid-template-columns:2fr 1fr 1fr;gap:10px">
-          <label>Nombre<input id="custom-service-name" placeholder="Ej. Corte infantil"></label>
-          <label>Precio MXN<input id="custom-service-price" type="number" min="0" step="0.01" placeholder="250"></label>
+
+      <section id="custom-service-box" class="ob-custom-box">
+        <div class="ob-custom-head"><div><strong>¿No encuentras tu servicio?</strong><p>Crea uno propio con su precio y duración.</p></div><button id="toggle-custom-service" type="button" class="ct-btn ct-btn-primary">＋ Crear servicio nuevo</button></div>
+        <div id="custom-service-form" class="hidden ob-custom-form">
+          <label>Nombre del servicio<input id="custom-service-name" placeholder="Ej. Corte infantil"></label>
+          <label>Precio (MXN)<input id="custom-service-price" type="number" min="0" step="0.01" placeholder="250"></label>
           <label>Duración (min)<input id="custom-service-duration" type="number" min="5" step="5" value="60"></label>
-          <label style="grid-column:1/-1">Descripción<input id="custom-service-description" placeholder="Descripción opcional"></label>
-          <div style="grid-column:1/-1;display:flex;gap:8px"><button id="save-custom-service" type="button" class="ct-btn ct-btn-primary">Agregar servicio</button><button id="cancel-custom-service" type="button" class="ct-btn ct-btn-secondary">Cancelar</button></div>
+          <label class="ob-custom-wide">Descripción<input id="custom-service-description" placeholder="Descripción opcional"></label>
+          <div class="ob-custom-actions"><button id="save-custom-service" type="button" class="ct-btn ct-btn-primary">Agregar servicio</button><button id="cancel-custom-service" type="button" class="ct-btn ct-btn-secondary">Cancelar</button></div>
         </div>
       </section>
 
@@ -135,6 +137,18 @@
       </div>
     </section>
 
+    <section class="onboarding-card hidden" id="step-branding">
+      <span class="step-label">PASO 5 DE 5</span>
+      <h2>Personaliza la imagen de tu negocio</h2>
+      <p>Sube tu logo y una imagen de portada para que tus clientes reconozcan tu negocio. Puedes hacerlo después si lo prefieres.</p>
+      <div class="ob-brand-grid">
+        <label class="ob-brand-upload"><strong>Logo de tu negocio</strong><span>PNG, JPG o WEBP</span><input id="onboarding-logo" type="file" accept="image/png,image/jpeg,image/webp"></label>
+        <label class="ob-brand-upload"><strong>Portada o banner</strong><span>Imagen horizontal recomendada</span><input id="onboarding-cover" type="file" accept="image/png,image/jpeg,image/webp"></label>
+      </div>
+      <div id="onboarding-brand-preview" class="ob-brand-grid"></div>
+      <div class="onboarding-actions"><button id="back-team" class="ct-btn ct-btn-secondary" type="button">Atrás</button><button id="skip-branding" class="ct-btn ct-btn-secondary" type="button">Configurar después</button><button id="save-branding-finish" class="ct-btn ct-btn-primary" type="button">Guardar y terminar</button></div>
+    </section>
+
     <section id="onboarding-success" class="onboarding-card success hidden">
       <div class="success-icon">✓</div>
       <span class="step-label">LISTO PARA COMPARTIR</span>
@@ -161,7 +175,7 @@
   <script src="../js/config.js"></script>
   <script src="../js/supabase.js"></script>
   <script src="../js/admin-auth.js"></script>
-  <script src="../js/media-manager.js?v=20261019-ob5"></script><script src="../js/admin-onboarding.js?v=20261020-custom-services-v2"></script>
+  <script src="../js/media-manager.js?v=20261019-ob5"></script><script src="../js/admin-onboarding.js?v=20261020-branding-fix3"></script>
   <script src="../js/d3-onboarding-canonical.js?v=20260914-d3"></script>
   <script src="../js/citago-shell.js"></script>
   <script>document.addEventListener('DOMContentLoaded',()=>CitagoShell.mount({mode:'tenant',activePage:'inicio'}));</script>
