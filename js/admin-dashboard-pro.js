@@ -410,7 +410,13 @@ function appointmentCard(a){
   m2.innerHTML='<i data-lucide="clock"></i>';
   m2.append(document.createTextNode(` ${hour(a.start_time)} – ${hour(a.end_time)}`));
   meta.append(m1,m2);
-  left.append(h,p,meta);
+  const details=document.createElement('div');
+  details.className='dash-appointment-details';
+  const price=document.createElement('strong');price.textContent=appointmentPrice(a).toLocaleString('es-MX',{style:'currency',currency:'MXN'});
+  details.appendChild(price);
+  const phone=String(a.customers?.whatsapp||'').replace(/\D/g,'');
+  if(phone){const wa=document.createElement('a');wa.href='https://wa.me/'+phone;wa.target='_blank';wa.rel='noopener noreferrer';wa.textContent='WhatsApp: '+phone;wa.addEventListener('click',event=>event.stopPropagation());details.appendChild(wa)}
+  left.append(h,p,meta,details);
 
   const statusWrap=document.createElement('div');
   statusWrap.className='appointment-status-stack';
@@ -425,7 +431,7 @@ function appointmentCard(a){
 function renderToday(){
   const root=$('today-timeline');
   root.replaceChildren();
-  const rows=dashState.appointments.filter(a=>a.appointment_date===dateKey() && a.status!=='cancelada');
+  const rows=dashState.appointments.filter(a=>a.appointment_date===dateKey() && a.status!=='cancelada').sort((a,b)=>String(b.start_time||'').localeCompare(String(a.start_time||'')));
 
   if(!rows.length){
     const e=document.createElement('div');
@@ -455,7 +461,7 @@ function renderUpcoming(){
   const root=$('upcoming-list');
   root.replaceChildren();
   const today=dateKey();
-  const rows=dashState.appointments.filter(a=>a.appointment_date>today && activeStatus(a.status)).slice(0,5);
+  const rows=dashState.appointments.filter(a=>a.appointment_date>today && activeStatus(a.status)).sort((a,b)=>String(a.appointment_date+' '+a.start_time).localeCompare(String(b.appointment_date+' '+b.start_time))).slice(0,5);
 
   if(!rows.length){
     const e=document.createElement('div');
