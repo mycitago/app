@@ -6,7 +6,19 @@ async function enablePush({businessId,appointmentId,accessToken}={}){
  if(!('serviceWorker' in navigator)||!('PushManager' in window)||!('Notification' in window))throw Error('Este navegador no admite notificaciones push.');
  const permission=await Notification.requestPermission();if(permission!=='granted')throw Error('No se concedió permiso para notificaciones.');
  const reg=await navigator.serviceWorker.register(fromBase('sw.js'));await navigator.serviceWorker.ready;
- const {data:config,error:configError}=await supabaseClient.functions.invoke('push-config');if(configError||!config?.publicKey)throw Error('El servicio de notificaciones todavía no está configurado.');
+ let config;
+ try{
+   const result=await supabaseClient.functions.invoke('push-config');
+   if(result.error){
+     let status=result.error?.context?.status||'';
+     let detail='';
+     try{const body=await result.error.context?.clone?.().json();detail=body?.error||body?.message||''}catch{}
+     if(status===503||detail==='push_not_configured')throw Error('Supabase no encuentra VAPID_PUBLIC_KEY. Revisa Edge Functions → Secrets.');
+     throw Error('No se pudo consultar push-config en Supabase'+(status?' (HTTP '+status+')':'')+(detail?': '+detail:'')+'.');
+   }
+   config=result.data;
+ }catch(error){throw Error(error?.message||'Error al consultar la configuración de notificaciones.')}
+ if(!config?.publicKey)throw Error('push-config respondió sin clave pública VAPID. Comprueba el secreto VAPID_PUBLIC_KEY.');
  const sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:decodeKey(config.publicKey)});
  const json=sub.toJSON(),keys=json.keys||{};
  if(appointmentId&&accessToken){
