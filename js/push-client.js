@@ -7,18 +7,18 @@ async function enablePush({businessId,appointmentId,accessToken}={}){
  const permission=await Notification.requestPermission();if(permission!=='granted')throw Error('No se concedió permiso para notificaciones.');
  const reg=await navigator.serviceWorker.register(fromBase('sw.js'));await navigator.serviceWorker.ready;
  let config;
+ const base=String(window.CITAS_CONFIG?.supabaseUrl||'').replace(/\/$/,'');
+ if(!base)throw Error('Falta la URL de Supabase en la configuración.');
  try{
-   const result=await supabaseClient.functions.invoke('push-config');
-   if(result.error){
-     let status=result.error?.context?.status||'';
-     let detail='';
-     try{const body=await result.error.context?.clone?.().json();detail=body?.error||body?.message||''}catch{}
-     if(status===503||detail==='push_not_configured')throw Error('Supabase no encuentra VAPID_PUBLIC_KEY. Revisa Edge Functions → Secrets.');
-     throw Error('No se pudo consultar push-config en Supabase'+(status?' (HTTP '+status+')':'')+(detail?': '+detail:'')+'.');
+   const response=await fetch(base+'/functions/v1/push-config',{method:'GET',mode:'cors',cache:'no-store'});
+   const body=await response.json().catch(()=>null);
+   if(!response.ok){
+     if(response.status===503||body?.error==='push_not_configured')throw Error('Falta VAPID_PUBLIC_KEY en los secretos de Supabase.');
+     throw Error('push-config respondió HTTP '+response.status+': '+(body?.message||body?.error||'error del servidor'));
    }
-   config=result.data;
- }catch(error){throw Error(error?.message||'Error al consultar la configuración de notificaciones.')}
- if(!config?.publicKey)throw Error('push-config respondió sin clave pública VAPID. Comprueba el secreto VAPID_PUBLIC_KEY.');
+   config=body;
+ }catch(error){throw Error(error?.message||'No se pudo consultar push-config.')}
+ if(typeof config?.publicKey!=='string'||!config.publicKey.trim())throw Error('push-config no devolvió publicKey.');
  const sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:decodeKey(config.publicKey)});
  const json=sub.toJSON(),keys=json.keys||{};
  if(appointmentId&&accessToken){
