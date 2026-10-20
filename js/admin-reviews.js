@@ -38,8 +38,8 @@ async function loadEntitlements(){
   const enabled=reviewEntitlements?.features?.internal_reviews===true;
   if(!enabled){
     setSummaryEmpty();
-    setReviewAccessState('locked','Esta sección distingue ahora un bloqueo por plan de un negocio que realmente tiene 0 reseñas.');
-    renderEmptyState('Reseñas no disponibles en este plan','La función internal_reviews está deshabilitada para la suscripción actual.');
+    setReviewAccessState('locked','Las reseñas no están disponibles para esta suscripción. Comprueba que tu plan esté activo o dentro del primer mes gratuito.');
+    renderEmptyState('Reseñas no disponibles','Verifica el estado de tu suscripción o vuelve a iniciar sesión.');
     return {ok:true,enabled:false};
   }
   setReviewAccessState('ok');
@@ -58,7 +58,7 @@ function renderReviews(){
     else if(f)list=list.filter(x=>String(x.star_rating)===f);
   }
   const host=R('reviews-list');if(!host)return;host.replaceChildren();
-  if(!list.length){renderEmptyState('No hay reseñas con este filtro','Las reseñas verificadas de MyCitaGo aparecerán aquí.');return}
+  if(!list.length){renderEmptyState('Todavía no tienes reseñas','Cuando tus clientes califiquen una cita completada, sus opiniones aparecerán aquí.');return}
   list.forEach(x=>{
     const a=document.createElement('article');a.className='review-card';
     const verified=x.source==='internal'&&x.verified?'<span class="verified-review-badge">✓ Cliente verificado</span>':'';
