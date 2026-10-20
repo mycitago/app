@@ -184,9 +184,23 @@ async function saveManualPayment(ev){
   }catch(error){alert('No se pudo guardar el pago: '+String(error?.message||error))}
   finally{if(submit){submit.disabled=false;submit.textContent='Guardar pago'}}
 }
+function agendaSafe(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function renderList(items){
   const root=A('agenda-list');
-  root.innerHTML=items.length?items.map(a=>`<div class="agenda-list-row"><time>${new Date(a.appointment_date+'T12:00:00').toLocaleDateString('es-MX',{weekday:'short',day:'numeric',month:'short'})} ${String(a.start_time).slice(0,5)}</time><div><b>${a.customers?.name||'Cliente'}</b><small>${a.services?.name||'Servicio'}${a.staff_id?' · '+(agendaStaff.find(s=>s.id===a.staff_id)?.name||'Profesional'):''}</small><div class="agenda-ops">${paymentLabel(a)}${reviewLabel(a)}</div></div><div class="agenda-row-actions"><em>${a.status||'Pendiente'}</em><div class="agenda-management-actions">${managementActions(a)}${canRegisterPayment(a)?`<button type="button" class="agenda-mini-btn" data-payment-register="${a.id}">Registrar pago</button>`:''}</div></div></div>`).join(''):'<div class="agenda-empty">No hay citas para esta vista.</div>';
+  const sorted=[...items].sort((a,b)=>String(a.appointment_date).localeCompare(String(b.appointment_date))||String(a.start_time).localeCompare(String(b.start_time)));
+  root.innerHTML=sorted.length?sorted.map(a=>{
+    const date=new Date(a.appointment_date+'T12:00:00').toLocaleDateString('es-MX',{weekday:'short',day:'numeric',month:'short'});
+    const staff=agendaStaff.find(s=>s.id===a.staff_id)?.name||'Sin asignar';
+    const phone=String(a.customers?.whatsapp||'').replace(/[^0-9+]/g,'');
+    const duration=Number(a.duration_charged||a.services?.duration_minutes)||60;
+    const price=Number(a.price_charged||0);
+    return `<div class="agenda-list-row agenda-list-detailed">
+      <time class="agenda-list-time"><strong>${agendaSafe(String(a.start_time||'').slice(0,5))}</strong><small>${agendaSafe(date)}</small><small>Hasta ${agendaSafe(String(a.end_time||'').slice(0,5))}</small></time>
+      <div class="agenda-list-details"><b>${agendaSafe(a.customers?.name||'Cliente')}</b><small>${agendaSafe(a.services?.name||'Servicio')} · ${duration} min</small><small>Profesional: ${agendaSafe(staff)}</small>${phone?`<a href="https://wa.me/${phone.replace(/[^0-9]/g,'')}" target="_blank" rel="noopener noreferrer">WhatsApp: ${agendaSafe(a.customers.whatsapp)}</a>`:''}<div class="agenda-ops">${paymentLabel(a)}${reviewLabel(a)}</div></div>
+      <div class="agenda-list-financial"><strong>${money(price)}</strong><small>Importe de cita</small></div>
+      <div class="agenda-row-actions"><em>${agendaSafe(a.status||'Pendiente')}</em><div class="agenda-management-actions">${managementActions(a)}${canRegisterPayment(a)?`<button type="button" class="agenda-mini-btn" data-payment-register="${agendaSafe(a.id)}">Registrar pago</button>`:''}</div></div>
+    </div>`;
+  }).join(''):'<div class="agenda-empty">No hay citas para esta vista.</div>';
   root.querySelectorAll('[data-review-request]').forEach(b=>b.onclick=()=>requestReview(b.dataset.reviewRequest));
   root.querySelectorAll('[data-payment-register]').forEach(b=>b.onclick=()=>openPaymentDialog(b.dataset.paymentRegister));
   bindManagementActions(root);
