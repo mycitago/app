@@ -51,6 +51,14 @@ async function getAvailableSlots(business,date,durationMinutes,resource){
 function validateWhatsapp(raw){const digits=String(raw||'').replace(/\D/g,'');return digits.length===10?digits:null;}
 async function bookAppointment({business,service,branchId,staffId,dateKey,startTime,endTime,name,whatsappDigits,notes}){
   const bookingSource=(new URLSearchParams(location.search).get('src')||'').toLowerCase().replace(/[^a-z0-9_-]/g,'').slice(0,32);
+  // Defensa adicional: comprobar disponibilidad justo antes de reservar.
+  // La garantía contra reservas simultáneas debe permanecer en la RPC transaccional.
+  try {
+    const busy=await fetchBusyRanges(business.id,dateKey,{branchId,staffId,serviceId:service.id});
+    const start=timeToMinutes(startTime),end=timeToMinutes(endTime);
+    if(!Number.isFinite(start)||!Number.isFinite(end)||start>=end)return{ok:false,reason:'El horario seleccionado no es válido.'};
+    if(await isDateFullyBlocked(business.id,dateKey)||busy.some(([a,b])=>rangesOverlap(start,end,a,b)))return{ok:false,reason:'Este profesional ya tiene una cita o bloqueo en ese horario. Elige otro horario.'};
+  }catch(e){console.error('[MyCitaGo booking precheck]',e);return{ok:false,reason:'No pudimos verificar la disponibilidad. Intenta de nuevo.'};}
   const {data,error}=await supabaseClient.rpc('create_appointment_v2',{p_business_id:business.id,p_service_id:service.id,p_branch_id:branchId,p_staff_id:staffId,p_name:name,p_whatsapp:`52${whatsappDigits}`,p_date:dateKey,p_start:startTime,p_end:endTime,p_notes:notes||null});
   if(error){
     console.error('Error creando cita:',error);
