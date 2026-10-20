@@ -60,6 +60,7 @@ function showPaywall(sub) {
         <p style="color:#6b5a5e;">Disfrutaste 30 días con 100% de descuento. Para continuar con MyCitaGo, renueva tu plan${amount?' por $'+amount.toLocaleString('es-MX')+' MXN/mes':''}.</p>
         <p style="font-size:12px;color:#85757a;">Periodo gratuito hasta ${fin}.</p>
         <a href="${payUrl}" target="_blank" rel="noopener" style="display:inline-flex;padding:12px 18px;border-radius:12px;background:#7c3aed;color:#fff;text-decoration:none;font:700 13px system-ui;">Pagar con Mercado Pago</a>
+        <div style="margin-top:14px;"><a href="comprobante-pago.html?plan=${encodeURIComponent(planId)}" style="font-weight:700;color:#6930c3;">Ya pagué · Adjuntar comprobante</a></div>
         <div style="margin-top:14px;"><button onclick="location.href='login.html'" style="border:0;background:transparent;cursor:pointer;color:#6b5a5e;">Salir</button></div>
       </div>
     </div>`;
