@@ -543,6 +543,7 @@ async function loadStaff() {
   }
 
   staffItems = data || [];
+  if (staffItems.length===1 && !$('sid')?.value) selectedStaffIds.add(staffItems[0].id);
   if (!staffItems.length) {
     const e = document.createElement('div');
     e.className='svc-empty';
@@ -726,6 +727,7 @@ async function saveService() {
     if (!Number.isFinite(price) || price < 0) throw new Error('Revisa el precio');
     if (!duration || duration < 5) throw new Error('La duración debe ser de al menos 5 minutos');
 
+    if ($('active').checked && staffItems.length===1 && selectedStaffIds.size===0) selectedStaffIds.add(staffItems[0].id);
     if ($('active').checked && selectedStaffIds.size===0) throw new Error('Para publicar el servicio, asigna al menos un profesional activo en Equipo. Puedes desactivar el servicio y guardarlo como borrador.');
     if ($('active').checked) {
       const {data:branches,error:branchError}=await supabaseClient.from('business_branches').select('id').eq('business_id',biz.id).eq('active',true).limit(1);
