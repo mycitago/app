@@ -839,7 +839,13 @@ function renderDashboardLoadError(error){
   window.lucide?.createIcons();
 }
 
+let dashboardRefreshInFlight=null;
 async function refreshData(){
+  if(dashboardRefreshInFlight)return dashboardRefreshInFlight;
+  dashboardRefreshInFlight=refreshDashboardData();
+  try{return await dashboardRefreshInFlight}finally{dashboardRefreshInFlight=null}
+}
+async function refreshDashboardData(){
   let snapshotError=null;
   let snapshotLoaded=false;
 
@@ -866,7 +872,7 @@ async function refreshData(){
   // appointments es la fuente operativa crítica. Siempre se verifica directamente
   // para evitar que un snapshot vacío o desactualizado oculte citas existentes.
   try{
-    await fetchAppointments();
+    await Promise.race([fetchAppointments(),new Promise((_,reject)=>setTimeout(()=>reject(Object.assign(new Error('La consulta de citas excedió el tiempo de espera.'),{code:'DATA_TIMEOUT'})),12000))]);
   }catch(appointmentsError){
     if(!snapshotLoaded){
       renderDashboardLoadError(appointmentsError);
@@ -877,7 +883,7 @@ async function refreshData(){
 
   // Servicios y clientes son complementarios: sus errores no deben derribar Agenda/KPIs.
   if(!snapshotLoaded){
-    const secondary=await Promise.allSettled([fetchServices(),fetchCustomers()]);
+    const secondary=await Promise.allSettled([Promise.race([fetchServices(),new Promise((_,reject)=>setTimeout(()=>reject(new Error('Servicios: tiempo agotado')),8000))]),Promise.race([fetchCustomers(),new Promise((_,reject)=>setTimeout(()=>reject(new Error('Clientes: tiempo agotado')),8000))])]);
     secondary.forEach((result,index)=>{
       if(result.status==='rejected'){
         console.warn(index===0?'[MyCitaGo dashboard] Servicios no disponibles.':'[MyCitaGo dashboard] Clientes no disponibles.',result.reason);
@@ -887,7 +893,7 @@ async function refreshData(){
 
   try{
     setDates();
-    await renderBusinessHealth();
+    await Promise.race([renderBusinessHealth(),new Promise((_,reject)=>setTimeout(()=>reject(new Error('Estado del negocio: tiempo agotado')),8000))]).catch(error=>console.warn('[MyCitaGo dashboard]',error));
     renderKPIs();
     renderToday();
     renderUpcoming();
