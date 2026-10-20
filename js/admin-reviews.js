@@ -6,7 +6,7 @@ function functionError(error,name){const raw=String(error?.message||error||''),c
 async function syncReviews(){if(!GOOGLE_REVIEWS_CONFIGURED)return msg('Integración de Google no configurada.');const {data,error}=await supabaseClient.functions.invoke('google-reviews-sync',{body:{business_id:reviewBiz.id}});if(error)return msg(functionError(error,'google-reviews-sync'));await loadReviews();return data}
 async function connectGoogle(){if(!GOOGLE_REVIEWS_CONFIGURED)return msg('Integración de Google no configurada.');const {data,error}=await supabaseClient.functions.invoke('google-oauth-start',{body:{business_id:reviewBiz.id}});if(error)return msg(functionError(error,'google-oauth-start'));if(data?.authorization_url)location.href=data.authorization_url}
 function msg(m){const t=R('toast');if(!t)return;t.textContent=m;t.classList.remove('hidden');setTimeout(()=>t.classList.add('hidden'),2600)}
-function sourceLabel(x){return x.source==='google'?'Google':x.verified?'MyCitaGo · Cliente verificado':'MyCitaGo'}
+function sourceLabel(x){return x.verified?'MyCitaGo · Cliente verificado':'MyCitaGo'}
 function normalizeInternal(x){return {...x,star_rating:x.rating,reply_comment:x.reply_text,review_id:x.id,source:x.source||'internal',create_time:x.external_created_at||x.created_at}}
 function setReviewAccessState(kind,message=''){
   const box=R('review-access-alert'),title=R('review-access-title'),body=R('review-access-message');
@@ -52,7 +52,6 @@ function renderReviews(){
   else{
     list=list.filter(x=>x.status==='published');
     if(f==='verified')list=list.filter(x=>x.source==='internal'&&x.verified);
-    else if(f==='google')list=list.filter(x=>x.source==='google');
     else if(f==='internal')list=list.filter(x=>x.source==='internal');
     else if(f==='unanswered')list=list.filter(x=>!x.reply_comment);
     else if(f==='low')list=list.filter(x=>Number(x.star_rating)<=3);
@@ -105,7 +104,7 @@ async function loadReviews(){
     renderEmptyState('No pudimos consultar tus reseñas','Revisa permisos de acceso del negocio y vuelve a cargar.');
     return;
   }
-  reviewRows=(data||[]).map(normalizeInternal);
+  reviewRows=(data||[]).filter(x=>x.source==='internal'||!x.source).map(normalizeInternal);
   const published=reviewRows.filter(x=>x.status==='published'),total=published.length;
   R('review-total').textContent=total;
   R('review-rating').textContent=total?(published.reduce((a,x)=>a+Number(x.star_rating||0),0)/total).toFixed(1)+' ★':'–';
@@ -130,7 +129,6 @@ async function init(){
   const s=await requireAuth();if(!s)return;
   reviewBiz=await getMyBusiness(s.user);if(!reviewBiz)return;
   R('review-filter').onchange=renderReviews;
-  setupGoogle();
   await loadReviews();
 }
 document.addEventListener('DOMContentLoaded',init);
