@@ -47,6 +47,7 @@ function setMercadoPagoStatus(row) {
   const connect = pay$('connect-mercadopago');
 
   const connected = Boolean(row?.connected) || row?.connection_status === 'connected';
+  const manualReady=Boolean(pay$('manual-payment-link')?.value.trim());
   const reauth = row?.status === 'reauth_required' || row?.connection_status === 'reauth_required';
 
   if (connected) {
@@ -68,7 +69,7 @@ function setMercadoPagoStatus(row) {
 
   const enabled = Boolean(pay$('online-payments-enabled')?.checked);
   if (pay$('payment-rules')) {
-    pay$('payment-rules').disabled = !enabled || !connected;
+    pay$('payment-rules').disabled = !enabled || (!connected && !manualReady);
   }
 }
 
@@ -190,10 +191,10 @@ async function saveSettings() {
 
   if (pay$('online-payments-enabled').checked) {
     const status = await refreshMercadoPagoStatus(false);
-    if (!status?.connected) {
+    if (!status?.connected && !pay$('manual-payment-link')?.value.trim()) {
       pay$('online-payments-enabled').checked = false;
       if (pay$('payment-rules')) pay$('payment-rules').disabled = true;
-      return payToast('Primero conecta Mercado Pago antes de activar pagos online.', 'error');
+      return payToast('Conecta Mercado Pago o guarda un enlace de pago válido.', 'error');
     }
   }
 
@@ -231,10 +232,10 @@ async function initAdminPayments() {
   pay$('online-payments-enabled').addEventListener('change', async () => {
     if (pay$('online-payments-enabled').checked) {
       const data = await refreshMercadoPagoStatus(false);
-      if (!data?.connected) {
+      if (!data?.connected && !pay$('manual-payment-link')?.value.trim()) {
         pay$('online-payments-enabled').checked = false;
         if (pay$('payment-rules')) pay$('payment-rules').disabled = true;
-        payToast('Conecta Mercado Pago antes de activar pagos online.', 'info');
+        payToast('Conecta Mercado Pago o configura un enlace de pago.', 'info');
       } else if (pay$('payment-rules')) {
         pay$('payment-rules').disabled = false;
       }
@@ -246,7 +247,7 @@ async function initAdminPayments() {
   pay$('connect-mercadopago').onclick = startMercadoPago;
   pay$('refresh-mercadopago').onclick = () => refreshMercadoPagoStatus(true);
   pay$('save-payment-settings').onclick = saveSettings;
-  if(pay$('save-manual-payment-link'))pay$('save-manual-payment-link').onclick=async()=>{const value=pay$('manual-payment-link').value.trim();if(value&&!/^https:\/\/(?:www\.)?(?:mpago\.la|mercadopago\.com(?:\.mx)?)\//i.test(value))return payToast('Introduce un enlace válido de Mercado Pago.','error');const {error}=await supabaseClient.from('business_payment_settings').upsert({business_id:paymentBiz.id,manual_payment_link:value||null},{onConflict:'business_id'});payToast(error?'Error al guardar: '+error.message:'Enlace de pago guardado.',error?'error':'success')};
+  if(pay$('save-manual-payment-link'))pay$('save-manual-payment-link').onclick=async()=>{const value=pay$('manual-payment-link').value.trim();if(value&&!/^https:\/\/(?:www\.)?(?:mpago\.la|mercadopago\.com(?:\.mx)?)\//i.test(value))return payToast('Introduce un enlace válido de Mercado Pago.','error');const {error}=await supabaseClient.from('business_payment_settings').upsert({business_id:paymentBiz.id,manual_payment_link:value||null},{onConflict:'business_id'});if(!error&&pay$('payment-rules'))pay$('payment-rules').disabled=!pay$('online-payments-enabled').checked;payToast(error?'Error al guardar: '+error.message:'Enlace de pago guardado.',error?'error':'success')};
 
   try {
     await Promise.all([loadPaymentSettings(), loadSubscription()]);
