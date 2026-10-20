@@ -46,8 +46,19 @@ function canConfirm(a){return ['pendiente','pending'].includes(normalizedStatus(
 function canComplete(a){return ['confirmada','confirmed'].includes(normalizedStatus(a))}
 function canCancel(a){return !['cancelada','cancelled','completada','completado','completed','done'].includes(normalizedStatus(a))}
 async function updateAppointmentStatus(id,status){
-  const {error}=await supabaseClient.from('appointments').update({status}).eq('id',id).eq('business_id',agendaBiz.id);
+  const allowed=new Set(['confirmada','completada','cancelada']);
+  if(!allowed.has(status))return alert('Estado de cita no permitido.');
+  const current=agendaItems.find(item=>String(item.id)===String(id));
+  if(!current)return alert('No se encontró la cita en la agenda actual.');
+  if(status==='cancelada'&&!canCancel(current))return alert('Esta cita ya no se puede cancelar.');
+  if(status==='confirmada'&&!canConfirm(current))return alert('Esta cita ya no se puede confirmar.');
+  if(status==='completada'&&!canComplete(current))return alert('Esta cita ya no se puede completar.');
+  const {data,error}=await supabaseClient.from('appointments')
+    .update({status}).eq('id',id).eq('business_id',agendaBiz.id)
+    .select('id,status').maybeSingle();
   if(error){alert('No se pudo actualizar la cita: '+error.message);return}
+  if(!data||data.status!==status){alert('La cita no se actualizó. Revisa los permisos e inténtalo nuevamente.');return}
+  window.dispatchEvent(new CustomEvent('mycitago:appointment-updated',{detail:{id,status}}));
   await loadAgenda();
 }
 async function cancelAppointment(id){
