@@ -501,7 +501,24 @@ async function loadStaff(){
 }
 
 async function saveOptionalTeam(){
-  if(onboardingTeamMode!=='add')return true;
+  if(onboardingTeamMode!=='add'){
+    const active=onboardingStaff.filter(x=>x.active!==false);
+    if(active.length===1){
+      const serviceIds=onboardingExistingServices.filter(x=>x.active!==false).map(x=>x.id);
+      if(!serviceIds.length){obToast('Agrega un servicio antes de continuar.','error');return false}
+      const {data:links,error:linkError}=await supabaseClient.from('service_staff').select('service_id,staff_id').eq('business_id',onboardingBiz.id);
+      if(linkError){obToast('No se pudieron verificar las asignaciones: '+linkError.message,'error');return false}
+      const existing=new Set((links||[]).map(x=>x.service_id+':'+x.staff_id));
+      const missing=serviceIds.filter(id=>!existing.has(id+':'+active[0].id));
+      if(missing.length){
+        const {error}=await supabaseClient.from('service_staff').insert(missing.map(service_id=>({business_id:onboardingBiz.id,service_id,staff_id:active[0].id})));
+        if(error){obToast('No se pudo asignar el profesional único: '+error.message,'error');return false}
+      }
+      return true;
+    }
+    if(active.length>1){obToast('Hay varios profesionales. Selecciona Agregar profesional y asigna los servicios correspondientes.','error');return false}
+    obToast('Agrega un profesional para que tus clientes puedan reservar.','error');return false;
+  }
 
   const name=ob('team-name').value.trim();
   if(!name){
