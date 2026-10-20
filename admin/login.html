@@ -48,6 +48,7 @@
   <div id="view-forgot" class="hidden"><div class="field"><label for="forgot-email">Correo</label><input type="email" id="forgot-email" autocomplete="email" placeholder="tu@correo.com"></div><button id="btn-forgot" class="btn btn-primary">Enviar enlace de recuperación</button><div class="adm-links"><button class="adm-link" data-view="login">Volver a iniciar sesión</button></div></div>
   <div id="view-reset" class="hidden"><div class="field"><label for="reset-password">Nueva contraseña</label><input type="password" id="reset-password" autocomplete="new-password"></div><button id="btn-reset" class="btn btn-primary">Guardar nueva contraseña</button></div>
 
+  <div id="existing-session" class="adm-info hidden" style="margin:14px 0;text-align:center"><span>Ya tienes una sesión iniciada.</span><div style="display:flex;justify-content:center;gap:12px;margin-top:10px;flex-wrap:wrap"><button id="continue-session" class="btn btn-primary" type="button">Continuar al panel</button><button id="switch-account" class="btn" type="button">Cerrar sesión / Cambiar cuenta</button></div></div>
   <p id="msg-error" class="adm-error hidden"></p><p id="msg-info" class="adm-info hidden"></p>
   <div class="login-trust"><span>✓ Sin tarjeta</span><span>✓ Configuración guiada</span><span>✓ Acceso seguro</span></div>
 </main>
@@ -149,6 +150,8 @@ window.MyCitaGoOAuth = (() => {
   window.addEventListener('pageshow',resetGoogleButtons);
   resetGoogleButtons();$('btn-login').addEventListener('click',handleLogin);$('btn-register').addEventListener('click',handleRegister);$('btn-forgot').addEventListener('click',handleForgot);$('btn-reset').addEventListener('click',handleReset);$('login-password').addEventListener('keydown',e=>{if(e.key==='Enter')handleLogin()});
 
+  $('switch-account').addEventListener('click',async()=>{const btn=$('switch-account');btn.disabled=true;try{const {error}=await supabaseClient.auth.signOut({scope:'local'});if(error)throw error;sessionStorage.removeItem('mycitago:login:session');$('existing-session').classList.add('hidden');showView('login');showInfo('Sesión cerrada en este navegador. Puedes entrar con otra cuenta.')}catch(e){showError(e.message||'No se pudo cerrar la sesión.')}finally{btn.disabled=false}});
+  $('continue-session').addEventListener('click',async()=>{const {data:{user}}=await supabaseClient.auth.getUser();if(!user)return showError('Tu sesión expiró. Inicia sesión de nuevo.');location.replace(await platformAdminFor(user.id)?'plataforma.html':'index.html')});
   (async function start(){
     const authHash=new URLSearchParams(location.hash.replace(/^#/,''));
     const isRecovery=authHash.get('type')==='recovery'||new URLSearchParams(location.search).get('type')==='recovery';
@@ -180,6 +183,12 @@ window.MyCitaGoOAuth = (() => {
       history.replaceState({},document.title,window.MyCitaGoOAuth.cleanOAuthUrl(location.href));
     }
 
+    if(user && !oauthReturn){
+      $('existing-session').classList.remove('hidden');
+      if(params.get('view')==='forgot'){showView('forgot');return}
+      if(params.get('view')==='register'){showView('register');return}
+      showView('login');return;
+    }
     if(user){
       if(await platformAdminFor(user.id)){location.replace('plataforma.html');return}
       const member=await membershipFor(user.id);
