@@ -11,6 +11,9 @@
 .agenda-list-detailed .agenda-management-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:5px}
 @media(max-width:900px){.agenda-list-detailed{grid-template-columns:110px minmax(0,1fr);gap:12px}.agenda-list-detailed .agenda-row-actions{align-items:flex-start}.agenda-list-detailed .agenda-list-financial{grid-column:2}}
 @media(max-width:520px){.agenda-list-detailed{grid-template-columns:1fr;padding:15px}.agenda-list-detailed .agenda-list-time{flex-direction:row;align-items:center;flex-wrap:wrap}.agenda-list-detailed .agenda-list-financial{grid-column:auto}}
+.agenda-page:has([data-agenda-view="list"].active) #agenda-workspace{display:none!important}
+.agenda-page:has([data-agenda-view="list"].active) #agenda-list-shell{display:block!important;margin-top:0;min-height:180px}
+#agenda-list-shell.hidden{display:none!important}
 </style></head><body><div id="citago-shell"></div><main class="agenda-page">
 <header class="ct-page-head agenda-head"><div><span class="ct-eyebrow">AGENDA OPERATIVA</span><h1 id="agenda-greeting">Tu agenda de hoy</h1><p id="agenda-subtitle">Todo lo importante para operar el día desde una sola pantalla.</p></div><div class="agenda-date-actions"><button id="agenda-prev" class="ct-btn ct-btn-secondary" aria-label="Anterior">‹</button><button id="agenda-today" class="ct-btn ct-btn-secondary">Hoy</button><button id="agenda-next" class="ct-btn ct-btn-secondary" aria-label="Siguiente">›</button></div></header>
 <section class="agenda-toolbar ct-card"><div class="agenda-view-switch" role="group" aria-label="Vista de agenda"><button data-agenda-view="day">Día</button><button data-agenda-view="3day">3 días</button><button data-agenda-view="week">Semana</button><button data-agenda-view="month">Mes</button><button data-agenda-view="list">Lista</button></div><div class="agenda-filters"><select id="agenda-branch-filter"><option value="">Todas las sucursales</option></select><select id="agenda-staff-filter"><option value="">Todos los profesionales</option></select><select id="agenda-service-filter"><option value="">Todos los servicios</option></select></div></section>
@@ -22,7 +25,8 @@
 <div class="kpi-money"><span>Ingresos esperados</span><strong id="agenda-revenue">$0</strong></div>
 <div><span>Ocupación</span><strong id="agenda-utilization">0%</strong></div>
 </section>
-<section class="agenda-workspace">
+<section id="agenda-list-shell" class="agenda-mobile-list ct-card"><div class="card-head"><div><span class="ct-eyebrow">LISTA</span><h2>Próximas citas</h2></div></div><div id="agenda-list"></div></section>
+<section class="agenda-workspace" id="agenda-workspace">
 <div class="agenda-primary">
 <section id="agenda-calendar-shell" class="calendar-shell"><div class="calendar-head" id="calendar-head"></div><div class="calendar-body"><div class="time-axis" id="time-axis"></div><div class="calendar-grid" id="calendar-grid"></div></div></section>
 <section id="agenda-detail" class="agenda-detail ct-card"><div class="agenda-detail-empty"><strong>Selecciona una cita</strong><span>Verás aquí cliente, servicio y acciones rápidas.</span></div></section>
@@ -33,5 +37,5 @@
 </aside>
 </section>
 <section id="agenda-month" class="agenda-month ct-card hidden"></section>
-<section id="agenda-list-shell" class="agenda-mobile-list ct-card"><div class="card-head"><div><span class="ct-eyebrow">LISTA</span><h2>Próximas citas</h2></div></div><div id="agenda-list"></div></section>
-</main><div id="toast" class="toast hidden"></div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script><script src="../js/config.js"></script><script src="../js/supabase.js"></script><script src="../js/admin-auth.js"></script><script src="../js/admin-agenda.js?v=20261020-list-detail"></script><script src="../js/citago-shell.js"></script><script>document.addEventListener('DOMContentLoaded',()=>CitagoShell.mount({mode:'tenant',activePage:'agenda'}));</script></body></html>
+
+</main><div id="toast" class="toast hidden"></div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4"></script><script src="../js/config.js"></script><script src="../js/supabase.js"></script><script src="../js/admin-auth.js"></script><script src="../js/admin-agenda.js?v=20261020-list-position2"></script><script src="../js/citago-shell.js"></script><script>document.addEventListener('DOMContentLoaded',()=>CitagoShell.mount({mode:'tenant',activePage:'agenda'}));</script></body></html>
