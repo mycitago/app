@@ -56,7 +56,7 @@ async function updateAppointmentStatus(id,status){
   const {data,error}=await supabaseClient.from('appointments')
     .update({status}).eq('id',id).eq('business_id',agendaBiz.id)
     .select('id,status').maybeSingle();
-  if(error){alert('No se pudo actualizar la cita: '+error.message);return}
+  if(error){const conflict=error.code==='23P01'||/slot_taken|overlap|exclu/i.test(String(error.message||''));alert(conflict?'No se puede confirmar ni completar: este profesional tiene otra cita en el mismo horario. Reprograma una de las citas.':'No se pudo actualizar la cita: '+error.message);return}
   if(!data||data.status!==status){alert('La cita no se actualizó. Revisa los permisos e inténtalo nuevamente.');return}
   window.dispatchEvent(new CustomEvent('mycitago:appointment-updated',{detail:{id,status}}));
   await loadAgenda();
