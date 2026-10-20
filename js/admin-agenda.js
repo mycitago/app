@@ -187,7 +187,7 @@ async function saveManualPayment(ev){
 function agendaSafe(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function renderList(items){
   const root=A('agenda-list');
-  const sorted=[...items].sort((a,b)=>String(a.appointment_date).localeCompare(String(b.appointment_date))||String(a.start_time).localeCompare(String(b.start_time)));
+  const sorted=[...items].sort((a,b)=>String(b.appointment_date).localeCompare(String(a.appointment_date))||String(b.start_time).localeCompare(String(a.start_time)));
   root.innerHTML=sorted.length?sorted.map(a=>{
     const date=new Date(a.appointment_date+'T12:00:00').toLocaleDateString('es-MX',{weekday:'short',day:'numeric',month:'short'});
     const staff=agendaStaff.find(s=>s.id===a.staff_id)?.name||'Sin asignar';
