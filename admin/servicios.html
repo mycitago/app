@@ -13,6 +13,10 @@
 <link rel="stylesheet" href="../css/citago-admin.css"><link rel="stylesheet" href="../css/admin-services.css"><link rel="stylesheet" href="../css/mycitago-themes.css">
 <script src="../js/ui-theme.js"></script>
 <link rel="stylesheet" href="../css/mycitago-fase3-unified.css">
+<style>
+/* Servicios: edición simple y consistente con MyCitaGo */
+.svc-main{max-width:1120px!important;width:calc(100% - 40px)!important;margin:24px auto!important;box-sizing:border-box}.svc-layout{display:block!important}.svc-column{min-width:0}.svc-page-head{margin-bottom:22px}.svc-page-head h1{font-size:clamp(24px,2.5vw,34px)}.svc-quick-start{background:#fff!important;color:#17151f!important;border:1px solid #e8e2f1;border-radius:18px!important;padding:22px!important;box-shadow:0 6px 25px rgba(35,22,62,.04)!important}.svc-quick-start h2,.svc-quick-start .svc-eyebrow{color:#6d35ee!important}.svc-quick-start p,.svc-quick-hint{color:#746c82!important}.svc-business-type label{color:#4b4358!important}.svc-business-type select{background:#fff!important;color:#17151f!important;border-color:#ded7eb!important}.svc-business-lock-note{background:#faf8ff!important;color:#625975!important;border-color:#e6dcff!important}.svc-business-lock-note b{color:#42345b!important}.svc-template-card{background:#faf8ff!important;color:#21172e!important;border-color:#e5dff0!important}.svc-template-card small{color:#70677c!important}.svc-template-card:hover{background:#f2edff!important}.svc-quick-hint{background:#faf8ff!important}.svc-quick-start .svc-template-batch-tools{background:#faf8ff!important}.svc-layout>.svc-column:last-child{display:none!important}.svc-main .svc-intelligence,.svc-main .svc-summary,.svc-main .svc-history-panel,.svc-main .svc-advanced,.svc-main .svc-business-details{display:none}.svc-main .svc-card{margin-bottom:16px}.svc-main .svc-card-title h2{font-size:16px}.svc-main .svc-field input,.svc-main .svc-field textarea{font-size:14px}.svc-main .svc-template-library{grid-template-columns:repeat(3,minmax(0,1fr))}.svc-main[data-view="catalog"] .svc-layout>.svc-column:last-child{display:none!important}.svc-main[data-view="catalog"] .svc-catalog-section{display:block!important}.svc-main[data-view="catalog"] .svc-layout>.svc-column:first-child>section:not(.svc-catalog-section){display:none!important}@media(max-width:800px){.svc-main{width:calc(100% - 24px)!important;margin:16px auto!important}.svc-main .svc-template-library{grid-template-columns:repeat(2,minmax(0,1fr))}.svc-page-head{flex-wrap:wrap}.svc-form-row.three{grid-template-columns:1fr!important}}@media(max-width:480px){.svc-main .svc-template-library{grid-template-columns:1fr}}
+</style>
 </head>
 <body class="svc-body"><div id="citago-shell"></div>
 
@@ -20,9 +24,9 @@
     <div class="svc-view-tabs"><button class="active" type="button" data-svc-view="create">+ Agregar servicio</button><button type="button" data-svc-view="catalog">Mis servicios</button></div>
     <section class="svc-page-head">
       <div>
-        <span class="svc-eyebrow">SERVICIOS INTELIGENTES</span>
-        <h1>Configura un servicio en minutos <span>✦</span></h1>
-        <p>Elige una plantilla, define el precio y MyCitaGo completa una configuración recomendada que puedes ajustar después.</p>
+        <span class="svc-eyebrow">MI NEGOCIO</span>
+        <h1>Servicios de tu negocio</h1>
+        <p>Crea un servicio con nombre, duración y precio. Los demás ajustes son opcionales.</p>
       </div>
       <div class="svc-head-actions">
         <div class="svc-more-wrap">
@@ -43,7 +47,7 @@
     <input id="sid" type="hidden">
 
     <section class="svc-quick-start" id="quick-start">
-      <div class="svc-quick-copy"><span class="svc-eyebrow">CONFIGURACIÓN RÁPIDA</span><h2>¿Qué quieres ofrecer?</h2><p>Selecciona un servicio recomendado para tu giro. Podrás personalizar todo después.</p></div>
+      <div class="svc-quick-copy"><span class="svc-eyebrow">CONFIGURACIÓN RÁPIDA</span><h2>¿Qué quieres ofrecer?</h2><p>Usa una plantilla o crea tu propio servicio.</p></div>
       <div style="padding:12px 16px;background:#fff;border-radius:12px;margin:12px 0;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap">
         <div><strong>¿No encuentras tu servicio?</strong><div style="font-size:12px;color:#665e74">Crea uno propio usando el formulario de abajo, sin elegir plantilla.</div></div>
         <button type="button" class="svc-btn svc-btn-primary" id="svc-create-custom-fast">＋ Crear servicio personalizado</button>
