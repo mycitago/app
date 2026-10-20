@@ -1,0 +1,10 @@
+{
+  "name": "MyCitaGo",
+  "short_name": "MyCitaGo",
+  "start_url": "./admin/agenda.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#7138d8",
+  "icons": []
+}
