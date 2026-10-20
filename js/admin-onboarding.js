@@ -596,6 +596,23 @@ function renderBrandPreview(logoUrl,coverUrl){
   const root=ob('onboarding-brand-preview');if(!root)return;
   root.innerHTML=`<div style="border:1px solid #e7e2ee;border-radius:14px;padding:10px;text-align:center"><small>Logo</small><div style="height:90px;display:grid;place-items:center">${logoUrl?`<img src="${logoUrl}" alt="Logo" style="max-width:100%;max-height:80px">`:'Sin logo'}</div></div><div style="border:1px solid #e7e2ee;border-radius:14px;padding:10px"><small>Portada</small><div style="height:90px;border-radius:10px;background:${coverUrl?`url('${coverUrl}') center/cover`:'#f4f1f8'}"></div></div>`;
 }
+async function validateBookingReadiness(){
+  const [branches,services,staff,links]=await Promise.all([
+    supabaseClient.from('business_branches').select('id').eq('business_id',onboardingBiz.id).eq('active',true),
+    supabaseClient.from('services').select('id,name').eq('business_id',onboardingBiz.id).eq('active',true),
+    supabaseClient.from('staff').select('id,name,branch_id').eq('business_id',onboardingBiz.id).eq('active',true),
+    supabaseClient.from('service_staff').select('service_id,staff_id').eq('business_id',onboardingBiz.id)
+  ]);
+  for(const result of [branches,services,staff,links])if(result.error)throw new Error('No se pudo validar la configuración de reservas: '+result.error.message);
+  if(!branches.data?.length)throw new Error('Configura una sucursal activa antes de publicar tu negocio.');
+  if(!services.data?.length)throw new Error('Agrega al menos un servicio activo antes de publicar tu negocio.');
+  if(!staff.data?.length)throw new Error('Agrega al menos un profesional activo y asígnale servicios antes de continuar.');
+  const activeStaff=new Set(staff.data.map(x=>x.id));
+  const assigned=new Set((links.data||[]).filter(x=>activeStaff.has(x.staff_id)).map(x=>x.service_id));
+  const missing=services.data.filter(x=>!assigned.has(x.id));
+  if(missing.length)throw new Error('Asigna un profesional a estos servicios antes de publicar: '+missing.map(x=>x.name).join(', ')+'.');
+  return true;
+}
 async function saveBrandingAndComplete(skip=false){
   const btn=ob('save-branding-finish');if(btn){btn.disabled=true;btn.textContent='Guardando…'}
   try{
@@ -615,6 +632,7 @@ async function saveBrandingAndComplete(skip=false){
         renderBrandPreview(logoUrl,coverUrl);
       }
     }
+    await validateBookingReadiness();
     const {data,error}=await supabaseClient.from('businesses').update({setup_completed:true}).eq('id',onboardingBiz.id).select('*').single();if(error)throw error;
     onboardingBiz={...onboardingBiz,...data};configureSuccess();showStep(6);
   }catch(error){obToast('No se pudo finalizar: '+error.message,'error')}
