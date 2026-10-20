@@ -1,0 +1,24 @@
+name: Enviar notificaciones MyCitaGo
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Procesar cola de notificaciones
+        env:
+          PUSH_DISPATCH_SECRET: ${{ secrets.PUSH_DISPATCH_SECRET }}
+        run: |
+          if [ -z "$PUSH_DISPATCH_SECRET" ]; then
+            echo "::error::Configura PUSH_DISPATCH_SECRET en los secretos de GitHub Actions."
+            exit 1
+          fi
+          curl --fail-with-body --show-error --silent --retry 2 --max-time 90 \
+            -X POST 'https://rienqmmrxzuseiaweugz.supabase.co/functions/v1/push-dispatch' \
+            -H "x-push-dispatch-secret: $PUSH_DISPATCH_SECRET" \
+            -H 'Content-Type: application/json' \
+            -d '{}'
