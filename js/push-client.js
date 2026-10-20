@@ -31,5 +31,20 @@ async function enablePush({businessId,appointmentId,accessToken}={}){
  }
  return true;
 }
-window.MyCitaGoPush={enablePush};
+async function getPushStatus({businessId}={}){
+ if(!('serviceWorker' in navigator)||!('PushManager' in window)||!('Notification' in window))return 'unsupported';
+ if(Notification.permission==='denied')return 'denied';
+ if(Notification.permission!=='granted')return 'inactive';
+ const reg=await navigator.serviceWorker.getRegistration(fromBase('sw.js'));
+ if(!reg)return 'inactive';
+ const sub=await reg.pushManager.getSubscription();
+ if(!sub)return 'inactive';
+ if(!businessId)return 'active';
+ const {data:{user},error:userError}=await supabaseClient.auth.getUser();
+ if(userError||!user)return 'inactive';
+ const {data,error}=await supabaseClient.from('push_subscriptions').select('endpoint').eq('business_id',businessId).eq('user_id',user.id).eq('endpoint',sub.endpoint).maybeSingle();
+ if(error){console.warn('[MyCitaGo push status]',error);return 'unknown';}
+ return data?'active':'inactive';
+}
+window.MyCitaGoPush={enablePush,getPushStatus};
 })();
