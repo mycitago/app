@@ -140,7 +140,7 @@ window.MyCitaGoOAuth = (() => {
   }
 
   async function handleForgot(){hideMsgs();const email=$('forgot-email').value.trim();if(!email)return showError('Escribe tu correo.');const{error}=await supabaseClient.auth.resetPasswordForEmail(email,{redirectTo:location.href.split('#')[0]});if(error)return showError(error.message);showInfo('Listo. Revisa tu correo y abre el enlace para crear una nueva contraseña.')}
-  async function handleReset(){hideMsgs();const password=$('reset-password').value;if(password.length<10)return showError('Usa una contraseña de al menos 10 caracteres.');const{error}=await supabaseClient.auth.updateUser({password});if(error)return showError(error.message);await supabaseClient.auth.signOut();showView('login');showInfo('Contraseña actualizada. Inicia sesión con tu nueva contraseña.')}
+  async function handleReset(){hideMsgs();const {data:{session}}=await supabaseClient.auth.getSession();if(!session)return showError('La sesión de recuperación expiró. Solicita un nuevo enlace.');const password=$('reset-password').value;if(password.length<10)return showError('Usa una contraseña de al menos 10 caracteres.');const{error}=await supabaseClient.auth.updateUser({password});if(error)return showError(error.message);await supabaseClient.auth.signOut();showView('login');showInfo('Contraseña actualizada. Inicia sesión con tu nueva contraseña.')}
 
   function prepareOAuthRegistration(user){oauthMode=true;showView('register');$('email-register-fields').classList.add('hidden');$('register-google-option').classList.add('hidden');$('oauth-profile').classList.remove('hidden');$('oauth-name').textContent=user.user_metadata?.full_name||user.user_metadata?.name||'Cuenta Google conectada';$('oauth-email').textContent=user.email||'';$('oauth-avatar').textContent=($('oauth-name').textContent||'G').slice(0,1).toUpperCase();$('card-title').textContent='Completa tu negocio';$('card-sub').textContent='Google ya verificó tu identidad. Sólo faltan los datos de tu negocio.';$('btn-register').textContent='Crear mi negocio'}
 
@@ -150,7 +150,14 @@ window.MyCitaGoOAuth = (() => {
   resetGoogleButtons();$('btn-login').addEventListener('click',handleLogin);$('btn-register').addEventListener('click',handleRegister);$('btn-forgot').addEventListener('click',handleForgot);$('btn-reset').addEventListener('click',handleReset);$('login-password').addEventListener('keydown',e=>{if(e.key==='Enter')handleLogin()});
 
   (async function start(){
-    if(location.hash.includes('type=recovery')){showView('reset');return}
+    const authHash=new URLSearchParams(location.hash.replace(/^#/,''));
+    const isRecovery=authHash.get('type')==='recovery'||new URLSearchParams(location.search).get('type')==='recovery';
+    if(isRecovery){
+      showView('reset');
+      const {data:{session},error}=await supabaseClient.auth.getSession();
+      if(error||!session){showError('El enlace de recuperación es inválido o expiró. Solicita uno nuevo desde «¿Olvidaste tu contraseña?».');$('btn-reset').disabled=true;}
+      return;
+    }
     const params=new URLSearchParams(location.search);
     const currentInvite=params.get('invite')||'';
     if(currentInvite)localStorage.setItem('mycitago:invite',currentInvite);
