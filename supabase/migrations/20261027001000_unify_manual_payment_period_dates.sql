@@ -212,3 +212,8 @@ begin
   );
 end;
 $function$;
+
+-- El panel invoca esta función por RPC como usuario autenticado.
+-- La función conserva su validación interna de administrador de plataforma.
+revoke all on function public.mark_subscription_paid(uuid, text) from public, anon;
+grant execute on function public.mark_subscription_paid(uuid, text) to authenticated;
