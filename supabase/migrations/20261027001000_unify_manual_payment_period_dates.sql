@@ -142,6 +142,9 @@ begin
 end
 $function$;
 
+-- Elimina la firma antigua para impedir extensiones sin motivo.
+drop function if exists public.mark_subscription_paid(uuid);
+
 -- Extensión manual separada del registro de un pago. Exige motivo auditable.
 create or replace function public.mark_subscription_paid(
   p_business_id uuid,
