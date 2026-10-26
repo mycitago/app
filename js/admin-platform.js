@@ -25,6 +25,7 @@ async function loadData(){
   renderPlatformDashboard(snap);
   renderAll();
   await loadOperationsModules();
+  await loadManualPaymentProofs();
 }
 function renderAll(){renderKpis();renderPlans();renderPayments();renderAlerts();applyBusinessFilters()}
 
@@ -107,6 +108,56 @@ function renderTemplateSummary(loadError){
 }
 
 function renderAudit(loadError){const root=$('platform-audit-list');if(!root)return;if(loadError){moduleError('platform-audit-list','auditoría',loadError);return}const rows=platformState.audit||[];root.innerHTML=rows.map(x=>`<div class="platform-compact-item"><div><strong>${esc(x.action)}</strong><small>${esc(x.entity)} · ${new Date(x.created_at).toLocaleString('es-MX')}</small></div></div>`).join('')||'<div class="creator-empty">Sin eventos de auditoría.</div>'}
+
+async function loadManualPaymentProofs(){
+  const root=$('manual-payment-proofs');
+  if(!root)return;
+  root.innerHTML='<div class="creator-empty">Cargando comprobantes…</div>';
+  const {data,error}=await supabaseClient.from('subscription_payment_proofs')
+    .select('id,business_id,plan_id,amount,payment_reference,receipt_path,created_at,status,review_note,reviewed_at')
+    .order('created_at',{ascending:false}).limit(40);
+  if(error){moduleError('manual-payment-proofs','comprobantes de pago',error,'loadManualPaymentProofs');return;}
+  const rows=data||[],pending=rows.filter(p=>p.status==='pending'),history=rows.filter(p=>p.status!=='pending');
+  if(!rows.length){root.innerHTML='<div class="creator-empty">Todavía no hay comprobantes. Cuando un cliente pague por el enlace y envíe su comprobante, aparecerá aquí.</div>';return;}
+  root.replaceChildren();
+  const summary=document.createElement('div');summary.className='creator-empty';
+  summary.textContent=pending.length+' comprobante(s) pendiente(s) · '+history.length+' revisado(s)';root.append(summary);
+  for(const p of pending){
+    const b=platformState.businesses.find(x=>x.id===p.business_id),plan=platformState.plans.find(x=>x.id===p.plan_id);
+    const item=document.createElement('article');item.className='platform-compact-item';
+    item.style.cssText='display:block;padding:14px 0;border-bottom:1px solid var(--ct-line,#e6e8ee)';
+    const title=document.createElement('strong');title.textContent=(b?.name||'Negocio sin nombre')+' · '+(plan?.name||'Plan no identificado')+' · '+money(p.amount)+' MXN';
+    const detail=document.createElement('small');detail.style.cssText='display:block;margin:6px 0;overflow-wrap:anywhere';
+    detail.textContent='Referencia: '+(p.payment_reference||'Sin referencia')+' · Recibido: '+new Date(p.created_at).toLocaleString('es-MX');item.append(title,detail);
+    if(p.receipt_path){const signed=await supabaseClient.storage.from('subscription-receipts').createSignedUrl(p.receipt_path,120);if(!signed.error&&signed.data?.signedUrl){const receipt=document.createElement('a');receipt.href=signed.data.signedUrl;receipt.target='_blank';receipt.rel='noopener noreferrer';receipt.textContent='Ver comprobante (enlace temporal)';receipt.style.display='inline-block';receipt.style.margin='0 12px 8px 0';item.append(receipt);}}
+    const note=document.createElement('input');note.className='input';note.placeholder='Nota de revisión (opcional)';note.setAttribute('aria-label','Nota de revisión para '+(b?.name||'negocio'));note.style.cssText='display:block;width:100%;margin:8px 0';
+    const actions=document.createElement('div');actions.className='platform-compact-actions';
+    const approve=document.createElement('button');approve.type='button';approve.className='approve';approve.textContent='Confirmé el pago · Aprobar';
+    const reject=document.createElement('button');reject.type='button';reject.className='reject';reject.textContent='Rechazar';
+    const msg=document.createElement('small');msg.style.display='block';
+    async function review(approvePayment){
+      if(approvePayment&&!confirm('¿Ya verificaste en tu cuenta de Mercado Pago que esta referencia corresponde al importe de '+money(p.amount)+' MXN? La aprobación activará o ampliará la suscripción.'))return;
+      if(!approvePayment&&!confirm('¿Rechazar este comprobante?'))return;
+      approve.disabled=reject.disabled=true;msg.textContent='Procesando…';
+      const {error:rpcError}=await supabaseClient.rpc('review_subscription_proof',{p_proof_id:p.id,p_approve:approvePayment,p_note:note.value.trim()||null});
+      if(rpcError){msg.textContent='No se pudo procesar: '+rpcError.message;approve.disabled=reject.disabled=false;return;}
+      toast(approvePayment?'Pago verificado y registrado.':'Comprobante rechazado.');await loadData();
+    }
+    approve.onclick=()=>review(true);reject.onclick=()=>review(false);actions.append(approve,reject);item.append(note,actions,msg);root.append(item);
+  }
+  if(!pending.length){const empty=document.createElement('div');empty.className='creator-empty';empty.textContent='No hay comprobantes pendientes de validar.';root.append(empty);}
+  if(history.length){
+    const heading=document.createElement('h3');heading.textContent='Últimos comprobantes revisados';heading.style.margin='18px 0 8px';root.append(heading);
+    history.slice(0,12).forEach(p=>{
+      const b=platformState.businesses.find(x=>x.id===p.business_id),plan=platformState.plans.find(x=>x.id===p.plan_id);
+      const row=document.createElement('div');row.className='platform-compact-item';const main=document.createElement('div');
+      const strong=document.createElement('strong');strong.textContent=(b?.name||'Negocio')+' · '+(plan?.name||'Plan')+' · '+money(p.amount)+' MXN';
+      const small=document.createElement('small');small.style.display='block';small.textContent=(p.status==='approved'?'Aprobado':p.status==='rejected'?'Rechazado':p.status)+' · '+new Date(p.reviewed_at||p.created_at).toLocaleString('es-MX')+(p.review_note?' · '+p.review_note:'');
+      main.append(strong,small);row.append(main);root.append(row);
+    });
+  }
+}
+
 function renderPlatformModules(){
  const pay=$('platform-payments-list');if(pay)pay.innerHTML=(platformState.payments||[]).slice(0,12).map(p=>`<div class="platform-compact-item"><div><strong>${money(p.amount)}</strong><small>${esc(p.status||'sin estado')} · ${iso(p.paid_at||p.created_at)}</small></div></div>`).join('')||'<div class="creator-empty">Sin pagos registrados.</div>';
  const inc=$('platform-incidents-list');if(inc)inc.innerHTML=(platformState.incidents||[]).slice(0,12).map(i=>`<div class="platform-compact-item"><div><strong>${esc(i.title||'Incidencia')}</strong><small>${esc(i.severity||'')} · ${esc(i.status||'')}</small></div></div>`).join('')||'<div class="creator-empty">Sin incidencias registradas.</div>';
@@ -169,7 +220,7 @@ function exportPaymentsCsv(){const rows=(platformState.payments||[]).map(p=>{con
 function exportAuditCsv(){const rows=(platformState.audit||[]).map(x=>{const b=platformState.businesses.find(v=>v.id===x.business_id);return[x.created_at||'',x.action||'',x.entity||'',b?.name||x.business_id||'',x.entity_id||'']});downloadCsv('mycitago-auditoria.csv',['Fecha','Acción','Entidad','Negocio','ID entidad'],rows)}
 
 async function renderTemplateMediaManager(){const root=$('platform-default-assets-list');if(!root)return;const {data:assets}=await supabaseClient.from('platform_default_assets').select('*').eq('kind','service');const map=new Map((assets||[]).map(a=>[a.asset_key,a]));root.innerHTML='<h4>Fotos por plantilla de servicio</h4>'+platformState.templates.map(t=>{const key=`${t.business_category_id}:${String(t.name).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')}`,a=map.get(key);return `<div class="platform-asset-row">${a?`<img src="${esc(a.image_url)}" alt="">`:'<div class="platform-asset-placeholder">IMG</div>'}<div><b>${esc(t.name)}</b><small>${esc(t.business_category_id)}${a?' · '+new Date(a.updated_at).toLocaleDateString('es-MX'):''}</small></div><label class="btn btn-ghost">${a?'Reemplazar':'Subir foto'}<input hidden type="file" accept="image/jpeg,image/png,image/webp" data-template-media="${esc(key)}" data-template-category="${esc(t.business_category_id)}"></label></div>`}).join('');root.querySelectorAll('[data-template-media]').forEach(input=>input.onchange=async()=>{try{await uploadPlatformAsset('service',input.files?.[0],input.dataset.templateMedia,input.dataset.templateCategory);await renderTemplateMediaManager()}catch(e){toast(e.message)}})}
-async function init(){if(!await requirePlatformAccess())return;$('creator-date').textContent=new Date().toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long',year:'numeric'});if($('btn-logout'))$('btn-logout').onclick=logout;if($('refresh-platform'))$('refresh-platform').onclick=loadData;if($('invite-business'))$('invite-business').onclick=openInviteDialog;if($('invite-business-form'))$('invite-business-form').onsubmit=createBusinessInvite;if($('invite-copy'))$('invite-copy').onclick=async()=>{await navigator.clipboard.writeText($('invite-url').value);toast('Link copiado')};document.querySelectorAll('[data-invite-close]').forEach(x=>x.onclick=closeInviteDialog);if($('refresh-templates'))$('refresh-templates').onclick=loadOperationsModules;if($('new-template'))$('new-template').onclick=()=>$('template-create-panel').classList.toggle('hidden');if($('save-template'))$('save-template').onclick=createServiceTemplate;$('business-search').oninput=applyBusinessFilters;$('business-filter').onchange=applyBusinessFilters;$('business-sort').onchange=applyBusinessFilters;$('business-select-visible').onchange=e=>{platformState.filtered.forEach(b=>e.target.checked?platformState.selectedBusinesses.add(b.id):platformState.selectedBusinesses.delete(b.id));renderBusinesses()};$('bulk-suspend').onclick=bulkSuspendSelected;$('bulk-reactivate').onclick=bulkReactivateSelected;$('export-businesses').onclick=exportBusinessesCsv;$('export-payments').onclick=exportPaymentsCsv;$('export-audit').onclick=exportAuditCsv;$('support-history-filter').onchange=()=>renderSupportInbox();document.querySelectorAll('[data-close-drawer]').forEach(x=>x.onclick=closeDrawer);bindPlatformAssetUploads();await loadData();await renderTemplateMediaManager()}
+async function init(){if(!await requirePlatformAccess())return;$('creator-date').textContent=new Date().toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long',year:'numeric'});if($('btn-logout'))$('btn-logout').onclick=logout;if($('refresh-platform'))$('refresh-platform').onclick=loadData;if($('invite-business'))$('invite-business').onclick=openInviteDialog;if($('invite-business-form'))$('invite-business-form').onsubmit=createBusinessInvite;if($('invite-copy'))$('invite-copy').onclick=async()=>{await navigator.clipboard.writeText($('invite-url').value);toast('Link copiado')};document.querySelectorAll('[data-invite-close]').forEach(x=>x.onclick=closeInviteDialog);if($('refresh-templates'))$('refresh-templates').onclick=loadOperationsModules;if($('new-template'))$('new-template').onclick=()=>$('template-create-panel').classList.toggle('hidden');if($('save-template'))$('save-template').onclick=createServiceTemplate;$('business-search').oninput=applyBusinessFilters;$('business-filter').onchange=applyBusinessFilters;$('business-sort').onchange=applyBusinessFilters;$('business-select-visible').onchange=e=>{platformState.filtered.forEach(b=>e.target.checked?platformState.selectedBusinesses.add(b.id):platformState.selectedBusinesses.delete(b.id));renderBusinesses()};$('bulk-suspend').onclick=bulkSuspendSelected;$('bulk-reactivate').onclick=bulkReactivateSelected;$('export-businesses').onclick=exportBusinessesCsv;$('export-payments').onclick=exportPaymentsCsv;if($('refresh-manual-payments'))$('refresh-manual-payments').onclick=loadManualPaymentProofs;$('export-audit').onclick=exportAuditCsv;$('support-history-filter').onchange=()=>renderSupportInbox();document.querySelectorAll('[data-close-drawer]').forEach(x=>x.onclick=closeDrawer);bindPlatformAssetUploads();await loadData();await renderTemplateMediaManager()}
 document.addEventListener('DOMContentLoaded',init);
 
 // CITAGO Platform public render contracts
