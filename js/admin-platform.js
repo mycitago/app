@@ -130,7 +130,7 @@ async function loadManualPaymentProofs(){
     const detail=document.createElement('small');detail.style.cssText='display:block;margin:6px 0;overflow-wrap:anywhere';
     detail.textContent='Referencia: '+(p.payment_reference||'Sin referencia')+' · Recibido: '+new Date(p.created_at).toLocaleString('es-MX');item.append(title,detail);
     if(p.receipt_path){const signed=await supabaseClient.storage.from('subscription-receipts').createSignedUrl(p.receipt_path,60);if(!signed.error&&signed.data?.signedUrl){const receipt=document.createElement('a');receipt.href=signed.data.signedUrl;receipt.target='_blank';receipt.rel='noopener noreferrer';receipt.textContent='Ver comprobante (enlace temporal)';receipt.style.display='inline-block';receipt.style.margin='0 12px 8px 0';item.append(receipt);}}
-    const note=document.createElement('input');note.className='input';note.placeholder='Nota de revisión (opcional)';note.setAttribute('aria-label','Nota de revisión para '+(b?.name||'negocio'));note.style.cssText='display:block;width:100%;margin:8px 0';
+    const note=document.createElement('input');note.className='input';note.placeholder='Motivo del rechazo (obligatorio al rechazar)';note.setAttribute('aria-label','Nota de revisión para '+(b?.name||'negocio'));note.style.cssText='display:block;width:100%;margin:8px 0';
     const actions=document.createElement('div');actions.className='platform-compact-actions';
     const approve=document.createElement('button');approve.type='button';approve.className='approve';approve.textContent='Confirmé el pago · Aprobar';
     const reject=document.createElement('button');reject.type='button';reject.className='reject';reject.textContent='Rechazar';
@@ -138,8 +138,8 @@ async function loadManualPaymentProofs(){
     async function review(approvePayment){
       if(!approvePayment&&!note.value.trim()){note.setCustomValidity('Escribe el motivo del rechazo.');note.reportValidity();note.focus();return;}
       note.setCustomValidity('');
-      if(approvePayment&&!confirm('CONFIRMACIÓN DE PAGO\\n\\nNegocio: '+(b?.name||'Negocio sin nombre')+'\\nPlan: '+(plan?.name||'Plan no identificado')+'\\nImporte: '+money(p.amount)+' MXN\\nReferencia: '+(p.payment_reference||'Sin referencia')+'\\n\\n¿Verificaste este movimiento directamente en Mercado Pago? Aprobar activará o ampliará la suscripción.'))return;
-      if(!approvePayment&&!confirm('¿Rechazar el comprobante de '+(b?.name||'Negocio sin nombre')+' por '+money(p.amount)+' MXN?\\nMotivo: '+note.value.trim()))return;
+      if(approvePayment&&!confirm('CONFIRMACIÓN DE PAGO\n\nNegocio: '+(b?.name||'Negocio sin nombre')+'\nPlan: '+(plan?.name||'Plan no identificado')+'\nImporte: '+money(p.amount)+' MXN\nReferencia: '+(p.payment_reference||'Sin referencia')+'\n\n¿Verificaste este movimiento directamente en Mercado Pago? Aprobar activará o ampliará la suscripción.'))return;
+      if(!approvePayment&&!confirm('¿Rechazar el comprobante de '+(b?.name||'Negocio sin nombre')+' por '+money(p.amount)+' MXN?\nMotivo: '+note.value.trim()))return;
       approve.disabled=reject.disabled=true;msg.textContent='Procesando…';
       const {error:rpcError}=await supabaseClient.rpc('review_subscription_proof',{p_proof_id:p.id,p_approve:approvePayment,p_note:note.value.trim()||null});
       if(rpcError){msg.textContent='No se pudo procesar: '+rpcError.message;approve.disabled=reject.disabled=false;return;}
