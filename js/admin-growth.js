@@ -163,9 +163,38 @@ async function deletePromo(id){
   if(bookings>0||uses>0)return toast('No se puede eliminar una promoción con usos o reservas. Puedes pausarla para que deje de ofrecerse.');
   const label=p.title||p.code||'esta promoción';
   if(!window.confirm(`¿Eliminar definitivamente la promoción "${label}"? Esta acción no se puede deshacer.`))return;
-  const {error}=await supabaseClient.from('business_promotions').delete().eq('id',id).eq('business_id',biz.id).eq('uses_count',0);
-  if(error)return toast('No se pudo eliminar: '+error.message);
-  await refreshPromos();toast('Promoción eliminada.');
+  const button=G('promo-list')?.querySelector(`[data-delete-promo="${CSS.escape(String(id))}"]`);
+  if(button){button.disabled=true;button.textContent='Eliminando…'}
+  try{
+    const {data,error}=await supabaseClient.from('business_promotions')
+      .delete()
+      .eq('id',id)
+      .eq('business_id',biz.id)
+      .eq('uses_count',0)
+      .select('id');
+    if(error){
+      console.error('[growth delete promotion]',{id,error});
+      toast('No se pudo eliminar la promoción: '+error.message);
+      return;
+    }
+    if(!Array.isArray(data)||data.length===0){
+      await refreshPromos();
+      toast('La promoción no se eliminó. Puede tener usos, reservas o faltan permisos de eliminación.');
+      return;
+    }
+    await refreshPromos();
+    if(promos.some(item=>String(item.id)===String(id))){
+      toast('La promoción sigue en la base de datos. Revisa los permisos de Supabase.');
+      return;
+    }
+    toast('Promoción eliminada correctamente.');
+  }catch(error){
+    console.error('[growth delete promotion]',error);
+    toast('Error inesperado al eliminar la promoción. Revisa la consola.');
+  }finally{
+    const current=G('promo-list')?.querySelector(`[data-delete-promo="${CSS.escape(String(id))}"]`);
+    if(current){current.disabled=false;current.textContent='Eliminar'}
+  }
 }
 async function refreshPromos(){
   const {data,error}=await supabaseClient.from('business_promotions').select('*').eq('business_id',biz.id).order('created_at',{ascending:false});
