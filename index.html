@@ -78,6 +78,10 @@
 
 <section class="section" id="planes">
 <div class="section-head"><div><span class="eyebrow">PLANES</span><h2>Elige el tamaño que necesita tu negocio.</h2></div><p>Elige tu plan y úsalo 30 días con 100% de descuento. No pagas durante el primer mes.</p></div>
+<div class="billing-cycle-switch" role="group" aria-label="Frecuencia de pago" style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:20px 0">
+<button type="button" class="btn btn-primary" data-billing-cycle="monthly" aria-pressed="true">Pago mensual</button>
+<button type="button" class="btn" data-billing-cycle="annual" aria-pressed="false">Pago anual · paga 10 y recibe 12</button>
+</div>
 <div class="plans-grid" id="public-plans"><div class="plans-loading">Cargando planes…</div></div>
 <p class="plans-note" id="plans-note">30 días 100% gratis. Después continúa con el precio mensual del plan seleccionado. Cancela cuando quieras.</p>
 </section>
@@ -118,24 +122,58 @@ function publicPlanFeatures(features){
     .map(([key])=>PUBLIC_FEATURE_LABELS[key]);
 }
 
+let publicBillingCycle='monthly';
+
 function renderPublicPlans(plans){
   const root=document.getElementById('public-plans');
-  root.replaceChildren(...plans.slice(0,3).map(plan=>{
+  const validPlans=plans.slice(0,3);
+  root.replaceChildren(...validPlans.map(plan=>{
     const article=document.createElement('article'); article.className='plan';
     const name=document.createElement('h3'); name.textContent=plan.name||'Plan';
-    const amount=Number(plan.price_monthly??plan.monthly_price??0);
-    const price=document.createElement('div'); price.className='price'; price.textContent='$'+(Number.isFinite(amount)?amount.toLocaleString('es-MX'):0);
-    const cadence=document.createElement('small'); cadence.textContent=' MXN / mes'; price.append(cadence);
-    const planCode=String(plan.plan_code||plan.id||plan.name||'plan').toLowerCase().replace(/\s+/g,'-');
-    const promo=document.createElement('span'); promo.className='promo'; promo.textContent='100% DE DESCUENTO · PRIMER MES';
-    const promoPrice=document.createElement('p'); promoPrice.className='promo-price'; promoPrice.textContent='Hoy pagas $0 MXN';
-    const desc=document.createElement('p'); desc.className='desc'; desc.textContent='30 días gratis. Después $'+amount.toLocaleString('es-MX')+' MXN/mes. Cancela cuando quieras.';
+    const monthly=Number(plan.price_monthly??plan.monthly_price??0);
+    const annual= Math.round(monthly*10*100)/100;
+    const amount=publicBillingCycle==='annual'?annual:monthly;
+    const price=document.createElement('div'); price.className='price';
+    price.textContent='$'+(Number.isFinite(amount)?amount.toLocaleString('es-MX',{maximumFractionDigits:2}):0);
+    const cadence=document.createElement('small'); cadence.textContent=publicBillingCycle==='annual'?' MXN / año':' MXN / mes'; price.append(cadence);
+    const planCode=String(plan.plan_code||plan.id||plan.name||'plan').toLowerCase().replace(/\\s+/g,'-');
+    const promo=document.createElement('span'); promo.className='promo';
+    promo.textContent=publicBillingCycle==='annual'?'PROMOCIÓN ANUAL · 2 MESES GRATIS':'100% DE DESCUENTO · PRIMER MES';
+    const promoPrice=document.createElement('p'); promoPrice.className='promo-price';
+    if(publicBillingCycle==='annual'){
+      promoPrice.textContent='Pagas 10 meses y recibes 12';
+      const regular=document.createElement('s'); regular.textContent='$'+(monthly*12).toLocaleString('es-MX')+' MXN';
+      promoPrice.append(regular);
+    }else{
+      promoPrice.textContent='Hoy pagas $0 MXN';
+    }
+    const desc=document.createElement('p'); desc.className='desc';
+    desc.textContent=publicBillingCycle==='annual'
+      ? '12 meses de servicio por el precio de 10. Renovación anual; consulta las condiciones antes de pagar.'
+      : '30 días gratis. Después $'+monthly.toLocaleString('es-MX')+' MXN/mes. Cancela cuando quieras.';
     const list=document.createElement('ul');
     const features=publicPlanFeatures(plan.features);
     list.replaceChildren(...features.slice(0,6).map(label=>{const li=document.createElement('li');li.textContent=label;return li}));
-    const cta=document.createElement('a'); cta.className='btn btn-primary'; cta.href='admin/login.html?view=register&plan='+encodeURIComponent(planCode); cta.textContent='Activar 30 días gratis';
+    const cta=document.createElement('a'); cta.className='btn btn-primary';
+    cta.href='admin/login.html?view=register&plan='+encodeURIComponent(planCode)+'&billing_cycle='+publicBillingCycle;
+    cta.textContent=publicBillingCycle==='annual'?'Elegir plan anual':'Activar 30 días gratis';
     article.append(name,price,promo,promoPrice,desc,list,cta); return article;
   }));
+  const note=document.getElementById('plans-note');
+  if(note) note.textContent=publicBillingCycle==='annual'
+    ? 'Promoción anual: paga 10 meses y recibe 12. Precio antes de cualquier impuesto aplicable. La renovación anual debe confirmarse en el proceso de contratación.'
+    : '30 días 100% gratis. Después continúa con el precio mensual del plan seleccionado. Cancela cuando quieras.';
+}
+
+function setPublicBillingCycle(cycle){
+  publicBillingCycle=cycle==='annual'?'annual':'monthly';
+  document.querySelectorAll('[data-billing-cycle]').forEach(button=>{
+    const active=button.dataset.billingCycle===publicBillingCycle;
+    button.setAttribute('aria-pressed',String(active));
+    button.classList.toggle('btn-primary',active);
+  });
+  const plans=window.__mycitagoPublicPlans;
+  if(plans) renderPublicPlans(plans);
 }
 
 async function loadPublicPlans(){
@@ -147,14 +185,14 @@ async function loadPublicPlans(){
     }
     if(result.error) throw result.error;
     if(!result.data?.length) throw new Error('No hay planes activos disponibles.');
-    renderPublicPlans(result.data);
+    window.__mycitagoPublicPlans=result.data; renderPublicPlans(result.data);
   }catch(error){
     console.warn('[Landing] No se pudo cargar el catálogo público:',error);
     root.innerHTML='<div class="plans-loading">Consulta nuestros planes al crear tu negocio.</div>';
     document.getElementById('plans-note').textContent='El catálogo de planes no está disponible en este momento.';
   }
 }
-document.addEventListener('DOMContentLoaded',loadPublicPlans);
+document.querySelectorAll('[data-billing-cycle]').forEach(button=>button.addEventListener('click',()=>setPublicBillingCycle(button.dataset.billingCycle)));\ndocument.addEventListener('DOMContentLoaded',loadPublicPlans);
 </script>
 </body>
 </html>
