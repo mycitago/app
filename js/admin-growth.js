@@ -95,6 +95,7 @@ function renderPromos(){
         <button class="ct-btn ct-btn-secondary" data-wa-promo="${p.id}">WhatsApp</button>
         <button class="ct-btn ct-btn-secondary" data-img-promo="${p.id}">Imagen</button>
         <button class="ct-btn ct-btn-secondary" data-toggle-promo="${p.id}">${p.active?'Pausar':'Activar'}</button>
+        <button class="ct-btn ct-btn-secondary" data-delete-promo="${p.id}" ${(Number(p.uses_count||0)>0||promoBookings(p.id)>0)?'disabled title="No se puede eliminar porque tiene usos o reservas; puedes pausarla."':''}>Eliminar</button>
       </div>
     </article>`;
   }).join('');
@@ -102,6 +103,7 @@ function renderPromos(){
   host.querySelectorAll('[data-wa-promo]').forEach(b=>b.onclick=()=>{const p=promoById(b.dataset.waPromo);window.open(`https://wa.me/?text=${encodeURIComponent(`${p.title}: ${tagged('whatsapp',p.code)}`)}`,'_blank','noopener')});
   host.querySelectorAll('[data-img-promo]').forEach(b=>b.onclick=async()=>downloadImage(await buildShareFile(promoById(b.dataset.imgPromo))));
   host.querySelectorAll('[data-toggle-promo]').forEach(b=>b.onclick=()=>togglePromo(b.dataset.togglePromo));
+  host.querySelectorAll('[data-delete-promo]').forEach(b=>b.onclick=()=>deletePromo(b.dataset.deletePromo));
 }
 
 function availableSegments(){
@@ -154,6 +156,16 @@ async function togglePromo(id){
   const {error}=await supabaseClient.from('business_promotions').update({active:!p.active,updated_at:new Date().toISOString()}).eq('id',id).eq('business_id',biz.id);
   if(error)return toast('No se pudo actualizar: '+error.message);
   await refreshPromos();toast(p.active?'Promoción pausada.':'Promoción activada.');
+}
+async function deletePromo(id){
+  const p=promoById(id);if(!p)return;
+  const bookings=promoBookings(id),uses=Number(p.uses_count||0);
+  if(bookings>0||uses>0)return toast('No se puede eliminar una promoción con usos o reservas. Puedes pausarla para que deje de ofrecerse.');
+  const label=p.title||p.code||'esta promoción';
+  if(!window.confirm(`¿Eliminar definitivamente la promoción "${label}"? Esta acción no se puede deshacer.`))return;
+  const {error}=await supabaseClient.from('business_promotions').delete().eq('id',id).eq('business_id',biz.id).eq('uses_count',0);
+  if(error)return toast('No se pudo eliminar: '+error.message);
+  await refreshPromos();toast('Promoción eliminada.');
 }
 async function refreshPromos(){
   const {data,error}=await supabaseClient.from('business_promotions').select('*').eq('business_id',biz.id).order('created_at',{ascending:false});
