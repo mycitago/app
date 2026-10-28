@@ -110,29 +110,15 @@
 
 <section class="creator-card platform-payment-methods" id="metodos-cobro">
   <div class="creator-card-head">
-    <div><span class="eyebrow">COBROS</span><h2>Métodos de cobro</h2><p>Preparados para conectar un proveedor de pagos. Ningún método está activo todavía.</p></div>
-    <span class="creator-soft">Proveedor pendiente</span>
+    <div><span class="eyebrow">SUSCRIPCIONES · COBRO MANUAL</span><h2>Enlaces de pago de Mercado Pago</h2><p>El cliente paga desde el enlace de su plan, luego envía el comprobante. El equipo revisa el movimiento real en Mercado Pago y lo aprueba desde esta misma página.</p></div>
+    <span class="creator-soft">Validación manual</span>
   </div>
   <div class="payment-method-grid">
-    <article class="payment-method-card">
-      <div class="payment-method-icon">▣</div>
-      <div><h3>OXXO / pago en efectivo</h3><p>Permitirá generar una referencia para que el negocio pague en efectivo en tienda.</p></div>
-      <span class="payment-method-status disconnected">No conectado</span>
-      <button class="btn btn-ghost" type="button" data-payment-method="OXXO">Configurar</button>
-    </article>
-    <article class="payment-method-card">
-      <div class="payment-method-icon">⇄</div>
-      <div><h3>Transferencia bancaria (SPEI)</h3><p>Permitirá recibir transferencias bancarias cuando se conecte un proveedor compatible.</p></div>
-      <span class="payment-method-status disconnected">No conectado</span>
-      <button class="btn btn-ghost" type="button" data-payment-method="SPEI">Configurar</button>
-    </article>
-    <article class="payment-method-card">
-      <div class="payment-method-icon">▱</div>
-      <div><h3>Tarjeta de débito / crédito</h3><p>Permitirá cobrar suscripciones por tarjeta una vez que se defina el proveedor.</p></div>
-      <span class="payment-method-status disconnected">No conectado</span>
-      <button class="btn btn-ghost" type="button" data-payment-method="Tarjeta">Configurar</button>
-    </article>
+    <article class="payment-method-card"><div class="payment-method-icon">$</div><div><h3>Autónomo · $199 MXN/mes</h3><p>Enlace de pago del plan.</p><a href="https://mpago.la/2sLYNJ8" target="_blank" rel="noopener noreferrer">Abrir enlace de Mercado Pago ↗</a></div><span class="payment-method-status">Link configurado</span></article>
+    <article class="payment-method-card"><div class="payment-method-icon">$</div><div><h3>Pro · $399 MXN/mes</h3><p>Enlace de pago del plan.</p><a href="https://mpago.la/1EiGkvG" target="_blank" rel="noopener noreferrer">Abrir enlace de Mercado Pago ↗</a></div><span class="payment-method-status">Link configurado</span></article>
+    <article class="payment-method-card"><div class="payment-method-icon">$</div><div><h3>Premium · $899 MXN/mes</h3><p>Enlace de pago del plan.</p><a href="https://mpago.la/2Byumjb" target="_blank" rel="noopener noreferrer">Abrir enlace de Mercado Pago ↗</a></div><span class="payment-method-status">Link configurado</span></article>
   </div>
+  <p class="creator-empty">Importante: el enlace no confirma automáticamente el pago. No apruebes un comprobante solo porque fue enviado; verifica referencia e importe en Mercado Pago.</p>
 </section>
 
 <section class="creator-card" id="alertas">
@@ -163,7 +149,7 @@
 </section>
 
 <section class="creator-grid-2 platform-ops-grid">
-  <article class="creator-card" id="pagos"><div class="creator-card-head"><div><span class="eyebrow">PAGOS</span><h2>Movimientos de plataforma</h2></div><button id="export-payments" class="btn btn-ghost" type="button">Exportar CSV</button></div><div id="platform-payments-list" class="platform-compact-list"><div class="creator-empty">Cargando pagos…</div></div></article>
+  <article class="creator-card" id="pagos"><div class="creator-card-head"><div><span class="eyebrow">PAGOS MANUALES · MERCADO PAGO</span><h2>Comprobantes y pagos por validar</h2><p>El cliente paga mediante el enlace del plan y envía su comprobante. Verifica el movimiento en Mercado Pago antes de aprobarlo.</p></div><button id="refresh-manual-payments" class="btn btn-ghost" type="button">Actualizar</button></div><div id="manual-payment-proofs" class="platform-compact-list"><div class="creator-empty">Cargando comprobantes…</div></div><div class="creator-card-head" style="margin-top:22px"><div><span class="eyebrow">HISTORIAL</span><h2>Pagos registrados</h2></div><button id="export-payments" class="btn btn-ghost" type="button">Exportar CSV</button></div><div id="platform-payments-list" class="platform-compact-list"><div class="creator-empty">Cargando pagos…</div></div></article>
   <article class="creator-card" id="incidencias"><div class="creator-card-head"><div><span class="eyebrow">INCIDENCIAS</span><h2>Salud operativa</h2></div></div><div id="platform-incidents-list" class="platform-compact-list"><div class="creator-empty">Cargando incidencias…</div></div></article>
 </section>
 
